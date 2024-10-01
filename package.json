@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "postinstall": "npm ci --prefix public",
+    "start": "firebase emulators:exec npm\\ run\\ --prefix\\ public\\ watch"
+  }
+}
