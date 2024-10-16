@@ -19,7 +19,7 @@ watch(container, (value) => {
 })
 </script>
 
-<style module>
+<style scoped>
 div {
   @apply h-full;
 }

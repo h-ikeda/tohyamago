@@ -15,7 +15,7 @@ body {
 }
 </style>
 
-<style module>
+<style scoped>
 main {
   @apply grow;
 }
