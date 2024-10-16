@@ -13,7 +13,7 @@
   "scripts": {
     "build": "parcel build index.html",
     "postbuild": "cp --recursive ./node_modules/@pdftron/pdfjs-express-viewer/public/* ./dist",
-    "prewatch": "cp --recursive ./node_modules/@pdftron/pdfjs-express-viewer/public/* ./dist",
+    "prewatch": "mkdir -p ./dist && cp --recursive ./node_modules/@pdftron/pdfjs-express-viewer/public/* ./dist",
     "watch": "parcel watch index.html"
   }
 }
