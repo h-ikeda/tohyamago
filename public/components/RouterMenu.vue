@@ -42,7 +42,7 @@ menu, button {
 }
 
 menu {
-  @apply bg-slate-600 flex flex-col rounded-md border border-slate-400 text-gray-100 font-light shadow-lg;
+  @apply bg-slate-600 flex flex-col rounded-md border border-slate-400 text-gray-100 shadow-lg;
 }
 
 menu > li:not(:last-child) {
@@ -78,7 +78,7 @@ menu.next-leave-to {
 }
 
 button {
-  @apply w-14 h-14 rounded-full border border-slate-300 shadow bg-slate-600 text-gray-200 font-light;
+  @apply w-14 h-14 rounded-full border border-slate-300 shadow bg-slate-600 text-gray-200;
 }
 
 button::after {

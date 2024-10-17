@@ -12,6 +12,13 @@ import RouterMenu from './components/RouterMenu.vue'
 
 <style>
 @tailwind base;
+
+@layer base {
+  :root {
+    @apply font-light;
+  }
+}
+
 @tailwind components;
 @tailwind utilities;
 
