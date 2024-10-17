@@ -16,6 +16,9 @@
       <li>
         <RouterLink to="/public_notices" class="link">公告</RouterLink>
       </li>
+      <li>
+        <RouterLink to="/notation" class="link">特定商取引法に基づく表記</RouterLink>
+      </li>
     </menu>
   </Transition>
 </template>
