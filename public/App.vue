@@ -22,7 +22,7 @@ body {
 
 <style scoped>
 main {
-  @apply grow;
+  @apply grow overflow-auto;
 }
 
 footer {
