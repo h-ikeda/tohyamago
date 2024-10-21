@@ -23,7 +23,7 @@ import RouterMenu from './components/RouterMenu.vue'
 @tailwind utilities;
 
 body {
-  @apply h-dvh flex flex-col bg-gray-100;
+  @apply h-dvh flex flex-col bg-gray-100 text-justify;
 }
 </style>
 
