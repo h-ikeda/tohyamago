@@ -5,3 +5,15 @@
   <p>地域の経済や文化を守り後世に豊かな社会を残すため、自律継続的に人口の維持と経済活動の発展が行われる仕組みを目指すことが私たちの活動の基本です。具体的には、地域経済の基盤となるべき農地や山林の維持保全、地域内にある価値の可視化や価値の創出による事業化、地域の魅力や課題の情報発信等です。これらの活動は、地域住民だけでなく都市部に住む人々が地域の課題を自らに係るものと捉えて主体的に取り組めることが望ましく、地域内外で相互に無理なく協力し合える環境を作っていきたいです。</p>
   <p>会員及び関係者においては、より豊かな社会の追求を通じて同時に個々人の幸福を実現されることを願います。</p>
 </template>
+
+<style scoped>
+h1 {
+  @apply mx-auto w-fit mb-4 mt-8 text-lg relative;
+  @apply before:border-x-[1rem] before:border-x-transparent before:border-b-[1.73rem] before:border-b-green-500 before:absolute before:-left-12 before:-top-1 before:scale-90;
+  @apply after:border-x-[1rem] after:border-x-transparent after:border-b-[1.75rem] after:border-b-green-700 after:absolute after:-left-10;
+}
+
+p {
+  @apply indent-4 mx-4 my-2;
+}
+</style>
