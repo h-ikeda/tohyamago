@@ -30,6 +30,7 @@ body {
 <style scoped>
 main {
   @apply grow overflow-auto;
+  @apply after:sticky after:bottom-0 after:bg-gradient-to-t after:from-gray-100 after:to-transparent after:w-full after:h-24 after:block;
 }
 
 footer {
