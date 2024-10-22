@@ -9,6 +9,9 @@ export default [{
 }, {
   path: '/articles',
   component: Articles,
+  meta: {
+    fullscreen: true,
+  },
 }, {
   path: '/purpose',
   component: Purpose,
