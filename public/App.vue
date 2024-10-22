@@ -38,7 +38,7 @@ main {
 }
 
 main.gradient {
-  @apply after:sticky after:bottom-0 after:bg-gradient-to-t after:from-gray-100 after:to-transparent after:via-gray-100 after:opacity-90 after:w-full after:h-20 after:block;
+  @apply after:sticky after:bottom-0 after:bg-gradient-to-t after:from-gray-100 after:to-transparent after:opacity-90 after:w-full after:h-20 after:block;
   @apply before:sticky before:top-0 before:bg-gradient-to-b before:from-lime-400 before:to-transparent before:w-full before:h-8 before:opacity-25 before:block;
 }
 
