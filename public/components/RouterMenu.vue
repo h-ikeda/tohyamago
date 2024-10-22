@@ -41,11 +41,11 @@ const done = () => { if (going.value) --going.value }
 
 <style scoped>
 menu, button {
-  @apply fixed bottom-2 left-4;
+  @apply fixed left-4;
 }
 
 menu {
-  @apply bg-slate-600 flex flex-col rounded-md border border-slate-400 text-gray-100 shadow-lg;
+  @apply bottom-4 bg-slate-600 flex flex-col rounded-md border border-slate-400 text-gray-100 shadow-lg;
 }
 
 menu > li:not(:last-child) {
@@ -81,7 +81,7 @@ menu.next-leave-to {
 }
 
 button {
-  @apply w-14 h-14 rounded-full border border-slate-300 shadow bg-slate-600 text-gray-200;
+  @apply bottom-2 w-14 h-14 rounded-full border border-slate-300 shadow bg-slate-600 text-gray-200;
 }
 
 button::after {
