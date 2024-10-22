@@ -10,10 +10,10 @@
 h1 {
   @apply mx-auto w-fit mb-4 mt-8 text-lg relative;
   @apply before:border-x-[1rem] before:border-x-transparent before:border-b-[1.73rem] before:border-b-green-500 before:absolute before:-left-12 before:-top-1 before:scale-90;
-  @apply after:border-x-[1rem] after:border-x-transparent after:border-b-[1.75rem] after:border-b-green-700 after:absolute after:-left-10;
+  @apply after:border-x-[1rem] after:border-x-transparent after:border-b-[1.73rem] after:border-b-green-700 after:absolute after:-left-10;
 }
 
 p {
-  @apply indent-4 mx-4 my-2;
+  @apply indent-4 mx-8 my-2;
 }
 </style>
