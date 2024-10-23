@@ -8,16 +8,24 @@
   <Transition :name="name" @after-leave="done">
     <menu v-show="!hidden" @click="next">
       <li>
-        <RouterLink to="/purpose" class="link">活動趣旨</RouterLink>
+        <RouterLink to="/purpose" class="link" activeClass="active">
+          活動趣旨
+        </RouterLink>
       </li>
       <li>
-        <RouterLink to="/articles" class="link">定款</RouterLink>
+        <RouterLink to="/articles" class="link" activeClass="active">
+          定款
+        </RouterLink>
       </li>
       <li>
-        <RouterLink to="/public_notices" class="link">公告</RouterLink>
+        <RouterLink to="/public_notices" class="link" activeClass="active">
+          公告
+        </RouterLink>
       </li>
       <li>
-        <RouterLink to="/notation" class="link">特定商取引法に基づく表記</RouterLink>
+        <RouterLink to="/notation" class="link" activeClass="active">
+          特定商取引法に基づく表記
+        </RouterLink>
       </li>
     </menu>
   </Transition>
@@ -53,7 +61,12 @@ menu > li:not(:last-child) {
 }
 
 .link {
-  @apply flex px-4 py-1.5;
+  @apply flex px-4 py-1.5 gap-2;
+  @apply before:border-l-4 before:border-transparent
+}
+
+.link.active {
+  @apply before:border-l-4 before:border-y-4 before:border-l-white before:h-0 before:self-center;
 }
 
 menu.v-enter-from, menu.v-leave-to {
