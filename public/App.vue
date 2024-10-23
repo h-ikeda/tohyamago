@@ -1,5 +1,5 @@
 <template>
-  <main :class="cls">
+  <main :class="cls" ref="main">
     <RouterView/>
   </main>
   <RouterMenu/>
@@ -9,10 +9,16 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import RouterMenu from './components/RouterMenu.vue'
-import { computed } from 'vue';
+import { computed, Ref, ref, watch } from 'vue';
 
 const route = useRoute()
 const cls = computed(() => ({ gradient: !route.meta.fullscreen }))
+const main = ref(null) as Ref<HTMLElement | null>
+
+watch(() => route.path, () => {
+  if (route.meta.fullscreen) return
+  main.value?.scrollTo({ top: 0 })
+})
 </script>
 
 <style>
