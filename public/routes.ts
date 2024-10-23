@@ -1,21 +1,16 @@
-import PublicNotices from './views/PublicNotices.vue'
-import Articles from './views/Articles.vue'
-import Purpose from './views/Purpose.vue'
-import Notation from './views/Notation.vue'
-
 export default [{
   path: '/public_notices',
-  component: PublicNotices,
+  component: () => import('./views/PublicNotices.vue'),
 }, {
   path: '/articles',
-  component: Articles,
+  component: () => import('./views/Articles.vue'),
   meta: {
     fullscreen: true,
   },
 }, {
   path: '/purpose',
-  component: Purpose,
+  component: () => import('./views/Purpose.vue'),
 }, {
   path: '/notation',
-  component: Notation,
+  component: () => import('./views/Notation.vue'),
 }]
