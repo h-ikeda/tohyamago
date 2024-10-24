@@ -1,4 +1,9 @@
+import Home from './views/Home.vue';
+
 export default [{
+  path: '/',
+  component: Home,
+}, {
   path: '/public_notices',
   component: () => import('./views/PublicNotices.vue'),
 }, {

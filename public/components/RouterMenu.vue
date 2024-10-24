@@ -49,7 +49,7 @@ const done = () => { if (going.value) --going.value }
 
 <style scoped>
 menu, button {
-  @apply fixed left-4;
+  @apply fixed left-4 z-10;
 }
 
 menu {

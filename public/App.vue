@@ -3,7 +3,11 @@
     <RouterView/>
   </main>
   <RouterMenu/>
-  <footer>一般社団法人遠山郷応援会</footer>
+  <footer>
+    <RouterLink to="/" class="link">
+      一般社団法人遠山郷応援会
+    </RouterLink>
+  </footer>
 </template>
 
 <script setup lang="ts">
@@ -49,8 +53,12 @@ main.gradient {
 }
 
 footer {
-  @apply text-center text-sm py-1 border-t border-lime-300 bg-lime-100 text-gray-700 font-light relative -z-10;
+  @apply text-sm py-1 border-t border-lime-300 bg-lime-100 text-gray-700 relative;
   @apply before:border-x-[0.58rem] before:border-b-[1rem] before:border-x-transparent before:border-b-green-500 before:absolute before:right-3.5 before:bottom-2;
   @apply after:border-x-[0.58rem] after:border-b-[1rem] after:border-x-transparent after:border-b-green-700 after:absolute after:right-2 after:bottom-1 after:scale-110 after:origin-bottom-right;
+}
+
+footer > .link {
+  @apply mx-auto w-fit block;
 }
 </style>
