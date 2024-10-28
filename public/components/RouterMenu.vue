@@ -13,6 +13,11 @@
         </RouterLink>
       </li>
       <li>
+        <RouterLink to="/membership" class="link" activeClass="active">
+          入会案内
+        </RouterLink>
+      </li>
+      <li>
         <RouterLink to="/articles" class="link" activeClass="active">
           定款
         </RouterLink>

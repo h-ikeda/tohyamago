@@ -18,4 +18,7 @@ export default [{
 }, {
   path: '/notation',
   component: () => import('./views/Notation.vue'),
+}, {
+  path: '/membership',
+  component: () => import('./views/Membership.vue'),
 }]
