@@ -6,7 +6,7 @@
     "buffer": "^6.0.3",
     "parcel": "^2.13.0",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.14",
+    "tailwindcss": "^3.4.15",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
   },
