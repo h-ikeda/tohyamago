@@ -28,6 +28,11 @@
         </RouterLink>
       </li>
       <li>
+        <RouterLink to="/privacy" class="link" activeClass="active">
+          個人情報保護方針
+        </RouterLink>
+      </li>
+      <li>
         <RouterLink to="/notation" class="link" activeClass="active">
           特定商取引法に基づく表記
         </RouterLink>

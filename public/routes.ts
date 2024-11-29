@@ -41,4 +41,10 @@ export default [{
   meta: {
     title: '入会案内',
   },
+}, {
+  path: '/privacy',
+  component: () => import('./views/Privacy.vue'),
+  meta: {
+    title: '個人情報保護方針',
+  },
 }]
