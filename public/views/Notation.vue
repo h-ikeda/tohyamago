@@ -14,7 +14,7 @@
     <dt>運営責任者</dt>
     <dd>代表理事　池田 大樹</dd>
     <dt>メールアドレス</dt>
-    <dd>recieve@tohyamago.org</dd>
+    <dd>receive@tohyamago.org</dd>
     <dt>電話番号</dt>
     <dd>050-5236-0637</dd>
     <dt>受付時間</dt>
