@@ -28,6 +28,11 @@
         </RouterLink>
       </li>
       <li>
+        <RouterLink to="//shop.tohyamago.org" class="link" activeClass="active">
+          成果品販売
+        </RouterLink>
+      </li>
+      <li>
         <RouterLink to="/notation" class="link" activeClass="active">
           特定商取引法に基づく表記
         </RouterLink>
