@@ -28,7 +28,7 @@
         </RouterLink>
       </li>
       <li>
-        <a to="https://shop.tohyamago.org" class="link">
+        <a href="https://shop.tohyamago.org" class="link">
           成果品販売
         </a>
       </li>
