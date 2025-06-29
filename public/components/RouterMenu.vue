@@ -28,9 +28,9 @@
         </RouterLink>
       </li>
       <li>
-        <RouterLink to="//shop.tohyamago.org" class="link" activeClass="active">
+        <a to="https://shop.tohyamago.org" class="link">
           成果品販売
-        </RouterLink>
+        </a>
       </li>
       <li>
         <RouterLink to="/notation" class="link" activeClass="active">
