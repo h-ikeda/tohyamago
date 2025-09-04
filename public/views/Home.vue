@@ -1,7 +1,7 @@
 <template>
   <h1>一般社団法人遠山郷応援会</h1>
   <section>
-    <img :src="farmImage">
+    <img :src="farmImage.toString()">
     <caption>
       秘境の遊休農地を保全活用するボランティアによる耕作活動
     </caption>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import farmImage from '../assets/farm.jpg'
+const farmImage = new URL('../assets/farm.jpg', import.meta.url)
 </script>
 
 <style scoped>
