@@ -1,10 +1,10 @@
 {
   "devDependencies": {
-    "@parcel/transformer-vue": "^2.13.3",
+    "@parcel/transformer-vue": "^2.15.4",
     "@pdftron/pdfjs-express-viewer": "^8.7.5",
     "autoprefixer": "^10.4.21",
     "buffer": "^6.0.3",
-    "parcel": "^2.13.3",
+    "parcel": "^2.15.4",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "vue": "^3.5.21",
