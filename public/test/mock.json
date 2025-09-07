@@ -1,0 +1,35 @@
+[
+	{
+		"attachments": {
+			"data": [
+				{
+					"media": {
+						"image": {
+							"height": 720,
+							"src": "https://example.com/link-to-image",
+							"width": 960
+						}
+					},
+					"subattachments": {
+						"data": [
+							{
+								"description": "3月末。まずは茶畑で春の整枝をします。",
+								"media": {
+									"image": {
+										"height": 720,
+										"src": "https://example.com/link-to-image",
+										"width": 960
+									}
+								}
+							}
+						]
+					}
+				}
+			]
+		},
+		"created_time": "2025-05-28T05:18:39+0000",
+		"message": "しばらく投稿をサボっていましたが、今年も例年通り活動しています。\n\n先日茶摘みを済ませ、まもなく新茶の販売も開始する予定です。\n今年の活動の様子を写真と共にお知らせします。\n\nなお、「下栗応援サークル」は「一般社団法人遠山郷応援会」（2024年10月1日設立）と形を変えました。\n今後ともよろしくお願いします。",
+		"permalink_url": "https://www.facebook.com/123456789012345/posts/123456789012345",
+		"id": "123456789012345_123456789012345"
+	}
+]

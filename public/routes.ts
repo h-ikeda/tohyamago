@@ -10,6 +10,7 @@ export function setTitle(to, from) {
 export default [{
   path: '/',
   component: Home,
+  props: route => ({ hash: route.hash })
 }, {
   path: '/public_notices',
   component: () => import('./views/PublicNotices.vue'),
