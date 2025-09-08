@@ -1,70 +1,70 @@
 <template>
-  <h1>特定商取引法に基づく表記</h1>
-  <p>
+  <h1 class="w-fit mx-auto my-4 text-lg">
+    特定商取引法に基づく表記
+  </h1>
+  <p class="indent-4 text-justify mx-8 mb-4">
     当会では、Webサイト上のオンライン決済による会費・寄付金の受入れ及び商品の販売を行っております。
   </p>
-  <dl>
-    <dt>事業者名称</dt>
+  <dl class="mx-8">
+    <dt class="text-sm font-medium mt-3">
+      事業者名称
+    </dt>
     <dd>一般社団法人遠山郷応援会</dd>
-    <dt>所在地</dt>
+    <dt class="text-sm font-medium mt-3">
+      所在地
+    </dt>
     <dd>
       〒399-1311<br>
       長野県飯田市南信濃和田1239番地
     </dd>
-    <dt>運営責任者</dt>
+    <dt class="text-sm font-medium mt-3">
+      運営責任者
+    </dt>
     <dd>代表理事　池田 大樹</dd>
-    <dt>メールアドレス</dt>
+    <dt class="text-sm font-medium mt-3">
+      メールアドレス
+    </dt>
     <dd>receive@tohyamago.org</dd>
-    <dt>電話番号</dt>
+    <dt class="text-sm font-medium mt-3">
+      電話番号
+    </dt>
     <dd>050-5236-0637</dd>
-    <dt>受付時間</dt>
+    <dt class="text-sm font-medium mt-3">
+      受付時間
+    </dt>
     <dd>10:00〜15:00 (不定休)</dd>
-    <dt>決済方法</dt>
+    <dt class="text-sm font-medium mt-3">
+      決済方法
+    </dt>
     <dd>クレジットカードでのお支払い</dd>
     <dd>銀行振込によるお支払い</dd>
     <dd>コンビニエンスストアでのお支払い</dd>
-    <dt>支払い金額</dt>
+    <dt class="text-sm font-medium mt-3">
+      支払い金額
+    </dt>
     <dd>
-      <p>
+      <p class="indent-4 text-justify">
         支払い総額は、決済画面による案内の通りとなります。支払い総額には、会費・寄付金額・商品代金のほか、決済方法に応じた手数料、配送料、消費税が含まれる場合があります。
       </p>
     </dd>
-    <dt>返金方針</dt>
+    <dt class="text-sm font-medium mt-3">
+      返金方針
+    </dt>
     <dd>
-      <p>
+      <p class="indent-4 text-justify">
         一度支払われた会費・寄付金は、返還致しません。商品代金については、引き渡した商品に欠陥がある場合にのみ、当該商品と引き換えに返金を認める場合があります。
       </p>
     </dd>
-    <dt>支払いの効力</dt>
+    <dt class="text-sm font-medium mt-3">
+      支払いの効力
+    </dt>
     <dd>
-      <p>
+      <p class="indent-4 text-justify">
         会費・寄付金は、決済の完了と同時に受取りが完了したものとみなします。ただし当会の判断または法律により受取ることが不適切な支払いについては、決済時に遡って受取りを拒否する場合があります。
       </p>
-      <p>
+      <p class="indent-4 text-justify">
         配送商品は決済完了後に発送しますが、在庫を確保できない場合にはお支払いを取消しとさせていただくことがあります。
       </p>
     </dd>
   </dl>
 </template>
-
-<style scoped>
-h1 {
-  @apply w-fit mx-auto my-4 text-lg;
-}
-
-p {
-  @apply indent-4 text-justify;
-}
-
-h1 + p {
-  @apply mx-8 mb-4;
-}
-
-dl {
-  @apply mx-8;
-}
-
-dt {
-  @apply text-sm font-medium mt-3;
-}
-</style>

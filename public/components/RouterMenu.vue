@@ -1,40 +1,56 @@
 <template>
-  <nav v-show="!hidden" @click="cancel" />
+  <nav v-show="!hidden" @click="cancel" class="fixed inset-0" />
   <Transition :name="name" @after-enter="done">
-    <button v-show="hidden" @click="menu">
+    <button
+      v-show="hidden"
+      @click="menu"
+      class="fixed left-4 z-10 bottom-2 w-14 h-14 rounded-full border border-slate-300 shadow bg-slate-600 text-gray-200 cursor-pointer
+             after:content-['▲'] after:absolute after:bottom-14 after:inset-x-0 after:text-sm after:text-slate-500 after:animate-bounce
+             [&.v-leave-from]:scale-y-100 [&.v-leave-from]:translate-y-0
+             [&.v-enter-to]:scale-y-100 [&.v-enter-to]:translate-y-0
+             [&.v-leave-active]:transition-transform [&.v-leave-active]:origin-top
+             [&.v-enter-active]:transition-transform [&.v-enter-active]:origin-top
+             [&.v-leave-to]:scale-y-0 [&.v-leave-to]:-translate-y-full
+             [&.v-enter-from]:scale-y-0 [&.v-enter-from]:-translate-y-full
+             [&.next-enter-from]:scale-y-0 [&.next-enter-from]:translate-y-full
+             [&.next-enter-active]:transition-transform [&.next-enter-active]:origin-bottom
+             [&.next-enter-to]:scale-y-100 [&.next-enter-to]:translate-y-0"
+    >
       目次
     </button>
   </Transition>
   <Transition :name="name" @after-leave="done">
-    <menu v-show="!hidden" @click="next">
-      <li>
-        <RouterLink to="/purpose" class="link" activeClass="active">
-          活動趣旨
-        </RouterLink>
-      </li>
-      <li>
-        <RouterLink to="/membership" class="link" activeClass="active">
-          入会案内
-        </RouterLink>
-      </li>
-      <li>
-        <RouterLink to="/articles" class="link" activeClass="active">
-          定款
-        </RouterLink>
-      </li>
-      <li>
-        <RouterLink to="/public_notices" class="link" activeClass="active">
-          公告
-        </RouterLink>
-      </li>
-      <li>
-        <a href="https://shop.tohyamago.org" class="link">
-          成果品販売
+    <menu
+      v-show="!hidden"
+      @click="next"
+      class="fixed left-4 z-10 bottom-4 bg-slate-600 flex flex-col rounded-md border border-slate-400 text-gray-100 shadow-lg
+             [&.v-enter-from]:scale-y-0 [&.v-enter-from]:translate-y-full
+             [&.v-leave-to]:scale-y-0 [&.v-leave-to]:translate-y-full
+             [&.v-enter-active]:transition-transform [&.v-leave-active]:transition-transform
+             [&.v-enter-active]:origin-bottom [&.v-leave-active]:origin-bottom
+             [&.v-enter-to]:scale-y-100 [&.v-leave-from]:scale-y-100
+             [&.v-enter-to]:translate-y-0 [&.v-leave-from]:translate-y-0
+             [&.next-leave-from]:translate-y-0 [&.next-leave-from]:scale-y-100
+             [&.next-leave-active]:transition-transform [&.next-leave-active]:origin-top
+             [&.next-leave-to]:-translate-y-full [&.next-leave-to]:scale-y-0"
+    >
+      <li v-for="link in links" class="border-b border-slate-500 last:border-none">
+        <a
+          v-if="link.path.startsWith('https://')"
+          :href="link.path"
+          class="flex px-4 py-1.5 gap-2
+                 before:border-l-4 before:border-transparent"
+        >
+          {{ link.title }}
         </a>
-      </li>
-      <li>
-        <RouterLink to="/notation" class="link" activeClass="active">
-          特定商取引法に基づく表記
+        <RouterLink
+          v-else
+          :to="link.path"
+          class="flex px-4 py-1.5 gap-2
+                 before:border-l-4 before:border-transparent"
+          activeClass="before:border-l-4 before:border-y-4 before:border-l-white before:h-0 before:self-center"
+        >
+          {{ link.title }}
         </RouterLink>
       </li>
     </menu>
@@ -55,89 +71,24 @@ const next = () => {
   hidden.value = true
 }
 const done = () => { if (going.value) --going.value }
+
+const links = [{
+  path: '/purpose',
+  title: '活動趣旨',
+}, {
+  path: '/membership',
+  title: '入会案内',
+}, {
+  path: '/articles',
+  title: '定款',
+}, {
+  path: '/public_notices',
+  title: '公告',
+}, {
+  path: 'https://shop.tohyamago.org',
+  title: '成果品販売',
+}, {
+  path: '/notation',
+  title: '特定商取引法に基づく表記',
+}]
 </script>
-
-<style scoped>
-menu, button {
-  @apply fixed left-4 z-10;
-}
-
-menu {
-  @apply bottom-4 bg-slate-600 flex flex-col rounded-md border border-slate-400 text-gray-100 shadow-lg;
-}
-
-menu > li:not(:last-child) {
-  @apply border-b border-slate-500;
-}
-
-.link {
-  @apply flex px-4 py-1.5 gap-2;
-  @apply before:border-l-4 before:border-transparent
-}
-
-.link.active {
-  @apply before:border-l-4 before:border-y-4 before:border-l-white before:h-0 before:self-center;
-}
-
-menu.v-enter-from, menu.v-leave-to {
-  @apply scale-y-0 translate-y-full;
-}
-
-menu.v-enter-active, menu.v-leave-active {
-  @apply transition-transform origin-bottom;
-}
-
-menu.v-enter-to, menu.v-leave-from {
-  @apply scale-y-100 translate-y-0;
-}
-
-menu.next-leave-from {
-  @apply translate-y-0 scale-y-100;
-}
-
-menu.next-leave-active {
-  @apply transition-transform origin-top;
-}
-
-menu.next-leave-to {
-  @apply -translate-y-full scale-y-0;
-}
-
-button {
-  @apply bottom-2 w-14 h-14 rounded-full border border-slate-300 shadow bg-slate-600 text-gray-200;
-}
-
-button::after {
-  content: "▲";
-  @apply absolute bottom-14 inset-x-0 text-sm text-slate-500 animate-bounce;
-}
-
-button.v-leave-from, button.v-enter-to {
-  @apply scale-y-100 translate-y-0;
-}
-
-button.v-leave-active, button.v-enter-active {
-  @apply transition-transform origin-top;
-}
-
-button.v-leave-to, button.v-enter-from {
-  @apply scale-y-0 -translate-y-full;
-}
-
-button.next-enter-from {
-  @apply scale-y-0 translate-y-full;
-}
-
-button.next-enter-active {
-  @apply transition-transform origin-bottom;
-}
-
-button.next-enter-to {
-  @apply scale-y-100 translate-y-0;
-}
-
-nav {
-  @apply fixed inset-0;
-}
-</style>
-

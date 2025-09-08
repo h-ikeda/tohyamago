@@ -1,5 +1,5 @@
 <template>
-  <div ref="container"/>
+  <div ref="container" class="h-full"/>
 </template>
 
 <script setup lang="ts">
@@ -18,9 +18,3 @@ watch(container, (value) => {
   }, value)
 })
 </script>
-
-<style scoped>
-div {
-  @apply h-full;
-}
-</style>
