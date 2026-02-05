@@ -3,7 +3,7 @@
     "@parcel/transformer-vue": "^2.16.4",
     "@pdftron/pdfjs-express-viewer": "^8.7.5",
     "@tailwindcss/postcss": "^4.1.18",
-    "autoprefixer": "^10.4.23",
+    "autoprefixer": "^10.4.24",
     "buffer": "^6.0.3",
     "parcel": "^2.16.4",
     "postcss": "^8.5.6",
