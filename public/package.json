@@ -6,7 +6,7 @@
     "autoprefixer": "^10.5.0",
     "buffer": "^6.0.3",
     "parcel": "^2.16.4",
-    "postcss": "^8.5.12",
+    "postcss": "^8.5.13",
     "tailwindcss": "^4.2.4",
     "vue": "^3.5.33",
     "vue-router": "^5.0.6"
