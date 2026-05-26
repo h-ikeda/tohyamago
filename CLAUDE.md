@@ -111,7 +111,7 @@ cd public && npm run build
 
 - [ ] `firebase.json` / `.firebaserc` を削除し、Cloudflare Pages 向け設定を追加
 - [ ] GitHub Actions ワークフロー（`firebase-hosting-*.yml`）を Cloudflare Pages デプロイに置き換え
-- [ ] SPAのフォールバック設定を Cloudflare Pages の `_redirects` または `_headers` ファイルで対応
+- [ ] SPAのフォールバック設定を Cloudflare Pages の `_redirects` ファイルで対応
 - [ ] セキュリティヘッダー（`X-Frame-Options` 等）を Cloudflare Pages の `_headers` ファイルへ移行
 - [ ] Parcel マクロの Facebook フェッチを Cloudflare Workers / Pages Functions に移行することも検討
 - [ ] Apple Pay `.well-known` ファイルの配信設定確認
