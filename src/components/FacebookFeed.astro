@@ -1,0 +1,43 @@
+---
+import { fetchFacebookFeeds, type FacebookPost } from '~/lib/facebook'
+
+const feed = await fetchFacebookFeeds()
+const filteredFeed = feed
+  .filter((post): post is FacebookPost & { message: string } => Boolean(post.message))
+  .sort((a, b) => Date.parse(b.created_time) - Date.parse(a.created_time))
+
+const dateFormat = (dateString: string) => {
+  const date = new Date(dateString)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const weekDay = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()]
+  return `${year}年${month}月${day}日(${weekDay})`
+}
+---
+
+<section class="grid gap-4 mx-5">
+  {
+    filteredFeed.map((post) => (
+      <article class="bg-white border shadow-md rounded-xl px-6 pt-4 pb-4">
+        <time class="text-xs font-medium block mb-2">{dateFormat(post.created_time)}</time>
+        <p class="whitespace-pre-wrap tracking-tighter text-justify">{post.message}</p>
+        {post.attachments?.data.map(
+          (item) =>
+            item.media?.image && (
+              <img
+                src={item.media.image.src}
+                class="mt-4 border saturate-50 aspect-video object-cover"
+                alt=""
+              />
+            ),
+        )}
+        <nav class="w-fit ml-auto text-sm mt-3">
+          <a href={post.permalink_url} class="underline">
+            Facebookで詳しく見る→
+          </a>
+        </nav>
+      </article>
+    ))
+  }
+</section>

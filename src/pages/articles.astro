@@ -1,0 +1,16 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro'
+import PdfViewer from '~/components/PdfViewer.vue'
+import articlesPdfUrl from '~/assets/articles.pdf?url'
+
+const licenseKey = import.meta.env.PDFJS_EXPRESS_VIEWER
+---
+
+<BaseLayout title="定款" fullscreen>
+  <PdfViewer
+    client:only="vue"
+    src={articlesPdfUrl}
+    filename="一般社団法人遠山郷応援会定款"
+    licenseKey={licenseKey}
+  />
+</BaseLayout>

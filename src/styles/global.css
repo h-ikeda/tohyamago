@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+:root {
+  font-weight: var(--font-weight-light);
+}
+
+body {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-gray-100);
+  text-align: justify;
+  margin: 0;
+}
