@@ -25,7 +25,7 @@
       予定
     </a>
   </nav>
-  <section v-if="activeTab === 'events'">
+  <section v-show="activeTab === 'events'">
     <p class="mx-5 bg-white border px-6 py-4 rounded-xl tracking-tighter">
       今後の活動予定は、<a class="underline" href="https://activo.jp/s/a/119414"
         >ボランティア募集ページ</a
@@ -41,7 +41,9 @@
       </a>
     </p>
   </section>
-  <slot v-else name="feed" />
+  <div v-show="activeTab === 'feed'">
+    <slot name="feed" />
+  </div>
 </template>
 
 <script setup lang="ts">

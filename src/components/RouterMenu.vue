@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps<{
   currentPath?: string
@@ -60,13 +60,8 @@ const props = defineProps<{
 const hidden = ref(true)
 const going = ref(0)
 const name = computed(() => (going.value ? 'next' : 'v'))
-const browserPath = ref('')
 
-onMounted(() => {
-  browserPath.value = window.location.pathname
-})
-
-const currentPath = computed(() => browserPath.value || props.currentPath || '/')
+const currentPath = computed(() => props.currentPath || '/')
 
 const open = () => {
   hidden.value = false

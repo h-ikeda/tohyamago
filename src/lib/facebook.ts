@@ -58,8 +58,8 @@ const fields = [
 ]
 
 export async function fetchFacebookFeeds(): Promise<FacebookPost[]> {
-  const pageId = process.env.FACEBOOK_PAGE_ID
-  const accessToken = process.env.FACEBOOK_ACCESS_TOKEN
+  const pageId = import.meta.env.FACEBOOK_PAGE_ID
+  const accessToken = import.meta.env.FACEBOOK_ACCESS_TOKEN
 
   if (!pageId || !accessToken) {
     return mock as FacebookPost[]
