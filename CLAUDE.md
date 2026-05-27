@@ -2,75 +2,87 @@
 
 一般社団法人遠山郷応援会の公式ウェブサイト。
 
-## 移行方針
+## ホスティング
 
-**現状:** Firebase Hosting でホスティング中  
-**方針:** Cloudflare への移行とデザイン・機能の全面刷新
+Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) はビルド検証のみを行う CI として動作し、デプロイは行わない。
 
-移行にあたり、Firebase CLI・Firebase Hosting 依存の設定・ワークフローはすべて Cloudflare 向けに置き換える。
+### Cloudflare ダッシュボード側の設定
+
+- Build command: `npm run build`
+- Build output directory: `dist` (`wrangler.toml` の `pages_build_output_dir` でも指定済み)
+- Root directory: `/`
+- Node version: 22
+- 環境変数: `FACEBOOK_PAGE_ID`, `FACEBOOK_ACCESS_TOKEN`, `PDFJS_EXPRESS_VIEWER`
+
+### Facebook フィード更新時の再デプロイ
+
+旧構成では GitHub の `repository_dispatch: facebook_feeds` で再ビルドしていたが、Cloudflare 連携運用ではダッシュボードで発行した **Deploy Hook URL** を直接呼ぶ方式に切り替える (例: 外部スケジューラ等から POST する)。
 
 ## 技術スタック
 
 | 用途 | ライブラリ |
 |------|-----------|
-| フレームワーク | Vue 3 (Composition API / `<script setup>`) |
+| フレームワーク | Astro 5 (静的サイト生成) |
+| インタラクティブ部品 | Vue 3 (Astro Islands、`<script setup>`) |
 | 言語 | TypeScript |
-| スタイリング | Tailwind CSS v4 |
-| バンドラー | Parcel 2 |
-| ルーター | vue-router v5 |
-| PDF表示 | @pdftron/pdfjs-express-viewer |
+| スタイリング | Tailwind CSS v4 (`@tailwindcss/vite`) |
+| PDF表示 | @pdftron/pdfjs-express-viewer (クライアント側) |
 
 ## ディレクトリ構造
 
 ```
 tohyamago/
-├── public/               # フロントエンドソース
-│   ├── index.html        # エントリーHTML
-│   ├── index.ts          # Vueアプリ起動・ルーター初期化
-│   ├── App.vue           # ルートコンポーネント（レイアウト）
-│   ├── routes.ts         # ルート定義・タイトル設定
-│   ├── macros.ts         # Parcelマクロ（Facebook APIフェッチ）
+├── astro.config.mjs            # Astro 設定 (Vue + Tailwind v4)
+├── tsconfig.json
+├── package.json
+├── src/
+│   ├── pages/                  # ファイルベースルーティング
+│   │   ├── index.astro         # トップ (近況/予定タブ)
+│   │   ├── purpose.astro       # 活動趣旨
+│   │   ├── membership.astro    # 入会案内
+│   │   ├── articles.astro      # 定款 (PDF, fullscreen)
+│   │   ├── public_notices.astro# 公告
+│   │   └── notation.astro      # 特定商取引法に基づく表記
+│   ├── layouts/
+│   │   └── BaseLayout.astro    # 共通レイアウト + フッター + RouterMenu
 │   ├── components/
-│   │   ├── RouterMenu.vue    # フローティングナビゲーションメニュー
-│   │   └── FacebookFeed.vue  # Facebookフィード表示
-│   ├── views/
-│   │   ├── Home.vue          # トップページ（近況・予定タブ）
-│   │   ├── Purpose.vue       # 活動趣旨
-│   │   ├── Membership.vue    # 入会案内
-│   │   ├── Articles.vue      # 定款（PDF表示）
-│   │   ├── PublicNotices.vue # 公告
-│   │   └── Notation.vue      # 特定商取引法に基づく表記
-│   ├── assets/
-│   │   ├── farm.jpg          # トップ画像
-│   │   ├── mounts.jpg        # 山の画像
-│   │   └── articles.pdf      # 定款PDF
-│   ├── statics/
-│   │   └── .well-known/      # Apple Pay ドメイン検証ファイル
-│   ├── test/mock.json        # Facebook APIモックデータ（開発用）
-│   └── .postcssrc            # PostCSS設定
-├── .github/workflows/        # CI/CDワークフロー（Firebase → Cloudflare移行対象）
-├── firebase.json             # Firebase設定（移行後は不要）
-├── .firebaserc               # Firebaseプロジェクト設定（移行後は不要）
-└── package.json              # ルートスクリプト（`postinstall`・`start`）
+│   │   ├── RouterMenu.vue      # フローティングメニュー (client:load)
+│   │   ├── HomeTabs.vue        # 近況/予定タブ (client:load, hash 同期)
+│   │   ├── FacebookFeed.astro  # ビルド時に Facebook API から取得
+│   │   └── PdfViewer.vue       # PDF.js Express ラッパー (client:only)
+│   ├── lib/
+│   │   ├── facebook.ts         # Facebook Graph API フェッチ
+│   │   └── facebook-mock.json  # 開発時のモック
+│   ├── assets/                 # Astro が処理する画像・PDF
+│   │   ├── farm.jpg
+│   │   ├── mounts.jpg
+│   │   └── articles.pdf
+│   └── styles/global.css       # Tailwind の import と body スタイル
+├── public/
+│   ├── _headers                # Cloudflare Pages のヘッダー設定
+│   └── .well-known/
+│       └── apple-developer-merchantid-domain-association
+├── wrangler.toml               # Cloudflare Pages 設定 (出力ディレクトリ)
+└── .github/workflows/ci.yml    # ビルド検証 CI (デプロイは Cloudflare 側)
 ```
 
 ## ページ一覧
 
 | パス | コンポーネント | 説明 |
 |------|---------------|------|
-| `/` | `Home.vue` | トップページ。「近況」(Facebook フィード) と「予定」タブを切り替え |
-| `/purpose` | `Purpose.vue` | 活動趣旨（テキスト） |
-| `/membership` | `Membership.vue` | 入会案内（会員権限・年会費・入会手続き） |
-| `/articles` | `Articles.vue` | 定款（PDF ビューワー、`fullscreen: true`） |
-| `/public_notices` | `PublicNotices.vue` | 公告 |
-| `/notation` | `Notation.vue` | 特定商取引法に基づく表記 |
+| `/` | `index.astro` | トップページ。「近況」(Facebook フィード) と「予定」タブを `#feed` / `#events` で切替 |
+| `/purpose` | `purpose.astro` | 活動趣旨 |
+| `/membership` | `membership.astro` | 入会案内 |
+| `/articles` | `articles.astro` | 定款 (PDF ビューワー、fullscreen) |
+| `/public_notices` | `public_notices.astro` | 公告 |
+| `/notation` | `notation.astro` | 特定商取引法に基づく表記 |
 
 ## 外部連携
 
 ### Facebook Graph API
-- `macros.ts` で Parcel マクロとして実装（ビルド時に API フェッチ）
-- 本番: `FACEBOOK_PAGE_ID` と `FACEBOOK_ACCESS_TOKEN` 環境変数を使用
-- 開発時: `NODE_ENV !== 'production'` のとき `test/mock.json` を返す
+- `src/lib/facebook.ts` がビルド時に API を呼ぶ
+- `FACEBOOK_PAGE_ID` と `FACEBOOK_ACCESS_TOKEN` が未設定なら `facebook-mock.json` を返す
+- 静的に HTML へ埋め込まれるため、フィード更新は再ビルドで反映 (Cloudflare Pages の Deploy Hook URL を叩く)
 
 ### 外部リンク
 - ボランティア募集: `https://activo.jp/s/a/119414`
@@ -84,34 +96,26 @@ tohyamago/
 | `FACEBOOK_ACCESS_TOKEN` | Facebook アクセストークン |
 | `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー |
 
+GitHub Actions の CI でも参照するため、上記は Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。
+
 ## 開発コマンド
 
 ```bash
-# 依存関係インストール（ルートで実行するとpublic/も自動インストール）
-npm ci
-
-# 開発サーバー起動（Firebase エミュレーター経由）
-# ※ Cloudflare 移行後はこのコマンドを置き換える
-npm start
-
-# ビルド（public/ ディレクトリ内で実行）
-cd public && npm run build
+npm ci          # 依存インストール
+npm run dev     # 開発サーバー (http://localhost:4321)
+npm run build   # 静的ビルド (dist/)
+npm run preview # ビルド成果物のローカル確認
 ```
 
-## デザイン規則（現行）
+## ビルド時の補助処理
 
-- カラーテーマ: green / lime（山・自然を想起）
-- 三角形（▲）の装飾モチーフをロゴ・見出し・フッターに使用
+PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/public/` 配下に静的アセット (Web Worker 等) を持つ。`npm run build` の `postbuild` フックでこれらを `dist/` へコピーしているため、ローカル / GitHub Actions / Cloudflare Pages のいずれの環境でも自動で配置される。
+
+## デザイン規則
+
+- カラーテーマ: green / lime (山・自然を想起)
+- 三角形 (▲) の装飾モチーフをロゴ・見出し・フッターに使用
   - Tailwind の `before:` / `after:` 疑似要素で border-trick を利用して描画
-- フォントウェイト: light（`:root` に `font-weight: var(--font-weight-light)` を設定）
+- フォントウェイト: light (`:root` に `font-weight: var(--font-weight-light)` を設定)
 - レスポンシブ: モバイルファーストで設計
 - ナビゲーション: 左下フローティングボタン「目次」を押してメニューを展開
-
-## Cloudflare 移行時の主な作業
-
-- [ ] `firebase.json` / `.firebaserc` を削除し、Cloudflare Pages 向け設定を追加
-- [ ] GitHub Actions ワークフロー（`firebase-hosting-*.yml`）を Cloudflare Pages デプロイに置き換え
-- [ ] SPAのフォールバック設定を Cloudflare Pages の `_redirects` ファイルで対応
-- [ ] セキュリティヘッダー（`X-Frame-Options` 等）を Cloudflare Pages の `_headers` ファイルへ移行
-- [ ] Parcel マクロの Facebook フェッチを Cloudflare Workers / Pages Functions に移行することも検討
-- [ ] Apple Pay `.well-known` ファイルの配信設定確認
