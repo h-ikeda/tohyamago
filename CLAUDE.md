@@ -4,7 +4,19 @@
 
 ## ホスティング
 
-Cloudflare Pages にデプロイする静的サイト。GitHub Actions の `cloudflare-pages.yml` ワークフローが `main` ブランチへの push、Pull Request、`facebook_feeds` repository_dispatch で発火し、`wrangler pages deploy` で `dist/` を公開する。
+Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) はビルド検証のみを行う CI として動作し、デプロイは行わない。
+
+### Cloudflare ダッシュボード側の設定
+
+- Build command: `npm run build`
+- Build output directory: `dist` (`wrangler.toml` の `pages_build_output_dir` でも指定済み)
+- Root directory: `/`
+- Node version: 22
+- 環境変数: `FACEBOOK_PAGE_ID`, `FACEBOOK_ACCESS_TOKEN`, `PDFJS_EXPRESS_VIEWER`
+
+### Facebook フィード更新時の再デプロイ
+
+旧構成では GitHub の `repository_dispatch: facebook_feeds` で再ビルドしていたが、Cloudflare 連携運用ではダッシュボードで発行した **Deploy Hook URL** を直接呼ぶ方式に切り替える (例: 外部スケジューラ等から POST する)。
 
 ## 技術スタック
 
@@ -50,7 +62,8 @@ tohyamago/
 │   ├── _headers                # Cloudflare Pages のヘッダー設定
 │   └── .well-known/
 │       └── apple-developer-merchantid-domain-association
-└── .github/workflows/cloudflare-pages.yml
+├── wrangler.toml               # Cloudflare Pages 設定 (出力ディレクトリ)
+└── .github/workflows/ci.yml    # ビルド検証 CI (デプロイは Cloudflare 側)
 ```
 
 ## ページ一覧
@@ -69,7 +82,7 @@ tohyamago/
 ### Facebook Graph API
 - `src/lib/facebook.ts` がビルド時に API を呼ぶ
 - `FACEBOOK_PAGE_ID` と `FACEBOOK_ACCESS_TOKEN` が未設定なら `facebook-mock.json` を返す
-- 静的に HTML へ埋め込まれるため、フィード更新は再ビルドで反映 (GitHub Actions の `repository_dispatch: facebook_feeds` で起動)
+- 静的に HTML へ埋め込まれるため、フィード更新は再ビルドで反映 (Cloudflare Pages の Deploy Hook URL を叩く)
 
 ### 外部リンク
 - ボランティア募集: `https://activo.jp/s/a/119414`
@@ -82,8 +95,8 @@ tohyamago/
 | `FACEBOOK_PAGE_ID` | Facebook ページ ID |
 | `FACEBOOK_ACCESS_TOKEN` | Facebook アクセストークン |
 | `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare Pages デプロイ用 (GitHub Secrets) |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare アカウント ID (GitHub Secrets) |
+
+GitHub Actions の CI でも参照するため、上記は Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。
 
 ## 開発コマンド
 
@@ -96,7 +109,7 @@ npm run preview # ビルド成果物のローカル確認
 
 ## ビルド時の補助処理
 
-PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/public/` 配下に静的アセット (Web Worker 等) を持つ。GitHub Actions のワークフローでは `astro build` の後にこれらを `dist/` へコピーしている。ローカルで `npm run preview` する場合も同様のコピーが必要。
+PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/public/` 配下に静的アセット (Web Worker 等) を持つ。`npm run build` の `postbuild` フックでこれらを `dist/` へコピーしているため、ローカル / GitHub Actions / Cloudflare Pages のいずれの環境でも自動で配置される。
 
 ## デザイン規則
 

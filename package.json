@@ -7,6 +7,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "postbuild": "cp -R ./node_modules/@pdftron/pdfjs-express-viewer/public/. ./dist/",
     "preview": "astro preview",
     "astro": "astro"
   },
