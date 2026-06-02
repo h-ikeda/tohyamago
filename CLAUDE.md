@@ -12,11 +12,7 @@ Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudf
 - Build output directory: `dist` (`wrangler.toml` の `pages_build_output_dir` でも指定済み)
 - Root directory: `/`
 - Node version: 22
-- 環境変数: `FACEBOOK_PAGE_ID`, `FACEBOOK_ACCESS_TOKEN`, `PDFJS_EXPRESS_VIEWER`
-
-### Facebook フィード更新時の再デプロイ
-
-旧構成では GitHub の `repository_dispatch: facebook_feeds` で再ビルドしていたが、Cloudflare 連携運用ではダッシュボードで発行した **Deploy Hook URL** を直接呼ぶ方式に切り替える (例: 外部スケジューラ等から POST する)。
+- 環境変数: `PDFJS_EXPRESS_VIEWER`
 
 ## 技術スタック
 
@@ -48,16 +44,18 @@ tohyamago/
 │   ├── components/
 │   │   ├── RouterMenu.vue      # フローティングメニュー (client:load)
 │   │   ├── HomeTabs.vue        # 近況/予定タブ (client:load, hash 同期)
-│   │   ├── FacebookFeed.astro  # ビルド時に Facebook API から取得
+│   │   ├── Posts.astro         # Content Collection から記事を描画
 │   │   └── PdfViewer.vue       # PDF.js Express ラッパー (client:only)
-│   ├── lib/
-│   │   ├── facebook.ts         # Facebook Graph API フェッチ
-│   │   └── facebook-mock.json  # 開発時のモック
+│   ├── content.config.ts       # Content Collection スキーマ
+│   ├── content/
+│   │   └── posts/              # 記事 (Markdown) と添付画像
 │   ├── assets/                 # Astro が処理する画像・PDF
 │   │   ├── farm.jpg
 │   │   ├── mounts.jpg
 │   │   └── articles.pdf
 │   └── styles/global.css       # Tailwind の import と body スタイル
+├── scripts/
+│   └── import-facebook-export.mjs  # Facebook エクスポート → Markdown 変換
 ├── public/
 │   ├── _headers                # Cloudflare Pages のヘッダー設定
 │   └── .well-known/
@@ -70,19 +68,20 @@ tohyamago/
 
 | パス | コンポーネント | 説明 |
 |------|---------------|------|
-| `/` | `index.astro` | トップページ。「近況」(Facebook フィード) と「予定」タブを `#feed` / `#events` で切替 |
+| `/` | `index.astro` | トップページ。「近況」(リポジトリ内の記事一覧) と「予定」タブを `#feed` / `#events` で切替 |
 | `/purpose` | `purpose.astro` | 活動趣旨 |
 | `/membership` | `membership.astro` | 入会案内 |
 | `/articles` | `articles.astro` | 定款 (PDF ビューワー、fullscreen) |
 | `/public_notices` | `public_notices.astro` | 公告 |
 | `/notation` | `notation.astro` | 特定商取引法に基づく表記 |
 
-## 外部連携
+## 記事 (Content Collection)
 
-### Facebook Graph API
-- `src/lib/facebook.ts` がビルド時に API を呼ぶ
-- `FACEBOOK_PAGE_ID` と `FACEBOOK_ACCESS_TOKEN` が未設定なら `facebook-mock.json` を返す
-- 静的に HTML へ埋め込まれるため、フィード更新は再ビルドで反映 (Cloudflare Pages の Deploy Hook URL を叩く)
+- `src/content/posts/` に `<slug>.md` (Markdown 本文) を配置
+- 添付画像は `src/content/posts/<slug>/<filename>` に置き、frontmatter の `images` で参照
+- スキーマは `src/content.config.ts` で定義 (`date` / `images` / `sourceUrl`)
+- Markdown は `remark-breaks` で単一改行も `<br>` 化されるため、Facebook 風の改行スタイルがそのまま再現される
+- Facebook のページエクスポート (JSON) からの一括取り込みは `scripts/import-facebook-export.mjs` を利用
 
 ### 外部リンク
 - ボランティア募集: `https://activo.jp/s/a/119414`
@@ -92,11 +91,9 @@ tohyamago/
 
 | 変数名 | 用途 |
 |--------|------|
-| `FACEBOOK_PAGE_ID` | Facebook ページ ID |
-| `FACEBOOK_ACCESS_TOKEN` | Facebook アクセストークン |
 | `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー |
 
-GitHub Actions の CI でも参照するため、上記は Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。
+GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。
 
 ## 開発コマンド
 
