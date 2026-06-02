@@ -47,7 +47,7 @@ function slugFor(date, seq) {
 }
 
 function escapeYaml(str) {
-  return `"${str.replace(/"/g, '\\"')}"`
+  return `"${str.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
 }
 
 /**
