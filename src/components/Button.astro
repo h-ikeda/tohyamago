@@ -13,10 +13,12 @@ const { href, variant = 'accent', class: className = '' } = Astro.props
 const external = href.startsWith('http')
 
 const base =
-  'inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+  'inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 const variants = {
-  accent: 'bg-accent text-white hover:opacity-90',
-  outline: 'border border-accent text-accent bg-surface hover:bg-accent hover:text-white',
+  // 白文字を載せる CTA は WCAG AA を満たす accent-strong を使用
+  accent: 'bg-accent-strong text-white hover:opacity-90',
+  outline:
+    'border border-accent-strong text-accent-strong bg-surface hover:bg-accent-strong hover:text-white',
 }
 ---
 

@@ -27,7 +27,7 @@ const rendered = await Promise.all(
   {
     rendered.map(({ post, Content }) => (
       <Card as="article" hover class="px-6 pt-4 pb-5">
-        <time class="mb-2 block font-mono text-xs font-medium text-accent">
+        <time class="mb-2 block font-mono text-xs font-medium text-accent-strong">
           {dateFormat(post.data.date)}
         </time>
         <div class="post-body text-justify leading-relaxed text-body">

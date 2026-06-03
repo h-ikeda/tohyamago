@@ -6,14 +6,18 @@
  *  ― 自然の空気感(余白) と 手仕事の温かさ(テラコッタ) を両立。
  */
 @theme {
-  /* 2.1 カラーパレット */
-  --color-base: #fdfaf3; /* ミストホワイト: サイト全体の背景 */
+  /* 2.1 カラーパレット ―「新緑＋陽だまり」: 緑×土の世界観を保ったまま彩度・明度を一段上げ、
+   *  活動の楽しさ・若々しさを陽光イエローの差し色で表現する。 */
+  --color-base: #fbfdf6; /* ほんのり緑がかった明るい白: サイト全体の背景 */
   --color-surface: #ffffff; /* カード・コンテンツエリア背景 */
-  --color-primary: #1b3022; /* ディープグリーン: 見出し・重要テキスト */
-  --color-primary-soft: #2f4b38; /* primary の少し明るい派生 (装飾用) */
-  --color-body: #374151; /* グレー: 一般本文 */
-  --color-accent: #a65f3b; /* テラコッタ: CTA・バッジ (白文字で AA) */
-  --color-accent-soft: #c98a68; /* accent の明るい派生 (装飾・ホバー用) */
+  --color-primary: #2f6b3f; /* 新緑グリーン: 見出し・重要テキスト */
+  --color-primary-soft: #3f8551; /* primary の明るい派生 (装飾・ホバー用) */
+  --color-body: #3a463a; /* やわらかいダークグリーン: 一般本文 */
+  --color-accent: #e8833a; /* オレンジ寄りテラコッタ: 装飾・アイコン・ボーダー */
+  --color-accent-strong: #b35e27; /* accent の濃い派生: 白文字 CTA 用 (WCAG AA ≒ 4.6:1) */
+  --color-accent-soft: #f7b27a; /* accent の淡い派生: カラーブロック・ホバー */
+  --color-sunlight: #f4c44d; /* 陽光イエロー: 差し色・アクセントライン */
+  --color-sunlight-soft: #fbe7a8; /* 陽光イエローの淡い派生: 帯・タグ */
 
   /* 2.2 タイポグラフィ */
   --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
