@@ -6,21 +6,21 @@
  *  ― 自然の空気感(余白) と 手仕事の温かさ(テラコッタ) を両立。
  */
 @theme {
-  /* 2.1 カラーパレット ―「新緑＋陽だまり」: 緑×土の世界観を保ったまま彩度・明度を一段上げ、
-   *  活動の楽しさ・若々しさを陽光イエローの差し色で表現する。 */
-  --color-base: #fbfdf6; /* ほんのり緑がかった明るい白: サイト全体の背景 */
+  /* 2.1 カラーパレット ―「里山ポップ」: 鮮やかな深緑〜ティールを軸に、
+   *  コーラル(朱)・空のティール・陽光イエローの多色使いで活動の楽しさを表現する。 */
+  --color-base: #fffdf7; /* あたたかいクリーム白: サイト全体の背景 */
   --color-surface: #ffffff; /* カード・コンテンツエリア背景 */
-  --color-primary: #3a8c50; /* 明るい新緑グリーン: 見出し・装飾・ボーダー (大きい文字用) */
-  --color-primary-deep: #348049; /* primary の濃い派生: 白文字 CTA/メニュー/小さい強調文字 (AA 用) */
-  --color-primary-soft: #4f9d63; /* primary の明るい派生 (装飾・ボーダー用) */
-  --color-body: #3a463a; /* やわらかいダークグリーン: 一般本文 */
-  --color-accent: #e8833a; /* オレンジ寄りテラコッタ: 装飾・アイコン・ボーダー */
-  --color-accent-strong: #b35e27; /* accent の濃い派生: 白文字 CTA 用 (WCAG AA ≒ 4.6:1) */
-  --color-accent-soft: #f7b27a; /* accent の淡い派生: カラーブロック・ホバー */
-  --color-sunlight: #f4c44d; /* 陽光イエロー: 差し色・アクセントライン */
-  --color-sunlight-soft: #fbe7a8; /* 陽光イエローの淡い派生: 帯・タグ */
-  --color-sky: #5bb4d6; /* 澄んだ空の青: ヒーロー・装飾 */
-  --color-sky-soft: #dceef8; /* 空の淡い派生: グラデーション帯 */
+  --color-primary: #1f7a5a; /* 鮮やかな深緑〜ティール: 見出し・重要テキスト */
+  --color-primary-deep: #1a6b4e; /* primary の濃い派生: 白文字 CTA/メニュー/小さい強調文字 (AA 用) */
+  --color-primary-soft: #38a380; /* primary の明るい派生 (装飾・ボーダー用) */
+  --color-body: #3e3a35; /* 温かみのある黒に近いダーク: 一般本文 */
+  --color-accent: #f06b4b; /* コーラル(朱): 装飾・アイコン・ボーダー */
+  --color-accent-strong: #cc4329; /* accent の濃い派生: 白文字 CTA 用 (WCAG AA ≒ 4.6:1) */
+  --color-accent-soft: #f7a892; /* accent の淡い派生: カラーブロック・ホバー */
+  --color-sunlight: #ffc24b; /* 陽光イエロー: 差し色・アクセントライン */
+  --color-sunlight-soft: #ffe6ac; /* 陽光イエローの淡い派生: 帯・タグ */
+  --color-sky: #4eb1c4; /* 空・水のティール: 装飾 */
+  --color-sky-soft: #d6eef1; /* 空の淡い派生: グラデーション帯 */
 
   /* 2.2 タイポグラフィ */
   --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
