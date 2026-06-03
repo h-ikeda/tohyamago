@@ -1,10 +1,10 @@
 import { defineConfig } from 'astro/config'
-import vue from '@astrojs/vue'
+import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
 import remarkBreaks from 'remark-breaks'
 
 export default defineConfig({
-  integrations: [vue()],
+  integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
   },
