@@ -4,7 +4,7 @@
       class="rounded-full px-8 py-1.5 tracking-widest transition-colors"
       :class="
         activeTab !== 'events'
-          ? 'bg-primary text-base shadow-sm'
+          ? 'bg-primary-deep text-base shadow-sm'
           : 'text-primary/60 hover:text-primary'
       "
       href="#feed"
@@ -16,7 +16,7 @@
       class="rounded-full px-8 py-1.5 tracking-widest transition-colors"
       :class="
         activeTab === 'events'
-          ? 'bg-primary text-base shadow-sm'
+          ? 'bg-primary-deep text-base shadow-sm'
           : 'text-primary/60 hover:text-primary'
       "
       href="#events"

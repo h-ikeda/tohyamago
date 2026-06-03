@@ -4,7 +4,7 @@
     <button
       v-show="hidden"
       @click="open"
-      class="fixed left-4 z-10 bottom-2 w-14 h-14 rounded-full border border-primary-soft shadow-lg bg-primary text-base cursor-pointer
+      class="fixed left-4 z-10 bottom-2 w-14 h-14 rounded-full border border-primary-soft shadow-lg bg-primary-deep text-base cursor-pointer
              after:content-['▲'] after:absolute after:bottom-14 after:inset-x-0 after:text-sm after:text-accent after:animate-bounce
              [&.v-leave-from]:scale-y-100 [&.v-leave-from]:translate-y-0
              [&.v-enter-to]:scale-y-100 [&.v-enter-to]:translate-y-0
@@ -23,7 +23,7 @@
     <menu
       v-show="!hidden"
       @click="next"
-      class="fixed left-4 z-10 bottom-4 bg-primary flex flex-col rounded-xl border border-primary-soft text-base shadow-xl
+      class="fixed left-4 z-10 bottom-4 bg-primary-deep flex flex-col rounded-xl border border-primary-soft text-base shadow-xl
              [&.v-enter-from]:scale-y-0 [&.v-enter-from]:translate-y-full
              [&.v-leave-to]:scale-y-0 [&.v-leave-to]:translate-y-full
              [&.v-enter-active]:transition-transform [&.v-leave-active]:transition-transform
