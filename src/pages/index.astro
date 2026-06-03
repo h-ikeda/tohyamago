@@ -1,0 +1,23 @@
+---
+import { Image } from 'astro:assets'
+import BaseLayout from '~/layouts/BaseLayout.astro'
+import HomeTabs from '~/components/HomeTabs.vue'
+import Posts from '~/components/Posts.astro'
+import farmImage from '~/assets/farm.jpg'
+---
+
+<BaseLayout>
+  <h1
+    class="w-fit mx-auto text-xl my-8 relative
+           before:border-x-[1rem] before:border-x-transparent before:border-b-[1.73rem] before:border-b-green-500 before:relative before:-left-3.5 before:-top-7 before:scale-110
+           after:border-x-[1rem] after:border-x-transparent after:border-b-[1.73rem] after:border-b-green-700 after:absolute after:-left-1 after:top-0 after:scale-[1.35]"
+  >
+    一般社団法人遠山郷応援会
+  </h1>
+  <section class="w-fit mx-auto my-6">
+    <Image src={farmImage} alt="" class="aspect-video object-cover" />
+  </section>
+  <HomeTabs client:load>
+    <Posts slot="feed" />
+  </HomeTabs>
+</BaseLayout>
