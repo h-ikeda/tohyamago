@@ -4,7 +4,7 @@
       class="rounded-full px-8 py-1.5 tracking-widest transition-colors"
       :class="
         activeTab !== 'events'
-          ? 'bg-primary-deep text-base shadow-sm'
+          ? 'bg-primary-deep text-white shadow-sm'
           : 'text-primary/60 hover:text-primary'
       "
       href="#feed"
@@ -16,7 +16,7 @@
       class="rounded-full px-8 py-1.5 tracking-widest transition-colors"
       :class="
         activeTab === 'events'
-          ? 'bg-primary-deep text-base shadow-sm'
+          ? 'bg-primary-deep text-white shadow-sm'
           : 'text-primary/60 hover:text-primary'
       "
       href="#events"
@@ -37,7 +37,7 @@
     </p>
     <a
       class="mx-auto my-6 flex w-fit items-center gap-2 rounded-full bg-accent-strong px-8 py-3 font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg
-             after:block after:h-0 after:border-y-6 after:border-l-10 after:border-y-transparent after:border-l-white"
+             after:block after:h-0 after:border-y-[6px] after:border-l-[10px] after:border-y-transparent after:border-l-white"
       href="https://activo.jp/s/a/119414"
       target="_blank"
       rel="noopener noreferrer"
