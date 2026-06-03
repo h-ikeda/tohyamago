@@ -41,7 +41,7 @@
       >
         <a
           :href="link.path"
-          class="flex px-5 py-2 gap-2 transition-colors hover:bg-primary-soft before:border-l-4 before:border-transparent"
+          class="flex px-5 py-2 gap-2 transition-colors hover:bg-white/15 before:border-l-4 before:border-transparent"
           :class="{
             'before:border-l-4 before:border-y-4 before:border-l-accent before:h-0 before:self-center':
               isActive(link.path),

@@ -10,14 +10,16 @@
    *  活動の楽しさ・若々しさを陽光イエローの差し色で表現する。 */
   --color-base: #fbfdf6; /* ほんのり緑がかった明るい白: サイト全体の背景 */
   --color-surface: #ffffff; /* カード・コンテンツエリア背景 */
-  --color-primary: #2f6b3f; /* 新緑グリーン: 見出し・重要テキスト */
-  --color-primary-soft: #3f8551; /* primary の明るい派生 (装飾・ホバー用) */
+  --color-primary: #348049; /* 明るい新緑グリーン: 見出し・重要テキスト (白文字で AA ≒ 4.7:1) */
+  --color-primary-soft: #4f9d63; /* primary の明るい派生 (装飾・ボーダー用) */
   --color-body: #3a463a; /* やわらかいダークグリーン: 一般本文 */
   --color-accent: #e8833a; /* オレンジ寄りテラコッタ: 装飾・アイコン・ボーダー */
   --color-accent-strong: #b35e27; /* accent の濃い派生: 白文字 CTA 用 (WCAG AA ≒ 4.6:1) */
   --color-accent-soft: #f7b27a; /* accent の淡い派生: カラーブロック・ホバー */
   --color-sunlight: #f4c44d; /* 陽光イエロー: 差し色・アクセントライン */
   --color-sunlight-soft: #fbe7a8; /* 陽光イエローの淡い派生: 帯・タグ */
+  --color-sky: #5bb4d6; /* 澄んだ空の青: ヒーロー・装飾 */
+  --color-sky-soft: #dceef8; /* 空の淡い派生: グラデーション帯 */
 
   /* 2.2 タイポグラフィ */
   --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
