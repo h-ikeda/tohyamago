@@ -7,15 +7,32 @@
  *
  * 出力:
  *   src/content/posts/YYYY-MM-DD-<n>.md
- *   src/content/posts/YYYY-MM-DD-<n>/<image>.jpg
+ *   src/content/posts/YYYY-MM-DD-<n>/image-NN.jpg
  *
- * Facebook の公式エクスポートは "your_posts/your_posts_1.json" のような構造で、
- * 各投稿は { timestamp, data: [{ post }], attachments: [{ data: [{ media }] }] }
- * の形を取る。実際のエクスポートに合わせて parsePost を調整すること。
+ * Facebook の公式エクスポート (「Facebookにおけるあなたのアクティビティ」→
+ * 「投稿」) は this_profile's_activity_across_facebook/posts/profile_posts_*.json
+ * のような構造で、各投稿は
+ *   {
+ *     timestamp,
+ *     data: [{ post }],
+ *     attachments: [{ data: [{ media: { uri } } | { external_context: { url } }] }],
+ *     title,
+ *   }
+ * の形を取る。
+ *
+ * 文字エンコーディングについて:
+ *   Facebook のエクスポートは UTF-8 の各バイトを \u00XX としてエスケープした
+ *   「mojibake」状態で出力される (例: 日本語が "ä¸..." のように見える)。
+ *   JSON.parse 後に latin1 → utf8 で再デコードすると正しい文字列に戻る。
+ *
+ * 画像について:
+ *   media.uri が指すファイルがローカルに存在する場合のみ co-located ディレクトリへ
+ *   コピーし、frontmatter の images に登録する。存在しない場合は警告を出してスキップ
+ *   する (テキストだけの取り込みも可能にするため)。
  */
 
 import { readFile, writeFile, mkdir, cp } from 'node:fs/promises'
-import { readdirSync, statSync } from 'node:fs'
+import { readdirSync, statSync, existsSync } from 'node:fs'
 import path from 'node:path'
 
 const exportRoot = process.argv[2]
@@ -26,6 +43,20 @@ if (!exportRoot) {
 
 const outRoot = path.resolve('src/content/posts')
 await mkdir(outRoot, { recursive: true })
+
+/** Facebook エクスポート特有の mojibake (latin1 で読まれた UTF-8) を修復する。 */
+function fixMojibake(value) {
+  if (typeof value === 'string') {
+    return Buffer.from(value, 'latin1').toString('utf8')
+  }
+  if (Array.isArray(value)) return value.map(fixMojibake)
+  if (value && typeof value === 'object') {
+    const out = {}
+    for (const [k, v] of Object.entries(value)) out[k] = fixMojibake(v)
+    return out
+  }
+  return value
+}
 
 function findJsonFiles(dir) {
   const found = []
@@ -43,7 +74,7 @@ function pad(n) {
 }
 
 function slugFor(date, seq) {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${pad(seq)}`
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}-${pad(seq)}`
 }
 
 function escapeYaml(str) {
@@ -62,6 +93,7 @@ function parsePost(entry, exportRoot) {
 
   const messages = []
   const images = []
+  let sourceUrl = entry.permalink_url ?? null
 
   const collect = (node) => {
     if (!node || typeof node !== 'object') return
@@ -71,6 +103,9 @@ function parsePost(entry, exportRoot) {
     }
     if (typeof node.post === 'string' && node.post.trim()) messages.push(node.post)
     if (typeof node.message === 'string' && node.message.trim()) messages.push(node.message)
+    if (node.external_context && typeof node.external_context.url === 'string' && !sourceUrl) {
+      sourceUrl = node.external_context.url
+    }
     if (node.media && typeof node.media.uri === 'string') {
       images.push(path.join(exportRoot, node.media.uri))
     }
@@ -85,7 +120,7 @@ function parsePost(entry, exportRoot) {
   const body = [...new Set(messages)].join('\n\n').trim()
   if (!body && images.length === 0) return null
 
-  return { date, body, images, sourceUrl: entry.permalink_url ?? null }
+  return { date, body, images, sourceUrl }
 }
 
 const jsonFiles = findJsonFiles(exportRoot)
@@ -96,26 +131,34 @@ if (jsonFiles.length === 0) {
 
 const seqByDate = new Map()
 let written = 0
+let missingImages = 0
 
 for (const file of jsonFiles) {
-  const json = JSON.parse(await readFile(file, 'utf8'))
+  const json = fixMojibake(JSON.parse(await readFile(file, 'utf8')))
   const entries = Array.isArray(json) ? json : Array.isArray(json.data) ? json.data : [json]
 
   for (const entry of entries) {
     const post = parsePost(entry, exportRoot)
     if (!post) continue
-    const dateKey = post.date.toISOString().slice(0, 10)
+
+    // ローカルに存在する画像だけを対象にする。
+    const existing = post.images.filter((src) => existsSync(src))
+    missingImages += post.images.length - existing.length
+
+    // 本文も画像も無い投稿 (場所チェックインのみ等) はスキップする。
+    if (!post.body && existing.length === 0) continue
+
+    const dateKey = slugFor(post.date, 0).slice(0, 10)
     const seq = (seqByDate.get(dateKey) ?? 0) + 1
     seqByDate.set(dateKey, seq)
     const slug = slugFor(post.date, seq)
     const dir = path.join(outRoot, slug)
-    await mkdir(dir, { recursive: true })
 
     const imageNames = []
-    for (let i = 0; i < post.images.length; ++i) {
-      const src = post.images[i]
+    for (const src of existing) {
       const ext = path.extname(src) || '.jpg'
-      const name = `image-${pad(i + 1)}${ext}`
+      const name = `image-${pad(imageNames.length + 1)}${ext}`
+      await mkdir(dir, { recursive: true })
       await cp(src, path.join(dir, name))
       imageNames.push(name)
     }
@@ -139,3 +182,9 @@ for (const file of jsonFiles) {
 }
 
 console.log(`Imported ${written} posts into ${outRoot}`)
+if (missingImages > 0) {
+  console.warn(
+    `${missingImages} 枚の画像がエクスポート内に見つからずスキップしました ` +
+      `(完全なエクスポートを展開したパスを指定すると画像も取り込まれます)`,
+  )
+}
