@@ -82,6 +82,15 @@ function escapeYaml(str) {
 }
 
 /**
+ * Astro の image() スキーマ / <Image> は画像のみを扱えるため、
+ * 画像拡張子のファイルだけを対象にする (動画 .mp4 などは除外)。
+ */
+const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif'])
+function isImageFile(uri) {
+  return IMAGE_EXTENSIONS.has(path.extname(uri).toLowerCase())
+}
+
+/**
  * 1 件の投稿エントリを正規化する。
  * Facebook エクスポートのフィールド名は時期によって異なるため、
  * 必要に応じてここを調整する。
@@ -106,7 +115,7 @@ function parsePost(entry, exportRoot) {
     if (node.external_context && typeof node.external_context.url === 'string' && !sourceUrl) {
       sourceUrl = node.external_context.url
     }
-    if (node.media && typeof node.media.uri === 'string') {
+    if (node.media && typeof node.media.uri === 'string' && isImageFile(node.media.uri)) {
       images.push(path.join(exportRoot, node.media.uri))
     }
     for (const key of Object.keys(node)) {
