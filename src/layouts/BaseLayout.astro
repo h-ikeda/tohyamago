@@ -18,6 +18,13 @@ const currentPath = Astro.url.pathname
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
+    <!-- タイポグラフィ: 見出し Noto Serif JP / 本文 Noto Sans JP (light 基調) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;500;600&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <main
@@ -27,7 +34,7 @@ const currentPath = Astro.url.pathname
           'after:sticky',
           'after:bottom-0',
           'after:bg-gradient-to-t',
-          'after:from-gray-100',
+          'after:from-base',
           'after:to-transparent',
           'after:opacity-90',
           'after:w-full',
@@ -35,11 +42,11 @@ const currentPath = Astro.url.pathname
           'after:block',
           'before:top-0',
           'before:bg-gradient-to-b',
-          'before:from-lime-400',
+          'before:from-primary',
           'before:to-transparent',
           'before:w-full',
           'before:h-8',
-          'before:opacity-25',
+          'before:opacity-10',
           'before:block',
         ],
       ]}
@@ -48,11 +55,13 @@ const currentPath = Astro.url.pathname
     </main>
     <RouterMenu client:load currentPath={currentPath} />
     <footer
-      class="text-sm py-1 border-t border-lime-300 bg-lime-100 text-gray-700 relative
-             before:border-x-[0.58rem] before:border-b-[1rem] before:border-x-transparent before:border-b-green-500 before:absolute before:right-3.5 before:bottom-2
-             after:border-x-[0.58rem] after:border-b-[1rem] after:border-x-transparent after:border-b-green-700 after:absolute after:right-2 after:bottom-1 after:scale-110 after:origin-bottom-right"
+      class="text-sm py-2.5 border-t-4 border-sunlight bg-primary-deep text-white relative
+             before:border-x-[0.58rem] before:border-b-[1rem] before:border-x-transparent before:border-b-sunlight before:absolute before:right-3.5 before:bottom-3
+             after:border-x-[0.58rem] after:border-b-[1rem] after:border-x-transparent after:border-b-accent after:absolute after:right-2 after:bottom-2 after:scale-110 after:origin-bottom-right"
     >
-      <a href="/" class="mx-auto w-fit block"> 一般社団法人遠山郷応援会 </a>
+      <a href="/" class="mx-auto w-fit block hover:opacity-80 transition-opacity">
+        一般社団法人遠山郷応援会
+      </a>
     </footer>
   </body>
 </html>

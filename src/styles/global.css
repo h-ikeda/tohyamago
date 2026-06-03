@@ -1,5 +1,37 @@
 @import "tailwindcss";
 
+/*
+ * デザインシステム (README「2. デザインシステム」/ ロードマップ Phase 1)
+ * 「秘境の息遣いと、守る人の想いを伝える」
+ *  ― 自然の空気感(余白) と 手仕事の温かさ(テラコッタ) を両立。
+ */
+@theme {
+  /* 2.1 カラーパレット ―「里山ポップ」: 鮮やかな深緑〜ティールを軸に、
+   *  コーラル(朱)・空のティール・陽光イエローの多色使いで活動の楽しさを表現する。 */
+  /* base は Tailwind 組み込みの font-size ユーティリティ text-base と名前が衝突するため、
+   * 背景系 (bg-base / from-base 等) 専用とし、文字色には使わない (暗背景上の文字は text-white)。 */
+  --color-base: #fffdf7; /* あたたかいクリーム白: サイト全体の背景 */
+  --color-surface: #ffffff; /* カード・コンテンツエリア背景 */
+  --color-primary: #1f855f; /* 明るい深緑〜ティール: 見出し・重要テキスト */
+  --color-primary-deep: #1a7152; /* primary の濃い派生: 白文字 CTA/メニュー/小さい強調文字 (AA 用) */
+  --color-primary-soft: #44b08c; /* primary の明るい派生 (装飾・ボーダー用) */
+  --color-body: #3e3a35; /* 温かみのある黒に近いダーク: 一般本文 */
+  --color-accent: #f06b4b; /* コーラル(朱): 装飾・アイコン・ボーダー */
+  --color-accent-strong: #cc4329; /* accent の濃い派生: 白文字 CTA 用 (WCAG AA ≒ 4.6:1) */
+  --color-accent-soft: #f7a892; /* accent の淡い派生: カラーブロック・ホバー */
+  --color-sunlight: #ffc24b; /* 陽光イエロー: 差し色・アクセントライン */
+  --color-sunlight-soft: #ffe6ac; /* 陽光イエローの淡い派生: 帯・タグ */
+  --color-sky: #4eb1c4; /* 空・水のティール: 装飾 */
+  --color-sky-soft: #d6eef1; /* 空の淡い派生: グラデーション帯 */
+
+  /* 2.2 タイポグラフィ */
+  --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-sans: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+
+  /* 2.3 スペーシング: セクション間の「空気感」 */
+  --spacing-section: 4rem; /* py-section ≒ py-16 相当の最小値 */
+}
+
 :root {
   font-weight: var(--font-weight-light);
 }
@@ -8,7 +40,9 @@ body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-gray-100);
+  background-color: var(--color-base);
+  color: var(--color-body);
+  font-family: var(--font-sans);
   text-align: justify;
   margin: 0;
 }

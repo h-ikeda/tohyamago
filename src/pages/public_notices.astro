@@ -1,7 +1,15 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro'
+import Container from '~/components/Container.astro'
+import SectionHeading from '~/components/SectionHeading.astro'
+import Card from '~/components/Card.astro'
 ---
 
 <BaseLayout title="公告">
-  <p class="w-fit mx-auto my-8">公告事項はありません。</p>
+  <Container class="py-12 md:py-16">
+    <SectionHeading as="h1" level="page" align="left" class="mb-8">公告</SectionHeading>
+    <Card class="border-t-4 border-t-sunlight px-6 py-12 text-center text-body md:py-16">
+      公告事項はありません。
+    </Card>
+  </Container>
 </BaseLayout>
