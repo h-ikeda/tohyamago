@@ -1,0 +1,17 @@
+---
+/**
+ * Container — コンテンツの最大幅と左右余白を揃える共通ラッパー。
+ * README 2.3「コンテナ幅: max-w-5xl/6xl, mx-auto, 左右 px-4〜px-6」に対応。
+ */
+interface Props {
+  size?: 'narrow' | 'wide'
+  class?: string
+}
+
+const { size = 'narrow', class: className = '' } = Astro.props
+const maxWidth = size === 'wide' ? 'max-w-6xl' : 'max-w-3xl'
+---
+
+<div class:list={['mx-auto w-full px-4 sm:px-6', maxWidth, className]}>
+  <slot />
+</div>

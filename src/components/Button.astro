@@ -1,0 +1,29 @@
+---
+/**
+ * Button — CTA ボタン (README 2.4)。
+ * 既定は accent(テラコッタ) 背景 + 白文字 (WCAG AA)、丸み rounded-full。
+ */
+interface Props {
+  href: string
+  variant?: 'accent' | 'outline'
+  class?: string
+}
+
+const { href, variant = 'accent', class: className = '' } = Astro.props
+const external = href.startsWith('http')
+
+const base =
+  'inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+const variants = {
+  accent: 'bg-accent text-white hover:opacity-90',
+  outline: 'border border-accent text-accent bg-surface hover:bg-accent hover:text-white',
+}
+---
+
+<a
+  href={href}
+  class:list={[base, variants[variant], className]}
+  {...external ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+>
+  <slot />
+</a>

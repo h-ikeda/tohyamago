@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+/*
+ * デザインシステム (README「2. デザインシステム」/ ロードマップ Phase 1)
+ * 「秘境の息遣いと、守る人の想いを伝える」
+ *  ― 自然の空気感(余白) と 手仕事の温かさ(テラコッタ) を両立。
+ */
+@theme {
+  /* 2.1 カラーパレット */
+  --color-base: #fdfaf3; /* ミストホワイト: サイト全体の背景 */
+  --color-surface: #ffffff; /* カード・コンテンツエリア背景 */
+  --color-primary: #1b3022; /* ディープグリーン: 見出し・重要テキスト */
+  --color-primary-soft: #2f4b38; /* primary の少し明るい派生 (装飾用) */
+  --color-body: #374151; /* グレー: 一般本文 */
+  --color-accent: #a65f3b; /* テラコッタ: CTA・バッジ (白文字で AA) */
+  --color-accent-soft: #c98a68; /* accent の明るい派生 (装飾・ホバー用) */
+
+  /* 2.2 タイポグラフィ */
+  --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-sans: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+
+  /* 2.3 スペーシング: セクション間の「空気感」 */
+  --spacing-section: 4rem; /* py-section ≒ py-16 相当の最小値 */
+}
+
 :root {
   font-weight: var(--font-weight-light);
 }
@@ -8,7 +31,9 @@ body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-gray-100);
+  background-color: var(--color-base);
+  color: var(--color-body);
+  font-family: var(--font-sans);
   text-align: justify;
   margin: 0;
 }

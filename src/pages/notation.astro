@@ -1,52 +1,76 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro'
+import Container from '~/components/Container.astro'
+import SectionHeading from '~/components/SectionHeading.astro'
 ---
 
 <BaseLayout title="特定商取引法に基づく表記">
-  <h1 class="w-fit mx-auto my-4 text-lg">特定商取引法に基づく表記</h1>
-  <p class="indent-4 text-justify mx-8 mb-4">
-    当会では、Webサイト上のオンライン決済による会費・寄付金の受入れ及び商品の販売を行っております。
-  </p>
-  <dl class="mx-8">
-    <dt class="text-sm font-medium mt-3">事業者名称</dt>
-    <dd>一般社団法人遠山郷応援会</dd>
-    <dt class="text-sm font-medium mt-3">所在地</dt>
-    <dd>
-      〒399-1311<br />
-      長野県飯田市南信濃和田1239番地
-    </dd>
-    <dt class="text-sm font-medium mt-3">運営責任者</dt>
-    <dd>代表理事　池田 大樹</dd>
-    <dt class="text-sm font-medium mt-3">メールアドレス</dt>
-    <dd>receive@tohyamago.org</dd>
-    <dt class="text-sm font-medium mt-3">電話番号</dt>
-    <dd>050-5236-0637</dd>
-    <dt class="text-sm font-medium mt-3">受付時間</dt>
-    <dd>10:00〜15:00 (不定休)</dd>
-    <dt class="text-sm font-medium mt-3">決済方法</dt>
-    <dd>クレジットカードでのお支払い</dd>
-    <dd>銀行振込によるお支払い</dd>
-    <dd>コンビニエンスストアでのお支払い</dd>
-    <dt class="text-sm font-medium mt-3">支払い金額</dt>
-    <dd>
-      <p class="indent-4 text-justify">
-        支払い総額は、決済画面による案内の通りとなります。支払い総額には、会費・寄付金額・商品代金のほか、決済方法に応じた手数料、配送料、消費税が含まれる場合があります。
-      </p>
-    </dd>
-    <dt class="text-sm font-medium mt-3">返金方針</dt>
-    <dd>
-      <p class="indent-4 text-justify">
-        一度支払われた会費・寄付金は、返還致しません。商品代金については、引き渡した商品に欠陥がある場合にのみ、当該商品と引き換えに返金を認める場合があります。
-      </p>
-    </dd>
-    <dt class="text-sm font-medium mt-3">支払いの効力</dt>
-    <dd>
-      <p class="indent-4 text-justify">
-        会費・寄付金は、決済の完了と同時に受取りが完了したものとみなします。ただし当会の判断または法律により受取ることが不適切な支払いについては、決済時に遡って受取りを拒否する場合があります。
-      </p>
-      <p class="indent-4 text-justify">
-        配送商品は決済完了後に発送しますが、在庫を確保できない場合にはお支払いを取消しとさせていただくことがあります。
-      </p>
-    </dd>
-  </dl>
+  <Container class="py-12 md:py-16">
+    <SectionHeading as="h1" level="page" class="mb-8">特定商取引法に基づく表記</SectionHeading>
+    <p class="indent-4 leading-relaxed text-body mb-8">
+      当会では、Webサイト上のオンライン決済による会費・寄付金の受入れ及び商品の販売を行っております。
+    </p>
+    <dl
+      class="divide-y divide-primary/10 rounded-2xl border border-primary/10 bg-surface px-6 py-2 shadow-sm"
+    >
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">事業者名称</dt>
+        <dd class="text-body">一般社団法人遠山郷応援会</dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">所在地</dt>
+        <dd class="text-body">
+          〒399-1311<br />
+          長野県飯田市南信濃和田1239番地
+        </dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">運営責任者</dt>
+        <dd class="text-body">代表理事　池田 大樹</dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">メールアドレス</dt>
+        <dd class="text-body font-mono">receive@tohyamago.org</dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">電話番号</dt>
+        <dd class="text-body font-mono">050-5236-0637</dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">受付時間</dt>
+        <dd class="text-body"><span class="font-mono">10:00〜15:00</span> (不定休)</dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">決済方法</dt>
+        <dd class="text-body">
+          クレジットカードでのお支払い<br />
+          銀行振込によるお支払い<br />
+          コンビニエンスストアでのお支払い
+        </dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">支払い金額</dt>
+        <dd class="indent-4 leading-relaxed text-body">
+          支払い総額は、決済画面による案内の通りとなります。支払い総額には、会費・寄付金額・商品代金のほか、決済方法に応じた手数料、配送料、消費税が含まれる場合があります。
+        </dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">返金方針</dt>
+        <dd class="indent-4 leading-relaxed text-body">
+          一度支払われた会費・寄付金は、返還致しません。商品代金については、引き渡した商品に欠陥がある場合にのみ、当該商品と引き換えに返金を認める場合があります。
+        </dd>
+      </div>
+      <div class="grid gap-1 py-4 sm:grid-cols-[10rem_1fr]">
+        <dt class="font-medium text-primary">支払いの効力</dt>
+        <dd class="space-y-2 indent-4 leading-relaxed text-body">
+          <p>
+            会費・寄付金は、決済の完了と同時に受取りが完了したものとみなします。ただし当会の判断または法律により受取ることが不適切な支払いについては、決済時に遡って受取りを拒否する場合があります。
+          </p>
+          <p>
+            配送商品は決済完了後に発送しますが、在庫を確保できない場合にはお支払いを取消しとさせていただくことがあります。
+          </p>
+        </dd>
+      </div>
+    </dl>
+  </Container>
 </BaseLayout>

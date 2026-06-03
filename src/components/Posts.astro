@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets'
 import { getCollection, render } from 'astro:content'
+import Card from '~/components/Card.astro'
 
 const posts = (await getCollection('posts')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -22,18 +23,24 @@ const rendered = await Promise.all(
 )
 ---
 
-<section class="grid gap-4 mx-5">
+<section class="mx-auto grid w-full max-w-2xl gap-5 px-4 sm:px-6">
   {
     rendered.map(({ post, Content }) => (
-      <article class="bg-white border shadow-md rounded-xl px-6 pt-4 pb-4">
-        <time class="text-xs font-medium block mb-2">{dateFormat(post.data.date)}</time>
-        <div class="post-body tracking-tighter text-justify">
+      <Card as="article" hover class="px-6 pt-4 pb-5">
+        <time class="mb-2 block font-mono text-xs font-medium text-accent">
+          {dateFormat(post.data.date)}
+        </time>
+        <div class="post-body text-justify leading-relaxed text-body">
           <Content />
         </div>
         {post.data.images.map((img) => (
-          <Image src={img} alt="" class="mt-4 border saturate-50 aspect-video object-cover" />
+          <Image
+            src={img}
+            alt=""
+            class="mt-4 aspect-video w-full rounded-xl border border-primary/10 object-cover saturate-[0.85]"
+          />
         ))}
-      </article>
+      </Card>
     ))
   }
 </section>

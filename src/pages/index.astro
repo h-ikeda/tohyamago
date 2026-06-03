@@ -7,15 +7,23 @@ import farmImage from '~/assets/farm.jpg'
 ---
 
 <BaseLayout>
-  <h1
-    class="w-fit mx-auto text-xl my-8 relative
-           before:border-x-[1rem] before:border-x-transparent before:border-b-[1.73rem] before:border-b-green-500 before:relative before:-left-3.5 before:-top-7 before:scale-110
-           after:border-x-[1rem] after:border-x-transparent after:border-b-[1.73rem] after:border-b-green-700 after:absolute after:-left-1 after:top-0 after:scale-[1.35]"
-  >
-    一般社団法人遠山郷応援会
-  </h1>
-  <section class="w-fit mx-auto my-6">
-    <Image src={farmImage} alt="" class="aspect-video object-cover" />
+  <section class="px-4 pt-12 pb-8 text-center sm:pt-16">
+    <p
+      class="font-serif text-base/relaxed text-accent tracking-wide mb-3 md:text-lg
+             before:content-['▲'] before:mr-2 before:text-xs before:align-middle before:text-accent-soft"
+    >
+      秘境の息遣いと、守る人の想いを伝える
+    </p>
+    <h1 class="font-serif font-medium text-primary text-2xl md:text-4xl">
+      一般社団法人遠山郷応援会
+    </h1>
+  </section>
+  <section class="mx-auto mb-10 w-full max-w-4xl px-4 sm:px-6">
+    <Image
+      src={farmImage}
+      alt="遠山郷の農地と山並み"
+      class="aspect-video w-full rounded-2xl object-cover shadow-md"
+    />
   </section>
   <HomeTabs client:load>
     <Posts slot="feed" />

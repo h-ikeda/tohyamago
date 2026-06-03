@@ -1,0 +1,24 @@
+---
+/**
+ * Card — 記事・商品などのカード (README 2.4)。
+ * surface 背景＋わずかなシャドウ。hover=true で浮き上がるホバー演出。
+ */
+interface Props {
+  as?: 'article' | 'div' | 'section'
+  hover?: boolean
+  class?: string
+}
+
+const { as = 'div', hover = false, class: className = '' } = Astro.props
+const Tag = as
+---
+
+<Tag
+  class:list={[
+    'overflow-hidden rounded-2xl border border-primary/10 bg-surface shadow-sm',
+    hover && 'transition-transform transition-shadow hover:-translate-y-1 hover:shadow-md',
+    className,
+  ]}
+>
+  <slot />
+</Tag>
