@@ -54,8 +54,6 @@ tohyamago/
 │   │   ├── mounts.jpg
 │   │   └── articles.pdf
 │   └── styles/global.css       # Tailwind の import と body スタイル
-├── scripts/
-│   └── import-facebook-export.mjs  # Facebook エクスポート → Markdown 変換
 ├── public/
 │   ├── _headers                # Cloudflare Pages のヘッダー設定
 │   └── .well-known/
@@ -81,7 +79,6 @@ tohyamago/
 - 添付画像は `src/content/posts/<slug>/<filename>` に置き、frontmatter の `images` で参照
 - スキーマは `src/content.config.ts` で定義 (`date` / `images` / `sourceUrl`)
 - Markdown は `remark-breaks` で単一改行も `<br>` 化されるため、Facebook 風の改行スタイルがそのまま再現される
-- Facebook のページエクスポート (JSON) からの一括取り込みは `scripts/import-facebook-export.mjs` を利用
 
 ### 外部リンク
 - ボランティア募集: `https://activo.jp/s/a/119414`
