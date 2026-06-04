@@ -8,7 +8,9 @@ interface Props {
 }
 
 const { title, fullscreen = false } = Astro.props
-const fullTitle = title ? `${title} | 一般社団法人遠山郷応援会` : '一般社団法人遠山郷応援会'
+const fullTitle = title
+  ? `${title} | 一般社団法人遠山郷応援会`
+  : '一般社団法人遠山郷応援会'
 const currentPath = Astro.url.pathname
 ---
 
@@ -59,7 +61,10 @@ const currentPath = Astro.url.pathname
              before:border-x-[0.58rem] before:border-b-[1rem] before:border-x-transparent before:border-b-sunlight before:absolute before:right-3.5 before:bottom-3
              after:border-x-[0.58rem] after:border-b-[1rem] after:border-x-transparent after:border-b-accent after:absolute after:right-2 after:bottom-2 after:scale-110 after:origin-bottom-right"
     >
-      <a href="/" class="mx-auto w-fit block hover:opacity-80 transition-opacity">
+      <a
+        href="/"
+        class="mx-auto w-fit block hover:opacity-80 transition-opacity"
+      >
         一般社団法人遠山郷応援会
       </a>
     </footer>

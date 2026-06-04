@@ -5,20 +5,20 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     groups:
       astro:
         patterns:
-          - "astro"
-          - "@astrojs/*"
+          - 'astro'
+          - '@astrojs/*'
       tailwind:
         patterns:
-          - "tailwindcss"
-          - "@tailwindcss/*"
-  - package-ecosystem: "github-actions"
-    directory: "/"
+          - 'tailwindcss'
+          - '@tailwindcss/*'
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'

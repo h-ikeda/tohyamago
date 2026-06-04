@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /*
  * デザインシステム (README「2. デザインシステム」/ ロードマップ Phase 1)
@@ -25,8 +25,10 @@
   --color-sky-soft: #d6eef1; /* 空の淡い派生: グラデーション帯 */
 
   /* 2.2 タイポグラフィ */
-  --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  --font-sans: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  --font-serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --font-sans:
+    'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic',
+    sans-serif;
 
   /* 2.3 スペーシング: セクション間の「空気感」 */
   --spacing-section: 4rem; /* py-section ≒ py-16 相当の最小値 */
@@ -38,24 +40,54 @@
 
 /* RouterMenu アニメーション */
 @keyframes rm-btn-enter-v {
-  from { transform: scaleY(0) translateY(-100%); transform-origin: top; }
-  to   { transform: scaleY(1) translateY(0);    transform-origin: top; }
+  from {
+    transform: scaleY(0) translateY(-100%);
+    transform-origin: top;
+  }
+  to {
+    transform: scaleY(1) translateY(0);
+    transform-origin: top;
+  }
 }
 @keyframes rm-btn-enter-next {
-  from { transform: scaleY(0) translateY(100%);  transform-origin: bottom; }
-  to   { transform: scaleY(1) translateY(0);     transform-origin: bottom; }
+  from {
+    transform: scaleY(0) translateY(100%);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(1) translateY(0);
+    transform-origin: bottom;
+  }
 }
 @keyframes rm-menu-enter {
-  from { transform: scaleY(0) translateY(100%);  transform-origin: bottom; }
-  to   { transform: scaleY(1) translateY(0);     transform-origin: bottom; }
+  from {
+    transform: scaleY(0) translateY(100%);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(1) translateY(0);
+    transform-origin: bottom;
+  }
 }
 @keyframes rm-menu-leave-v {
-  from { transform: scaleY(1) translateY(0);     transform-origin: bottom; }
-  to   { transform: scaleY(0) translateY(100%);  transform-origin: bottom; }
+  from {
+    transform: scaleY(1) translateY(0);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(0) translateY(100%);
+    transform-origin: bottom;
+  }
 }
 @keyframes rm-menu-leave-next {
-  from { transform: scaleY(1) translateY(0);     transform-origin: top; }
-  to   { transform: scaleY(0) translateY(-100%); transform-origin: top; }
+  from {
+    transform: scaleY(1) translateY(0);
+    transform-origin: top;
+  }
+  to {
+    transform: scaleY(0) translateY(-100%);
+    transform-origin: top;
+  }
 }
 
 body {

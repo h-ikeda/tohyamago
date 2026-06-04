@@ -7,6 +7,25 @@ on:
   pull_request:
 
 jobs:
+  quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      # 1 つのチェックが失敗しても他のチェック結果を確認できるようにする
+      fail-fast: false
+      matrix:
+        task: ['format:check', 'lint', 'typecheck', 'test']
+    name: quality (${{ matrix.task }})
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run ${{ matrix.task }}
+
   build:
     runs-on: ubuntu-latest
     permissions:

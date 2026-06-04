@@ -30,7 +30,10 @@ export default function HomeTabs({ feed }: { feed?: ReactNode }) {
               : 'text-primary/60 hover:text-primary'
           }`}
           href="#feed"
-          onClick={(e) => { e.preventDefault(); select('feed') }}
+          onClick={(e) => {
+            e.preventDefault()
+            select('feed')
+          }}
         >
           近況
         </a>
@@ -41,13 +44,19 @@ export default function HomeTabs({ feed }: { feed?: ReactNode }) {
               : 'text-primary/60 hover:text-primary'
           }`}
           href="#events"
-          onClick={(e) => { e.preventDefault(); select('events') }}
+          onClick={(e) => {
+            e.preventDefault()
+            select('events')
+          }}
         >
           予定
         </a>
       </nav>
 
-      <section style={{ display: activeTab === 'events' ? undefined : 'none' }} className="mx-auto w-full max-w-2xl px-4 sm:px-6">
+      <section
+        style={{ display: activeTab === 'events' ? undefined : 'none' }}
+        className="mx-auto w-full max-w-2xl px-4 sm:px-6"
+      >
         <p className="rounded-3xl border-t-4 border-t-sunlight border border-primary/10 bg-surface px-6 py-5 leading-loose text-body shadow-sm">
           今後の活動予定は、
           <a
