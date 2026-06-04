@@ -221,7 +221,7 @@ start: 12.0 # 月.上下旬。複数日にまたがる行事は start/end で範
 end: 12.5
 category: 地域行事 # 地域行事 / 当会イベント / 販売 など
 location: 遠山郷各地区
-url: https://... # 任意
+url: https://example.com # 任意
 note: 国指定重要無形民俗文化財。
 ```
 
@@ -230,6 +230,15 @@ note: 国指定重要無形民俗文化財。
 `content.config.ts` への追加イメージ:
 
 ```ts
+// 月.上下旬 (1.0〜12.5, 0.5 刻み)。CSS Grid の列計算に直結するためスキーマで厳密に検証する
+const halfMonth = z
+  .number()
+  .min(1.0)
+  .max(12.5)
+  .refine((n) => n % 0.5 === 0, {
+    message: '値は 1.0〜12.5 の 0.5 刻み（整数=上旬, .5=下旬）で指定してください',
+  })
+
 const crops = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/crops' }),
   schema: z.object({
@@ -240,8 +249,8 @@ const crops = defineCollection({
     tasks: z.array(
       z.object({
         label: z.string(),
-        start: z.number(), // 月.上下旬 (1.0〜12.5)
-        end: z.number(),
+        start: halfMonth,
+        end: halfMonth,
         volunteer: z.boolean().default(false),
         note: z.string().optional(),
       }),
@@ -253,8 +262,8 @@ const events = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/events' }),
   schema: z.object({
     name: z.string(),
-    start: z.number(),
-    end: z.number(),
+    start: halfMonth,
+    end: halfMonth,
     category: z.string().default('地域行事'),
     location: z.string().optional(),
     url: z.string().url().optional(),
