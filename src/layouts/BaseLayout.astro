@@ -32,32 +32,43 @@ const currentPath = Astro.url.pathname
   </head>
   <body>
     <SiteHeader currentPath={currentPath} />
-    <main
-      class:list={[
-        'grow overflow-auto',
-        !fullscreen && [
-          'after:sticky',
-          'after:bottom-0',
-          'after:bg-gradient-to-t',
-          'after:from-base',
-          'after:to-transparent',
-          'after:opacity-90',
-          'after:w-full',
-          'after:h-20',
-          'after:block',
-          'before:top-0',
-          'before:bg-gradient-to-b',
-          'before:from-primary',
-          'before:to-transparent',
-          'before:w-full',
-          'before:h-8',
-          'before:opacity-10',
-          'before:block',
-        ],
-      ]}
-    >
-      <slot />
-    </main>
-    <SiteFooter currentPath={currentPath} />
+    {
+      fullscreen ? (
+        <main class="grow overflow-auto">
+          <slot />
+        </main>
+      ) : (
+        <main class="flex grow flex-col overflow-auto">
+          {/* コンテンツ領域。下端フェード (after:sticky) はこのラッパーに封じ込め、
+              スクロール末尾のフッターには被らないようにする。grow で短いページでも
+              フッターをビューポート下端へ押し下げる。 */}
+          <div
+            class:list={[
+              'grow',
+              'after:sticky',
+              'after:bottom-0',
+              'after:bg-gradient-to-t',
+              'after:from-base',
+              'after:to-transparent',
+              'after:opacity-90',
+              'after:w-full',
+              'after:h-20',
+              'after:block',
+              'before:top-0',
+              'before:bg-gradient-to-b',
+              'before:from-primary',
+              'before:to-transparent',
+              'before:w-full',
+              'before:h-8',
+              'before:opacity-10',
+              'before:block',
+            ]}
+          >
+            <slot />
+          </div>
+          <SiteFooter currentPath={currentPath} />
+        </main>
+      )
+    }
   </body>
 </html>
