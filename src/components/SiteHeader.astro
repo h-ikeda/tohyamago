@@ -65,7 +65,8 @@ const ctas = [
 ]
 
 // ハッシュ/末尾スラッシュを無視してパスを比較する
-const normalize = (p: string) => p.split('#')[0].replace(/\/$/, '') || '/'
+const normalize = (p: string) =>
+  p.split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
 const isActivePath = (path: string) =>
   !path.startsWith('http') && normalize(path) === normalize(currentPath)
 const isGroupActive = (g: NavGroup) => g.items.some((i) => isActivePath(i.path))
@@ -118,10 +119,10 @@ const ctaVariants = {
                 {g.label}
                 <span
                   aria-hidden="true"
-                  class="h-0 w-0 border-x-[0.22rem] border-t-[0.28rem] border-x-transparent border-t-current transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180"
+                  class="h-0 w-0 border-x-[0.22rem] border-t-[0.28rem] border-x-transparent border-t-current transition-transform duration-200 group-hover:rotate-180 group-data-[open]:rotate-180"
                 />
               </button>
-              <ul class="invisible absolute left-0 top-full z-10 min-w-44 -translate-y-1 rounded-2xl border border-primary/10 bg-surface p-2 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+              <ul class="invisible absolute left-0 top-full z-10 min-w-44 -translate-y-1 rounded-2xl border border-primary/10 bg-surface p-2 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-data-[open]:visible group-data-[open]:translate-y-0 group-data-[open]:opacity-100">
                 {g.items.map((i) => (
                   <li>
                     <a
@@ -271,31 +272,54 @@ const ctaVariants = {
     toggle.setAttribute('aria-expanded', String(willOpen))
   })
 
-  // デスクトップドロップダウンの aria-expanded をホバー/フォーカスへ同期 (段階的拡張)
+  // デスクトップドロップダウン (ディスクロージャー)。
+  // マウスのホバー表示は CSS の group-hover が担う。クリック / Enter / Space /
+  // タッチでは data-open と aria-expanded を同時にトグルし、
+  // 「見た目の開閉」と「支援技術への通知」を常に一致させる。
   document
     .querySelectorAll<HTMLButtonElement>('[data-dropdown-trigger]')
     .forEach((btn) => {
       const li = btn.closest('li')
       if (!li) return
-      const sync = (open: boolean) =>
+      const setOpen = (open: boolean) => {
         btn.setAttribute('aria-expanded', String(open))
-      li.addEventListener('pointerenter', () => sync(true))
-      li.addEventListener('pointerleave', () => sync(false))
-      li.addEventListener('focusin', () => sync(true))
-      li.addEventListener('focusout', (e) => {
-        if (!li.contains(e.relatedTarget as Node | null)) sync(false)
-      })
-      // タッチ端末向けのクリックトグル
+        li.toggleAttribute('data-open', open)
+      }
       btn.addEventListener('click', () =>
-        sync(btn.getAttribute('aria-expanded') !== 'true'),
+        setOpen(btn.getAttribute('aria-expanded') !== 'true'),
       )
+      // フォーカスが項目の外へ移ったら閉じる (キーボードでの Tab 離脱・外クリック)
+      li.addEventListener('focusout', (e) => {
+        if (!li.contains(e.relatedTarget as Node | null)) setOpen(false)
+      })
+      // Escape で閉じ、フォーカスをトリガーへ戻す
+      li.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          setOpen(false)
+          btn.focus()
+        }
+      })
     })
 
-  // Escape でモバイルパネルを閉じる
+  // メニュー外をクリック/タップしたら、開いている他のドロップダウンを閉じる
+  // (フォーカスを取得しないタッチ端末でのフォールバック)
+  document.addEventListener('click', (e) => {
+    document
+      .querySelectorAll<HTMLButtonElement>('[data-dropdown-trigger]')
+      .forEach((btn) => {
+        const li = btn.closest('li')
+        if (!li || li.contains(e.target as Node | null)) return
+        btn.setAttribute('aria-expanded', 'false')
+        li.removeAttribute('data-open')
+      })
+  })
+
+  // Escape でモバイルパネルを閉じ、フォーカスを開閉ボタンへ戻す
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && panel && !panel.hasAttribute('hidden')) {
       panel.setAttribute('hidden', '')
       toggle?.setAttribute('aria-expanded', 'false')
+      toggle?.focus()
     }
   })
 </script>
