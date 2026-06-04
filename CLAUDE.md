@@ -331,7 +331,7 @@ npm run format:check  # Prettier の整形チェック (CI 用)
 npm run typecheck     # astro check による型チェック
 npm test              # Vitest を 1 回実行
 npm run test:watch    # Vitest ウォッチモード
-npm run test:coverage # カバレッジ付きで実行
+npm run test:coverage # カバレッジ付きで実行 (coverage/ に lcov / html を出力)
 npm run test:e2e      # Playwright (実ブラウザ E2E, e2e/ 配下)
 ```
 
@@ -340,6 +340,7 @@ npm run test:e2e      # Playwright (実ブラウザ E2E, e2e/ 配下)
 - **テスト (方針)**: リグレッションテストは可能な限りコードを広くカバーする。ブラウザ依存の不具合 (NG) を修正したときは、その再発防止として実ブラウザテストを追加する。
   - **単体/結合 (jsdom)**: Vitest + Testing Library。React アイランドや DOM ロジックの「動き」と「スタイリング」を `src/**/*.{test,spec}.{ts,tsx}` に配置。インライン `<script>` のロジックは `*.ts` モジュールへ分離してテスト可能にする (例: `SiteHeader.astro` の挙動は `siteHeaderNav.ts` に分離し `siteHeaderNav.test.ts` で検証)。
   - **E2E (実ブラウザ)**: Playwright (`playwright.config.ts` / `e2e/*.spec.ts`)。jsdom が扱えないレイアウト・重なり順 (z-index/stacking) など、描画を伴う回帰のみを対象とする。CI では `e2e` ジョブで `npx playwright install --with-deps chromium` 後に実行する。
+  - **カバレッジ (Codecov)**: `vitest.config.ts` の `coverage` 設定で v8 プロバイダを使い `coverage/lcov.info` を生成する。CI (`ci.yml`) の `coverage` ジョブが `npm run test:coverage` を実行し、`codecov/codecov-action` で Codecov へ送信する。トークンは GitHub Secrets の `CODECOV_TOKEN` を参照（公開リポジトリではトークンなしでも動作するが、設定推奨）。Codecov のステータスは導入初期のため `codecov.yml` で非ブロッキング（情報提供）にしてある。
 
 ## ビルド時の補助処理
 
