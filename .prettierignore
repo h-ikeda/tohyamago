@@ -3,6 +3,5 @@ dist/
 .wrangler/
 node_modules/
 package-lock.json
-src/content/posts/
 public/
 *.pdf
