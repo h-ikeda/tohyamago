@@ -1,0 +1,20 @@
+name: お茶
+emoji: 🍵
+color: '#2f8f6b' # 茶葉の深緑
+order: 4
+tasks:
+  - label: 整枝・施肥
+    start: 3.0 # 3月中旬。今季初の農作業になることが多い
+    end: 3.5
+    volunteer: true
+    note: 春一番の作業。茶樹の形を整え、肥料を施します。良いお茶が採れますように。
+  - label: 茶摘み（新茶）
+    start: 5.0 # 5月中旬〜下旬
+    end: 5.5
+    volunteer: true
+    note: 「一芯三葉」で手摘み。摘んだ茶葉は加工して新茶として数量限定で販売します。
+  - label: 中切り（大きな剪定）
+    start: 6.0
+    end: 8.5
+    volunteer: false
+    note: 茶樹を若返らせるための深い剪定。来年の収穫に向けた整枝も夏に行います。
