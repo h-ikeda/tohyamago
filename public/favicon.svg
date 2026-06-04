@@ -1,0 +1,10 @@
+<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="遠山郷応援会">
+  <!-- 陽光 -->
+  <circle cx="29" cy="12" r="5.5" fill="#ffc24b" />
+  <!-- 奥の稜線 -->
+  <path d="M2 33L13 11L25 33Z" fill="#44b08c" />
+  <!-- 主峰 -->
+  <path d="M8 33L20 15L32 33Z" fill="#1f855f" />
+  <!-- 手前の頂 (コーラル) -->
+  <path d="M23 33L30 20L38 33Z" fill="#f06b4b" />
+</svg>

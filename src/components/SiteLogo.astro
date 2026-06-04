@@ -1,0 +1,37 @@
+---
+/**
+ * SiteLogo — ブランドマーク (遠山郷の重なる稜線 + 陽光 + コーラルの頂)。
+ *
+ * デザイン規則 (CLAUDE.md):
+ * - 三角形(▲)=山 を核モチーフに、里山ポップの多色(深緑/ティール/陽光/コーラル)で構成する。
+ * - 「遠山」= 遠く重なる三つの稜線で奥行き(遠さ)を表現する。
+ * - 手前のコーラルの頂は、既存ロゴの before:▲(accent) を継承するブランドの差し色。
+ *   「守る人の想い・手仕事の温かさ」を象徴する。
+ * - 陽光イエローの太陽は、農と希望(あたたかさ)を象徴する。
+ *
+ * 装飾要素のため aria-hidden。団体名は隣接テキストで読み上げられる。
+ * favicon (public/favicon.svg) も同じ意匠で展開している。
+ */
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<svg
+  class={className}
+  viewBox="0 0 40 40"
+  role="img"
+  aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- 陽光 (希望・農のあたたかさ) -->
+  <circle cx="29" cy="12" r="5.5" fill="#ffc24b"></circle>
+  <!-- 奥の稜線 (遠さ・ティール緑) -->
+  <path d="M2 33L13 11L25 33Z" fill="#44b08c"></path>
+  <!-- 主峰 (深緑) -->
+  <path d="M8 33L20 15L32 33Z" fill="#1f855f"></path>
+  <!-- 手前の頂 (コーラル＝守る人の想い・ブランドの差し色) -->
+  <path d="M23 33L30 20L38 33Z" fill="#f06b4b"></path>
+</svg>
