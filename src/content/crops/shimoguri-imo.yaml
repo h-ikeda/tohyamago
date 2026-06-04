@@ -4,17 +4,17 @@ color: '#a65f3b' # テラコッタ寄りの土色
 order: 1
 tasks:
   - label: 植付け
-    start: 4.0 # 4月上旬 (実績: 3月末〜4月上旬)
-    end: 4.5
-    volunteer: true
-    note: 種芋（二度芋）の植付け。1時間半ほどの軽作業で、初参加の方も歓迎です。
+    start: 3.2 # 3月下旬〜4月上旬 (実績: 3/30 前後)
+    end: 4.0
+    intensity: medium
+    note: 種芋（二度芋）の植付け。1時間半ほどの作業で、初参加の方も歓迎です。
   - label: 土寄せ・除草
-    start: 5.0 # GW〜初夏。実績では5月中旬に実施
+    start: 5.1 # 5月中旬から初夏にかけて繰り返し
     end: 7.0
-    volunteer: true
-    note: 苗の生育に合わせて土寄せと草取りを行います。GW頃から繰り返し畑へ。
+    intensity: medium
+    note: 苗の生育に合わせて土寄せと草取りを行います。GW頃から畑へ通います。
   - label: 収穫（芋掘り）
-    start: 7.0 # 7月下旬〜8月上旬
+    start: 7.1 # 7月中旬〜8月上旬
     end: 8.0
-    volunteer: true
+    intensity: hard
     note: いよいよ芋掘り。掘りたての下栗芋はこの時期ならではの楽しみです。

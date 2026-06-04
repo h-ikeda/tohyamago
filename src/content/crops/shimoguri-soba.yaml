@@ -4,22 +4,22 @@ color: '#7c9a3e' # 蕎麦畑の若葉色
 order: 2
 tasks:
   - label: 種蒔き
-    start: 7.0 # 7月下旬。芋の収穫後、同じ畑に蒔く
-    end: 7.5
-    volunteer: true
-    note: 下栗芋を収穫した畑にそのまま蕎麦を蒔きます。作業の多い回ですが、皆で1日で仕上げます。
+    start: 7.1 # 7月中旬〜下旬。芋の収穫後、同じ畑に蒔く
+    end: 7.2
+    intensity: medium
+    note: 下栗芋を収穫した畑にそのまま蕎麦を蒔きます。皆で1日で仕上げます。
   - label: 草刈り・管理
     start: 8.0
-    end: 9.5
-    volunteer: true
+    end: 9.2
+    intensity: medium
     note: 真夏〜初秋の畑の草刈り。9月には白い蕎麦の花が咲き揃います。
   - label: 収穫（刈り取り）
     start: 10.0 # 10月上旬
-    end: 10.5
-    volunteer: true
+    end: 10.1
+    intensity: medium
     note: 実った蕎麦を刈り取ります。初めての方も交えての作業です。
   - label: 脱穀
-    start: 10.5 # 10月下旬
+    start: 10.2 # 10月下旬
     end: 11.0
-    volunteer: true
+    intensity: hard
     note: 乾燥させた蕎麦から実を落とします。冬には新蕎麦を味わう会も。

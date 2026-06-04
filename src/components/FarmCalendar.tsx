@@ -1,23 +1,35 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+import { createPortal } from 'react-dom'
 
 /**
  * FarmCalendar — 農作業ガントチャート (React island)。
  *
- * 横軸＝1〜12 月 (半月粒度＝24 列)、縦軸＝作物。各作業を 1 作業 1 行の期間バーで
- * 表示し、地域イベントを別レーンに重畳する。当月をハイライトし「今・近いうちに
- * 参加できる作業」へ視線を誘導する。バーの選択で詳細＋参加 CTA を開く。
+ * 横軸＝1〜12 月 (旬粒度＝36 列: 各月 上旬/中旬/下旬)、縦軸＝作物。各作業を
+ * 1 作業 1 行の期間バーで表示し、地域イベントを別レーンに重畳する。当月を
+ * ハイライトし「今・近いうちに参加できる作業」へ視線を誘導する。
  *
- * モバイルでバー幅が狭くても読めるよう、ラベルはバーの中ではなく横に置く
- * (バーが年末に寄る場合は左側)。月ごとの縦線と作物ごとの区切り線で見やすくする。
+ * - モバイルでバー幅が狭くても読めるよう、ラベルはバーの中ではなく横に置く。
+ * - 月ごとの縦線と作物ごとの横区切り線で見やすくする。
+ * - どの作業もボランティア歓迎のため、強調表示はせず「作業強度の目安」を示す。
+ * - バーをタップするとその付近にポップオーバーで詳細＋参加 CTA を表示する。
  *
  * データは calendar.astro が getCollection('crops'|'events') で取得し props で渡す。
  */
+
+export type Intensity = 'light' | 'medium' | 'hard'
 
 export interface CalendarTask {
   label: string
   start: number
   end: number
-  volunteer: boolean
+  intensity: Intensity
   note?: string
 }
 
@@ -41,40 +53,51 @@ export interface CalendarEvent {
   note?: string
 }
 
-export const MONTH_COLUMNS = 24
+/** 12 月 × 3 旬 = 36 列。 */
+export const MONTH_COLUMNS = 36
 
-/** 半月値 (1.0〜12.5) を 1〜24 のグリッド列 (開始) に変換する。整数=上旬, .5=下旬。 */
-export function startColumn(halfMonth: number): number {
-  const month = Math.floor(halfMonth)
-  const isLatter = halfMonth % 1 !== 0
-  return (month - 1) * 2 + (isLatter ? 1 : 0) + 1
+export const INTENSITY_META: Record<
+  Intensity,
+  { label: string; level: number }
+> = {
+  light: { label: '軽め', level: 1 },
+  medium: { label: 'ふつう', level: 2 },
+  hard: { label: 'しっかり', level: 3 },
 }
 
-/** 半月値を、その半月セルを塗りつぶす grid-column 終端 (排他的) に変換する。 */
-export function endColumn(halfMonth: number): number {
-  return startColumn(halfMonth) + 1
+/** 月.旬 (整数=上旬, .1=中旬, .2=下旬) を 1〜36 のグリッド列 (開始) に変換する。 */
+export function startColumn(monthThird: number): number {
+  const month = Math.floor(monthThird)
+  const third = Math.round((monthThird - month) * 10) // 0 / 1 / 2
+  return (month - 1) * 3 + third + 1
 }
 
-/** 半月値を「N月上旬 / N月下旬」の表記に変換する。 */
-export function formatHalfMonth(halfMonth: number): string {
-  const month = Math.floor(halfMonth)
-  const part = halfMonth % 1 !== 0 ? '下旬' : '上旬'
+/** その旬セルを塗りつぶす grid-column 終端 (排他的) に変換する。 */
+export function endColumn(monthThird: number): number {
+  return startColumn(monthThird) + 1
+}
+
+/** 月.旬を「N月上旬 / N月中旬 / N月下旬」の表記に変換する。 */
+export function formatMonthPart(monthThird: number): string {
+  const month = Math.floor(monthThird)
+  const third = Math.round((monthThird - month) * 10)
+  const part = ['上旬', '中旬', '下旬'][third]
   return `${month}月${part}`
 }
 
-/** start〜end の期間表記。単一半月なら 1 つだけ返す。 */
+/** start〜end の期間表記。単一の旬なら 1 つだけ返す。 */
 export function formatPeriod(start: number, end: number): string {
   return start === end
-    ? formatHalfMonth(start)
-    : `${formatHalfMonth(start)}〜${formatHalfMonth(end)}`
+    ? formatMonthPart(start)
+    : `${formatMonthPart(start)}〜${formatMonthPart(end)}`
 }
 
 /**
- * バーのラベルを左右どちらに置くかを決める。年末 (11 月以降に終わる) バーは
- * 右へ出すと見切れるため左側に置く。
+ * バーのラベルを左右どちらに置くか。年末 (11 月以降に終わる) バーは右へ出すと
+ * 見切れるため左側に置く。
  */
 export function labelOnLeft(end: number): boolean {
-  return endColumn(end) >= 22
+  return endColumn(end) >= 32
 }
 
 const MONTH_LABELS = Array.from({ length: 12 }, (_, i) => `${i + 1}月`)
@@ -82,6 +105,10 @@ const MONTH_LABELS = Array.from({ length: 12 }, (_, i) => `${i + 1}月`)
 /** バー (作業/イベント) の grid-column。ラベル列ぶん +1 する。 */
 function barColumn(start: number, end: number): string {
   return `${1 + startColumn(start)} / ${1 + endColumn(end)}`
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max)
 }
 
 type SelectedTask = {
@@ -104,62 +131,56 @@ export default function FarmCalendar({
   currentMonth = new Date().getMonth() + 1,
 }: Props) {
   const detailId = useId()
-  const detailRef = useRef<HTMLDivElement>(null)
-  const [selected, setSelected] = useState<SelectedTask | null>(null)
-
-  // 選択された作業の詳細が画面外にあれば、その位置までスクロールして気付かせる。
-  useEffect(() => {
-    if (!selected || !detailRef.current) return
-    try {
-      detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    } catch {
-      // scrollIntoView 未実装の環境 (jsdom 等) は無視する。
-    }
-  }, [selected])
+  const [detail, setDetail] = useState<{
+    data: SelectedTask
+    rect: DOMRect
+  } | null>(null)
 
   // 1 作業 1 行で行配置を計算する (各ブロックは直前ブロックの末尾から積み上げる)。
   // 行 1 は月ヘッダー。
-  const { cropBlocks, eventBlock, lastRow } = useMemo(() => {
-    const prepared = [...crops]
-      .sort((a, b) => a.order - b.order)
-      .map((crop) => {
-        const tasks = [...crop.tasks].sort(
-          (a, b) => a.start - b.start || a.end - b.end,
-        )
-        return { crop, tasks, rowCount: Math.max(1, tasks.length) }
-      })
+  const prepared = [...crops]
+    .sort((a, b) => a.order - b.order)
+    .map((crop) => {
+      const tasks = [...crop.tasks].sort(
+        (a, b) => a.start - b.start || a.end - b.end,
+      )
+      return { crop, tasks, rowCount: Math.max(1, tasks.length) }
+    })
+  const cropBlocks = prepared.map((block, i) => ({
+    ...block,
+    startRow: prepared.slice(0, i).reduce((row, b) => row + b.rowCount, 2),
+  }))
+  const eventList = [...events].sort(
+    (a, b) => a.start - b.start || a.end - b.end,
+  )
+  const eventStartRow = prepared.reduce((row, b) => row + b.rowCount, 2)
+  const eventBlock = {
+    events: eventList,
+    rowCount: Math.max(1, eventList.length),
+    startRow: eventStartRow,
+  }
+  const lastRow = eventStartRow + eventBlock.rowCount
 
-    const blocks = prepared.map((block, i) => ({
-      ...block,
-      startRow: prepared.slice(0, i).reduce((row, b) => row + b.rowCount, 2),
-    }))
+  // 作物・イベントブロックの境界となる行 (横区切り線を引く位置)。
+  const boundaryRows = [
+    ...cropBlocks.map((b) => b.startRow),
+    eventBlock.startRow,
+    lastRow,
+  ]
 
-    const eventList = [...events].sort(
-      (a, b) => a.start - b.start || a.end - b.end,
-    )
-    const eventStartRow = prepared.reduce((row, b) => row + b.rowCount, 2)
-    const eventRowCount = Math.max(1, eventList.length)
-    return {
-      cropBlocks: blocks,
-      eventBlock: {
-        events: eventList,
-        rowCount: eventRowCount,
-        startRow: eventStartRow,
-      },
-      lastRow: eventStartRow + eventRowCount,
-    }
-  }, [crops, events])
+  // 当月の 3 列 (上旬・中旬・下旬) を覆うハイライト帯の grid-column。ラベル列ぶん +1。
+  const bandColumn = `${2 + (currentMonth - 1) * 3} / span 3`
 
-  // 当月の 2 列 (上旬・下旬) を覆うハイライト帯の grid-column。ラベル列ぶん +1。
-  const bandColumn = `${1 + (currentMonth - 1) * 2 + 1} / span 2`
+  const isSelected = (cropName: string, task: CalendarTask) =>
+    detail?.data.cropName === cropName && detail?.data.task.label === task.label
 
   return (
     <div>
       <div className="overflow-x-auto pb-2">
         <div
-          className="grid min-w-[44rem] items-stretch"
+          className="grid min-w-[52rem] items-stretch"
           style={{
-            gridTemplateColumns: `minmax(5.5rem, max-content) repeat(${MONTH_COLUMNS}, minmax(1rem, 1fr))`,
+            gridTemplateColumns: `minmax(5rem, max-content) repeat(${MONTH_COLUMNS}, minmax(0.7rem, 1fr))`,
             gridAutoRows: '2.5rem',
           }}
         >
@@ -177,23 +198,23 @@ export default function FarmCalendar({
               key={`vline-${label}`}
               aria-hidden="true"
               className="pointer-events-none border-l border-primary/10"
-              style={{ gridColumn: 2 + i * 2, gridRow: `1 / ${lastRow}` }}
+              style={{ gridColumn: 2 + i * 3, gridRow: `1 / ${lastRow}` }}
             />
           ))}
           {/* 右端の閉じ線 */}
           <div
             aria-hidden="true"
             className="pointer-events-none border-r border-primary/10"
-            style={{ gridColumn: '25 / 26', gridRow: `1 / ${lastRow}` }}
+            style={{ gridColumn: '37 / 38', gridRow: `1 / ${lastRow}` }}
           />
 
-          {/* 作物・イベントブロックの区切り線 (先頭以外の各ブロック上端) */}
-          {[...cropBlocks.slice(1), eventBlock].map((block, i) => (
+          {/* 作物・イベントの横区切り線 (ラベル列まで貫通させるため最前面に描く) */}
+          {boundaryRows.map((row) => (
             <div
-              key={`sep-${i}`}
+              key={`hline-${row}`}
               aria-hidden="true"
-              className="pointer-events-none self-start border-t border-primary/15"
-              style={{ gridColumn: '1 / -1', gridRow: block.startRow }}
+              className="pointer-events-none z-30 self-start border-t border-primary/15"
+              style={{ gridColumn: '1 / -1', gridRow: row }}
             />
           ))}
 
@@ -207,7 +228,7 @@ export default function FarmCalendar({
                   ? 'font-medium text-accent-strong'
                   : 'text-primary/70'
               }`}
-              style={{ gridColumn: `${2 + i * 2} / span 2`, gridRow: 1 }}
+              style={{ gridColumn: `${2 + i * 3} / span 3`, gridRow: 1 }}
             >
               {label}
             </div>
@@ -236,12 +257,9 @@ export default function FarmCalendar({
                   crop={crop}
                   task={task}
                   row={startRow + i}
-                  isSelected={
-                    selected?.cropName === crop.name &&
-                    selected?.task.label === task.label
-                  }
+                  selected={isSelected(crop.name, task)}
                   detailId={detailId}
-                  onSelect={setSelected}
+                  onSelect={setDetail}
                 />
               ))}
             </div>
@@ -267,26 +285,40 @@ export default function FarmCalendar({
         </div>
       </div>
 
-      {/* 選択中の作業の詳細 (カレンダー直下。選択時にここへスクロール) */}
-      <div ref={detailRef} id={detailId} aria-live="polite" className="mt-5">
-        {selected && (
-          <TaskDetail selected={selected} onClose={() => setSelected(null)} />
-        )}
-      </div>
-
       {/* 凡例 */}
       <Legend crops={cropBlocks.map((b) => b.crop)} />
+
+      {/* タップした作業の詳細 (タップ位置の近くにポップオーバー表示) */}
+      {detail && (
+        <TaskPopover
+          id={detailId}
+          detail={detail.data}
+          rect={detail.rect}
+          onClose={() => setDetail(null)}
+        />
+      )}
     </div>
   )
 }
 
+function IntensityDots({ level }: { level: number }) {
+  return (
+    <span className="tracking-tight">
+      <span className="text-accent-strong">{'●'.repeat(level)}</span>
+      <span className="text-primary/25">{'●'.repeat(3 - level)}</span>
+    </span>
+  )
+}
+
 /** バーの横に置くラベル。狭いバーでも読めるよう、バーの外側へオーバーフローさせる。 */
-function BarLabel({ end, children }: { end: number; children: string }) {
+function BarLabel({ end, children }: { end: number; children: ReactNode }) {
   const left = labelOnLeft(end)
   return (
     <span
-      className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-body ${
-        left ? 'right-full mr-1.5 text-right' : 'left-full ml-1.5'
+      className={`absolute top-1/2 flex -translate-y-1/2 items-center gap-1 whitespace-nowrap text-xs text-body ${
+        left
+          ? 'right-full mr-1.5 flex-row-reverse text-right'
+          : 'left-full ml-1.5'
       }`}
     >
       {children}
@@ -298,57 +330,57 @@ function TaskBar({
   crop,
   task,
   row,
-  isSelected,
+  selected,
   detailId,
   onSelect,
 }: {
   crop: CalendarCrop
   task: CalendarTask
   row: number
-  isSelected: boolean
+  selected: boolean
   detailId: string
-  onSelect: (s: SelectedTask) => void
+  onSelect: (s: { data: SelectedTask; rect: DOMRect }) => void
 }) {
-  // ボランティア歓迎の作業は塗りで強調、それ以外は淡色＋破線で控えめに。
-  const style = task.volunteer
-    ? { backgroundColor: crop.color }
-    : {
-        backgroundColor: `${crop.color}26`,
-        border: `1px dashed ${crop.color}`,
-      }
+  const meta = INTENSITY_META[task.intensity]
   return (
     <button
       type="button"
       data-testid="task-bar"
-      data-volunteer={task.volunteer}
+      data-intensity={task.intensity}
+      aria-haspopup="dialog"
       aria-controls={detailId}
-      aria-expanded={isSelected}
-      aria-label={`${crop.name} ${task.label}（${formatPeriod(task.start, task.end)}）${
-        task.volunteer ? '・ボランティア歓迎' : ''
-      }`}
-      onClick={() =>
+      aria-expanded={selected}
+      aria-label={`${crop.name} ${task.label}（${formatPeriod(task.start, task.end)}・作業強度 ${meta.label}）`}
+      onClick={(e) =>
         onSelect({
-          cropName: crop.name,
-          emoji: crop.emoji,
-          color: crop.color,
-          task,
+          data: {
+            cropName: crop.name,
+            emoji: crop.emoji,
+            color: crop.color,
+            task,
+          },
+          rect: e.currentTarget.getBoundingClientRect(),
         })
       }
       className={`relative my-1 flex h-6 items-center justify-center self-center overflow-visible rounded-full transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-        isSelected ? 'ring-2 ring-accent ring-offset-1' : ''
+        selected ? 'ring-2 ring-accent ring-offset-1' : ''
       }`}
       style={{
-        ...style,
+        backgroundColor: crop.color,
         gridColumn: barColumn(task.start, task.end),
         gridRow: row,
       }}
     >
-      {task.volunteer && (
-        <span aria-hidden="true" className="text-[0.7rem] leading-none">
-          🙌
+      <BarLabel end={task.end}>
+        <span>{task.label}</span>
+        <span
+          aria-hidden="true"
+          className="text-[0.6rem] leading-none"
+          title={`作業強度: ${meta.label}`}
+        >
+          <IntensityDots level={meta.level} />
         </span>
-      )}
-      <BarLabel end={task.end}>{task.label}</BarLabel>
+      </BarLabel>
     </button>
   )
 }
@@ -383,7 +415,13 @@ function Legend({ crops }: { crops: CalendarCrop[] }) {
         </span>
       ))}
       <span className="flex items-center gap-1">
-        <span aria-hidden="true">🙌</span> ボランティア歓迎
+        作業強度:
+        {(['light', 'medium', 'hard'] as const).map((key) => (
+          <span key={key} className="flex items-center gap-0.5">
+            <IntensityDots level={INTENSITY_META[key].level} />
+            {INTENSITY_META[key].label}
+          </span>
+        ))}
       </span>
       <span className="flex items-center gap-1">
         <span
@@ -396,53 +434,144 @@ function Legend({ crops }: { crops: CalendarCrop[] }) {
   )
 }
 
-function TaskDetail({
-  selected,
+function TaskPopover({
+  id,
+  detail,
+  rect,
   onClose,
 }: {
-  selected: SelectedTask
+  id: string
+  detail: SelectedTask
+  rect: DOMRect
   onClose: () => void
 }) {
-  const { cropName, emoji, color, task } = selected
-  return (
-    <div
-      className="rounded-3xl border border-primary/10 bg-surface p-5 shadow-lg"
-      style={{ borderTopColor: color, borderTopWidth: '4px' }}
-    >
-      <span className="mb-3 flex w-fit items-center gap-1 rounded-full bg-sunlight-soft px-3 py-0.5 font-serif text-xs tracking-wide text-primary-deep before:text-[0.6rem] before:text-accent-strong before:content-['▲']">
-        選択中の作業
-      </span>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="font-serif text-lg text-primary">
-            {emoji} {cropName}・{task.label}
-          </p>
-          <p className="mt-1 text-sm text-body/80">
-            {formatPeriod(task.start, task.end)}
-            {task.volunteer && (
-              <span className="ml-2 rounded-full bg-accent-soft/40 px-2 py-0.5 text-accent-strong">
-                🙌 ボランティア歓迎
+  const ref = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{
+    left: number
+    top: number
+    width: number
+    arrowLeft: number
+    below: boolean
+  } | null>(null)
+
+  // 実際の高さを測ってからタップ位置の近くに配置する (画面外にはみ出さないよう調整)。
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const width = Math.min(320, vw - 24)
+    const height = el.offsetHeight
+    const centerX = rect.left + rect.width / 2
+    const left = clamp(centerX - width / 2, 12, Math.max(12, vw - width - 12))
+    const spaceBelow = vh - rect.bottom
+    const below = spaceBelow >= height + 14 || spaceBelow >= rect.top
+    const top = below
+      ? clamp(rect.bottom + 10, 12, Math.max(12, vh - height - 12))
+      : clamp(rect.top - 10 - height, 12, Math.max(12, vh - height - 12))
+    const arrowLeft = clamp(centerX - left, 18, width - 18)
+    setPos({ left, top, width, arrowLeft, below })
+  }, [rect])
+
+  // フォーカス移動・Escape・スクロール/リサイズで閉じる。
+  useEffect(() => {
+    ref.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('scroll', onClose, true)
+    window.addEventListener('resize', onClose)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('scroll', onClose, true)
+      window.removeEventListener('resize', onClose)
+    }
+  }, [onClose])
+
+  const { cropName, emoji, color, task } = detail
+  const meta = INTENSITY_META[task.intensity]
+
+  return createPortal(
+    <>
+      {/* 背景タップで閉じる (カレンダーは透けたまま) */}
+      <div
+        className="fixed inset-0 z-40 bg-black/5"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+      <div
+        ref={ref}
+        id={id}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${cropName} ${task.label}`}
+        tabIndex={-1}
+        className="fixed z-50 rounded-2xl border border-primary/10 bg-surface p-4 shadow-xl outline-none"
+        style={{
+          left: pos?.left ?? rect.left,
+          top: pos?.top ?? rect.bottom + 10,
+          width: pos?.width ?? 320,
+          maxHeight: 'calc(100dvh - 24px)',
+          overflowY: 'auto',
+          visibility: pos ? 'visible' : 'hidden',
+          borderTopColor: color,
+          borderTopWidth: '4px',
+        }}
+      >
+        {/* タップしたバーを指す小さな三角 */}
+        {pos && (
+          <span
+            aria-hidden="true"
+            className="absolute h-3 w-3 rotate-45 border-primary/10 bg-surface"
+            style={
+              pos.below
+                ? {
+                    left: pos.arrowLeft,
+                    top: -6,
+                    borderTopWidth: 1,
+                    borderLeftWidth: 1,
+                  }
+                : {
+                    left: pos.arrowLeft,
+                    bottom: -6,
+                    borderBottomWidth: 1,
+                    borderRightWidth: 1,
+                  }
+            }
+          />
+        )}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-serif text-base text-primary">
+              {emoji} {cropName}・{task.label}
+            </p>
+            <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-body/80">
+              <span>{formatPeriod(task.start, task.end)}</span>
+              <span className="flex items-center gap-1 rounded-full bg-base px-2 py-0.5 text-xs">
+                <span aria-hidden="true">
+                  <IntensityDots level={meta.level} />
+                </span>
+                作業強度 {meta.label}
               </span>
-            )}
-          </p>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="閉じる"
+            className="-mr-1 -mt-1 shrink-0 rounded-full px-2 py-1 text-body/50 hover:text-body focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            ✕
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="閉じる"
-          className="shrink-0 rounded-full px-2 text-body/50 hover:text-body focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          ✕
-        </button>
-      </div>
-      {task.note && (
-        <p className="mt-3 leading-relaxed text-body">{task.note}</p>
-      )}
-      {task.volunteer && (
-        <div className="mt-4 flex flex-wrap gap-3">
+        {task.note && (
+          <p className="mt-3 text-sm leading-relaxed text-body">{task.note}</p>
+        )}
+        <div className="mt-4 flex flex-wrap gap-2">
           <a
             href="/join"
-            className="inline-flex items-center justify-center rounded-full bg-accent-strong px-6 py-2 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="inline-flex items-center justify-center rounded-full bg-accent-strong px-5 py-2 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             参加の流れを見る
           </a>
@@ -450,12 +579,13 @@ function TaskDetail({
             href="https://activo.jp/s/a/119414"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-full border border-accent-strong px-6 py-2 text-sm font-medium text-accent-strong transition-colors hover:bg-accent-strong hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="inline-flex items-center justify-center rounded-full border border-accent-strong px-5 py-2 text-sm font-medium text-accent-strong transition-colors hover:bg-accent-strong hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            ボランティア募集を見る
+            募集を見る
           </a>
         </div>
-      )}
-    </div>
+      </div>
+    </>,
+    document.body,
   )
 }

@@ -23,9 +23,12 @@ const events = (await getCollection('events')).map((entry) => ({
       >農作業カレンダー</SectionHeading
     >
     <p class="mb-8 max-w-2xl leading-loose text-body">
-      下栗の里で一年を通して行う農作業の予定表です。<wbr />
-      <span class="font-medium text-accent-strong">🙌 のついた作業</span>
-      はボランティア参加を歓迎しています。気になる作業のバーをタップすると、内容と参加方法をご覧いただけます。今月の列をハイライトしているので、「今・近いうちに参加できる作業」を探してみてください。
+      下栗の里で一年を通して行う農作業の予定表です。どの作業も<span
+        class="font-medium text-accent-strong">参加歓迎</span
+      >。各バーには<span class="font-medium text-accent-strong"
+        >作業強度の目安</span
+      >（軽め / ふつう /
+      しっかり）を表示しています。気になる作業のバーをタップすると、内容と参加方法をご覧いただけます。今月の列をハイライトしているので、「今・近いうちに参加できる作業」を探してみてください。
     </p>
 
     <FarmCalendar client:load crops={crops} events={events} />

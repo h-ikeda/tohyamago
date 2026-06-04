@@ -6,7 +6,7 @@ import FarmCalendar, {
   type CalendarEvent,
   startColumn,
   endColumn,
-  formatHalfMonth,
+  formatMonthPart,
   formatPeriod,
   labelOnLeft,
 } from './FarmCalendar'
@@ -22,11 +22,11 @@ const crops: CalendarCrop[] = [
       {
         label: '植付け',
         start: 4.0,
-        end: 4.5,
-        volunteer: true,
+        end: 4.0,
+        intensity: 'medium',
         note: '種芋の植付け。初参加歓迎。',
       },
-      { label: '中切り', start: 6.0, end: 8.5, volunteer: false },
+      { label: '収穫（芋掘り）', start: 7.1, end: 8.0, intensity: 'hard' },
     ],
   },
 ]
@@ -36,77 +36,78 @@ const events: CalendarEvent[] = [
     id: 'shimotsuki',
     name: '霜月祭り',
     start: 12.0,
-    end: 12.5,
+    end: 12.2,
     category: '地域行事',
     note: '国指定重要無形民俗文化財。',
   },
 ]
 
-describe('FarmCalendar の純粋関数', () => {
-  it('startColumn は半月値を 1〜24 の列に変換する', () => {
+describe('FarmCalendar の純粋関数 (36 列・旬粒度)', () => {
+  it('startColumn は月.旬を 1〜36 の列に変換する', () => {
     expect(startColumn(1.0)).toBe(1) // 1月上旬
-    expect(startColumn(1.5)).toBe(2) // 1月下旬
-    expect(startColumn(4.0)).toBe(7) // 4月上旬
-    expect(startColumn(12.5)).toBe(24) // 12月下旬
+    expect(startColumn(1.1)).toBe(2) // 1月中旬
+    expect(startColumn(1.2)).toBe(3) // 1月下旬
+    expect(startColumn(4.0)).toBe(10) // 4月上旬
+    expect(startColumn(12.2)).toBe(36) // 12月下旬
   })
 
   it('endColumn は開始列の次の列 (排他的終端) を返す', () => {
-    expect(endColumn(4.0)).toBe(8)
-    expect(endColumn(12.5)).toBe(25)
+    expect(endColumn(4.0)).toBe(11)
+    expect(endColumn(12.2)).toBe(37)
   })
 
-  it('formatHalfMonth は上旬・下旬を表記する', () => {
-    expect(formatHalfMonth(5.0)).toBe('5月上旬')
-    expect(formatHalfMonth(5.5)).toBe('5月下旬')
+  it('formatMonthPart は上旬・中旬・下旬を表記する', () => {
+    expect(formatMonthPart(5.0)).toBe('5月上旬')
+    expect(formatMonthPart(5.1)).toBe('5月中旬')
+    expect(formatMonthPart(5.2)).toBe('5月下旬')
   })
 
-  it('formatPeriod は単一半月と期間を出し分ける', () => {
+  it('formatPeriod は単一の旬と期間を出し分ける', () => {
     expect(formatPeriod(11.0, 11.0)).toBe('11月上旬')
-    expect(formatPeriod(4.0, 4.5)).toBe('4月上旬〜4月下旬')
+    expect(formatPeriod(4.0, 4.2)).toBe('4月上旬〜4月下旬')
   })
 
   it('labelOnLeft は年末に終わるバーのラベルを左側に寄せる', () => {
-    expect(labelOnLeft(5.5)).toBe(false) // 5月下旬 → 右
-    expect(labelOnLeft(10.5)).toBe(false) // 10月下旬 → 右
+    expect(labelOnLeft(5.1)).toBe(false) // 5月中旬 → 右
+    expect(labelOnLeft(10.2)).toBe(false) // 10月下旬 → 右
     expect(labelOnLeft(11.0)).toBe(true) // 11月上旬 → 左
-    expect(labelOnLeft(12.5)).toBe(true) // 12月下旬 → 左
+    expect(labelOnLeft(12.2)).toBe(true) // 12月下旬 → 左
   })
 })
 
 describe('FarmCalendar コンポーネント', () => {
-  it('当月の列をハイライトし、当月ラベルを強調する', () => {
+  it('当月の 3 列をハイライトし、当月ラベルを強調する', () => {
     render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
 
-    // 5月 → 上旬列 = (5-1)*2+1 = 9、ラベル列ぶん +1 で 10 列目から 2 列ぶん
+    // 5月 → ラベル列ぶん +1 で (5-1)*3+2 = 14 列目から 3 列ぶん
     const band = screen.getByTestId('current-month-band')
-    expect(band.style.gridColumn).toBe('10 / span 2')
+    expect(band.style.gridColumn).toBe('14 / span 3')
 
     expect(screen.getByText('5月').className).toContain('text-accent-strong')
   })
 
-  it('ボランティア作業は強調し、非ボランティア作業は破線で控えめに描く', () => {
+  it('作業バーに作業強度を data 属性で持たせる (ボランティア強調はしない)', () => {
     render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
 
     const planting = screen.getByRole('button', { name: /植付け/ })
-    expect(planting.dataset.volunteer).toBe('true')
-    // 強調バーには 🙌 マークが付く
-    expect(planting.textContent).toContain('🙌')
-    expect(planting.style.borderStyle).not.toBe('dashed')
+    expect(planting.dataset.intensity).toBe('medium')
 
-    const nakagiri = screen.getByRole('button', { name: /中切り/ })
-    expect(nakagiri.dataset.volunteer).toBe('false')
-    expect(nakagiri.style.border).toContain('dashed')
+    const harvest = screen.getByRole('button', { name: /収穫（芋掘り）/ })
+    expect(harvest.dataset.intensity).toBe('hard')
+
+    // 旧仕様の 🙌 ボランティアマークは表示しない
+    expect(screen.queryByText('🙌')).not.toBeInTheDocument()
   })
 
   it('地域イベントを描画する', () => {
     render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
     const eventBar = screen.getByTestId('event-bar')
     expect(eventBar.textContent).toContain('霜月祭り')
-    // 12月上旬 → 列 23、ラベル列ぶん +1 で 24 から
-    expect(eventBar.style.gridColumn).toBe('24 / 26')
+    // 12月上旬 → 列 34 (+1=35) から、12月下旬 (列 36) の終端 37 (+1=38) まで
+    expect(eventBar.style.gridColumn).toBe('35 / 38')
   })
 
-  it('作業バーをクリックすると詳細と参加 CTA が開く', async () => {
+  it('バーをタップするとタップ付近にポップオーバーで詳細と CTA が開く', async () => {
     const user = userEvent.setup()
     render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
 
@@ -116,20 +117,23 @@ describe('FarmCalendar コンポーネント', () => {
     await user.click(planting)
 
     expect(planting).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByText('種芋の植付け。初参加歓迎。')).toBeInTheDocument()
+
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).toHaveTextContent('種芋の植付け。初参加歓迎。')
+    expect(dialog).toHaveTextContent('作業強度 ふつう')
 
     const joinCta = screen.getByRole('link', { name: '参加の流れを見る' })
     expect(joinCta).toHaveAttribute('href', '/join')
   })
 
-  it('非ボランティア作業の詳細には参加 CTA を出さない', async () => {
+  it('ポップオーバーは閉じるボタンで閉じられる', async () => {
     const user = userEvent.setup()
     render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
 
-    await user.click(screen.getByRole('button', { name: /中切り/ }))
+    await user.click(screen.getByRole('button', { name: /植付け/ }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
 
-    expect(
-      screen.queryByRole('link', { name: '参加の流れを見る' }),
-    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '閉じる' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })

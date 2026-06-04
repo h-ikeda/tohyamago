@@ -11,16 +11,22 @@ const posts = defineCollection({
     }),
 })
 
-// 月.上下旬 (1.0〜12.5, 0.5 刻み)。整数=上旬, .5=下旬。
-// CSS Grid の列計算 (24 列) に直結するためスキーマで厳密に検証する。
-const halfMonth = z
+// 月.旬 (1.0〜12.2)。各月 .0=上旬 / .1=中旬 / .2=下旬 の 3 分割。
+// CSS Grid の列計算 (36 列) に直結するためスキーマで厳密に検証する。
+const monthThird = z
   .number()
   .min(1.0)
-  .max(12.5)
-  .refine((n) => n % 0.5 === 0, {
-    message:
-      '値は 1.0〜12.5 の 0.5 刻み（整数=上旬, .5=下旬）で指定してください',
-  })
+  .max(12.2)
+  .refine(
+    (n) => {
+      const third = Math.round((n - Math.floor(n)) * 10)
+      return third === 0 || third === 1 || third === 2
+    },
+    {
+      message:
+        '値は 1.0〜12.2 で、各月 .0=上旬 / .1=中旬 / .2=下旬 を指定してください',
+    },
+  )
 
 const crops = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/crops' }),
@@ -32,9 +38,10 @@ const crops = defineCollection({
     tasks: z.array(
       z.object({
         label: z.string(),
-        start: halfMonth,
-        end: halfMonth,
-        volunteer: z.boolean().default(false),
+        start: monthThird,
+        end: monthThird,
+        // 作業強度の目安: light=軽め / medium=ふつう / hard=しっかり
+        intensity: z.enum(['light', 'medium', 'hard']).default('medium'),
         note: z.string().optional(),
       }),
     ),
@@ -45,8 +52,8 @@ const events = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/events' }),
   schema: z.object({
     name: z.string(),
-    start: halfMonth,
-    end: halfMonth,
+    start: monthThird,
+    end: monthThird,
     category: z.string().default('地域行事'),
     location: z.string().optional(),
     url: z.string().url().optional(),
