@@ -39,21 +39,10 @@ const currentPath = Astro.url.pathname
         </main>
       ) : (
         <main class="flex grow flex-col overflow-auto">
-          {/* コンテンツ領域。下端フェード (after:sticky) はこのラッパーに封じ込め、
-              スクロール末尾のフッターには被らないようにする。grow で短いページでも
-              フッターをビューポート下端へ押し下げる。 */}
+          {/* grow で短いページでもフッターをビューポート下端へ押し下げる */}
           <div
             class:list={[
               'grow',
-              'after:sticky',
-              'after:bottom-0',
-              'after:bg-gradient-to-t',
-              'after:from-base',
-              'after:to-transparent',
-              'after:opacity-90',
-              'after:w-full',
-              'after:h-20',
-              'after:block',
               'before:top-0',
               'before:bg-gradient-to-b',
               'before:from-primary',

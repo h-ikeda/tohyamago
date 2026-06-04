@@ -9,7 +9,8 @@
  * - 法令・規約: 定款 / 公告 / 特定商取引法に基づく表記
  *   （公告の URL は法人登記に記載のため変更禁止）
  * - 法人概要: 名称・所在地（詳細は特商法表記ページに集約）
- * - デザイン規則: 三角形(▲) モチーフ / green・sunlight 基調 (CLAUDE.md)
+ * - デザイン規則: 二重の山アイコン（ロゴと同系統の重なる稜線）/ green・sunlight 基調 (CLAUDE.md)
+ *   リンクマーカーは奥＝ティール・手前＝陽光、現在ページは手前をコーラル(accent)にする。
  * a11y: 現在ページに aria-current="page" を付与する。
  */
 import Container from '~/components/Container.astro'
@@ -36,21 +37,14 @@ const legalLinks = [
 
 const year = new Date().getFullYear()
 
-const linkClass = (path: string) =>
+const linkClass = (active: boolean) =>
   [
-    'inline-flex items-center gap-2 py-1 text-white/80 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sunlight',
-    "before:text-[0.6rem] before:text-sunlight before:content-['▲']",
-    isActivePath(path) && 'text-white before:text-accent',
-  ]
-    .filter(Boolean)
-    .join(' ')
+    'inline-flex items-center gap-2 py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sunlight',
+    active ? 'text-white' : 'text-white/80 hover:text-white',
+  ].join(' ')
 ---
 
-<footer
-  class="shrink-0 border-t-4 border-sunlight bg-primary-deep text-white relative
-         before:border-x-[0.58rem] before:border-b-[1rem] before:border-x-transparent before:border-b-sunlight before:absolute before:right-3.5 before:-top-[1.3rem]
-         after:border-x-[0.58rem] after:border-b-[1rem] after:border-x-transparent after:border-b-accent after:absolute after:right-2 after:-top-[1.4rem] after:scale-110 after:origin-bottom-right"
->
+<footer class="shrink-0 border-t-4 border-sunlight bg-primary-deep text-white">
   <Container size="wide" class="py-8 sm:py-10">
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
       <!-- ブランド -->
@@ -74,17 +68,33 @@ const linkClass = (path: string) =>
         </h2>
         <ul class="flex flex-col text-sm">
           {
-            legalLinks.map((link) => (
-              <li>
-                <a
-                  href={link.path}
-                  aria-current={isActivePath(link.path) ? 'page' : undefined}
-                  class={linkClass(link.path)}
-                >
-                  {link.title}
-                </a>
-              </li>
-            ))
+            legalLinks.map((link) => {
+              const active = isActivePath(link.path)
+              return (
+                <li>
+                  <a
+                    href={link.path}
+                    aria-current={active ? 'page' : undefined}
+                    class={linkClass(active)}
+                  >
+                    {/* 二重の山アイコン (奥=ティール / 手前=陽光・現在ページはコーラル) */}
+                    <svg
+                      class="h-3 w-[1.15rem] shrink-0"
+                      viewBox="0 0 22 15"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M1 14L8 3L15 14Z" fill="#44b08c" />
+                      <path
+                        d="M9 14L15 6L21 14Z"
+                        fill={active ? '#f06b4b' : '#ffc24b'}
+                      />
+                    </svg>
+                    {link.title}
+                  </a>
+                </li>
+              )
+            })
           }
         </ul>
       </nav>
