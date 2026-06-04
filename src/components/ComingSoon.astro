@@ -1,0 +1,46 @@
+---
+/**
+ * ComingSoon — 準備中ページの共通テンプレート。
+ *
+ * ナビには存在するがまだ実装していないページ (story / join / calendar /
+ * products / support など) で使用し、404 の真っ白な画面を避ける。
+ * 次の一歩 (CTA) を必ず置き、迷子を作らない方針に沿ってトップ・ボランティア
+ * 募集への導線を添える。
+ */
+import Container from '~/components/Container.astro'
+import SectionHeading from '~/components/SectionHeading.astro'
+import Card from '~/components/Card.astro'
+import Button from '~/components/Button.astro'
+
+interface Props {
+  title: string
+  description?: string
+}
+
+const { title, description } = Astro.props
+---
+
+<Container class="py-12 md:py-16">
+  <SectionHeading as="h1" level="page" align="left" class="mb-8"
+    >{title}</SectionHeading
+  >
+  <Card
+    class="border-t-4 border-t-sunlight px-6 py-12 text-center md:px-10 md:py-16"
+  >
+    <span
+      class="mx-auto flex w-fit items-center gap-2 rounded-full bg-sunlight-soft px-4 py-1 font-serif text-sm tracking-wide text-primary-deep
+             before:text-xs before:text-accent-strong before:content-['▲']"
+    >
+      準備中
+    </span>
+    <p class="mx-auto mt-6 max-w-xl leading-loose text-body">
+      {description ?? `「${title}」のページは現在準備中です。`}<br />
+      公開までもうしばらくお待ちください。最新の活動の様子はトップページや募集ページでご覧いただけます。
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <Button href="/" variant="outline">トップへ戻る</Button>
+      <Button href="https://activo.jp/s/a/119414">ボランティア募集を見る</Button
+      >
+    </div>
+  </Card>
+</Container>

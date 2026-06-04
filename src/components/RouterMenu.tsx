@@ -1,11 +1,8 @@
 import { useState, useCallback } from 'react'
 
 const links = [
-  { path: '/purpose', title: '活動趣旨' },
-  { path: '/membership', title: '入会案内' },
   { path: '/articles', title: '定款' },
   { path: '/public_notices', title: '公告' },
-  { path: 'https://shop.tohyamago.org', title: '成果品販売' },
   { path: '/notation', title: '特定商取引法に基づく表記' },
 ]
 
@@ -80,7 +77,7 @@ export default function RouterMenu({
         />
       )}
 
-      {/* 目次ボタン */}
+      {/* 法令ボタン */}
       <button
         onClick={open}
         onAnimationEnd={onBtnAnimEnd}
@@ -91,7 +88,7 @@ export default function RouterMenu({
         className="fixed left-4 z-20 bottom-2 w-14 h-14 rounded-full border border-primary-soft shadow-lg bg-primary-deep text-white cursor-pointer
                    after:content-['▲'] after:absolute after:bottom-14 after:inset-x-0 after:text-sm after:text-accent after:animate-bounce"
       >
-        目次
+        法令
       </button>
 
       {/* メニュー */}

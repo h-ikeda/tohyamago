@@ -1,0 +1,267 @@
+---
+/**
+ * SiteHeader — グローバルナビ (ジャーナリー導線ヘッダー)。
+ *
+ * 団体組織図ではなく「来訪者のやりたいこと」で章立てする (CLAUDE.md / README ロードマップ Phase 2)。
+ * - ドロップダウン: 活動を知る / 参加する(主) / 成果品 / 支える
+ * - 常時表示 CTA: 参加する・寄付 (どのページからもゴール導線へ届く)
+ * - ゴール優先度の高い「参加する」を最も目立たせる。
+ *
+ * 移行期間は左下フローティング `RouterMenu` と併存し、最終的にヘッダー＋フッターへ寄せる。
+ * a11y: キーボード操作 (focus-within でドロップダウン展開) / フォーカスリング / aria-current。
+ * デスクトップ未満はハンバーガーで全項目を展開する。
+ */
+import Container from '~/components/Container.astro'
+
+interface Props {
+  currentPath?: string
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props
+
+type NavItem = { path: string; title: string; external?: boolean }
+type NavGroup = { label: string; primary?: boolean; items: NavItem[] }
+
+const groups: NavGroup[] = [
+  {
+    label: '活動を知る',
+    items: [
+      { path: '/purpose', title: '活動趣旨' },
+      { path: '/story', title: '始まり物語' },
+      { path: '/#feed', title: '近況' },
+    ],
+  },
+  {
+    label: '参加する',
+    primary: true,
+    items: [
+      { path: '/join', title: 'はじめての方へ' },
+      { path: '/calendar', title: '農作業カレンダー' },
+    ],
+  },
+  {
+    label: '成果品',
+    items: [
+      { path: '/products', title: '成果品紹介' },
+      {
+        path: 'https://shop.tohyamago.org',
+        title: 'オンラインショップ',
+        external: true,
+      },
+    ],
+  },
+  {
+    label: '支える',
+    items: [
+      { path: '/support', title: '寄付' },
+      { path: '/membership', title: '入会案内' },
+    ],
+  },
+]
+
+const ctas = [
+  { path: '/join', title: '参加する', variant: 'accent' as const },
+  { path: '/support', title: '寄付', variant: 'outline' as const },
+]
+
+// ハッシュ/末尾スラッシュを無視してパスを比較する
+const normalize = (p: string) =>
+  p.split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
+const isActivePath = (path: string) =>
+  !path.startsWith('http') && normalize(path) === normalize(currentPath)
+const isGroupActive = (g: NavGroup) => g.items.some((i) => isActivePath(i.path))
+
+// ヘッダー内のコンパクト CTA (Button.astro と同系統。ヘッダー用に余白を縮小)
+const ctaBase =
+  'inline-flex items-center justify-center gap-1 rounded-full px-5 py-2 text-sm font-medium transition-all hover:-translate-y-0.5 hover:shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+const ctaVariants = {
+  accent: 'bg-accent-strong text-white shadow-sm hover:opacity-90',
+  outline:
+    'border border-accent-strong bg-surface text-accent-strong hover:bg-accent-strong hover:text-white',
+}
+---
+
+<header
+  class="relative z-40 shrink-0 border-b border-primary/10 bg-base/95 shadow-sm backdrop-blur"
+>
+  <Container size="wide" class="flex items-center justify-between gap-4 py-3">
+    <!-- ロゴ -->
+    <a
+      href="/"
+      class="flex items-center gap-2 whitespace-nowrap font-serif text-lg font-medium text-primary transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
+             before:text-sm before:text-accent before:content-['▲']"
+    >
+      遠山郷応援会
+    </a>
+
+    <!-- デスクトップナビ -->
+    <nav
+      aria-label="グローバルナビゲーション"
+      class="hidden items-center gap-1 lg:flex"
+    >
+      <ul class="flex items-center gap-1">
+        {
+          groups.map((g) => (
+            <li class="group relative">
+              <button
+                type="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+                data-dropdown-trigger
+                class:list={[
+                  'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  g.primary
+                    ? 'font-medium text-accent-strong hover:bg-accent-soft/20'
+                    : 'text-body hover:text-primary',
+                  isGroupActive(g) && !g.primary && 'font-medium text-primary',
+                ]}
+              >
+                {g.label}
+                <span
+                  aria-hidden="true"
+                  class="h-0 w-0 border-x-[0.22rem] border-t-[0.28rem] border-x-transparent border-t-current transition-transform duration-200 group-hover:rotate-180 group-data-[open]:rotate-180"
+                />
+              </button>
+              <ul class="invisible absolute left-0 top-full z-10 min-w-44 -translate-y-1 rounded-2xl border border-primary/10 bg-surface p-2 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-data-[open]:visible group-data-[open]:translate-y-0 group-data-[open]:opacity-100">
+                {g.items.map((i) => (
+                  <li>
+                    <a
+                      href={i.path}
+                      aria-current={isActivePath(i.path) ? 'page' : undefined}
+                      {...(i.external
+                        ? { target: '_blank', rel: 'noopener noreferrer' }
+                        : {})}
+                      class:list={[
+                        'flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 text-sm transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                        isActivePath(i.path)
+                          ? 'font-medium text-primary'
+                          : 'text-body',
+                      ]}
+                    >
+                      {i.title}
+                      {i.external && (
+                        <span
+                          aria-hidden="true"
+                          class="text-xs text-primary/50"
+                        >
+                          ↗
+                        </span>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+
+      <!-- 常時表示 CTA -->
+      <div class="ml-2 flex items-center gap-2">
+        {
+          ctas.map((c) => (
+            <a href={c.path} class:list={[ctaBase, ctaVariants[c.variant]]}>
+              {c.title}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
+
+    <!-- モバイル: ハンバーガー -->
+    <button
+      type="button"
+      data-menu-toggle
+      aria-expanded="false"
+      aria-controls="site-mobile-nav"
+      class="flex h-10 w-10 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden"
+    >
+      <span class="sr-only">メニューを開閉</span>
+      <span
+        aria-hidden="true"
+        class="relative block h-0.5 w-5 bg-current
+               before:absolute before:-top-1.5 before:left-0 before:block before:h-0.5 before:w-5 before:bg-current before:content-['']
+               after:absolute after:top-1.5 after:left-0 after:block after:h-0.5 after:w-5 after:bg-current after:content-['']"
+      ></span>
+    </button>
+  </Container>
+
+  <!-- モバイルパネル -->
+  <div
+    id="site-mobile-nav"
+    data-mobile-nav
+    hidden
+    class="border-t border-primary/10 bg-surface lg:hidden"
+  >
+    <Container size="wide" class="py-4">
+      <!-- CTA (最優先導線を上部に) -->
+      <div class="flex flex-col gap-2 pb-4">
+        {
+          ctas.map((c) => (
+            <a
+              href={c.path}
+              class:list={[ctaBase, 'w-full', ctaVariants[c.variant]]}
+            >
+              {c.title}
+            </a>
+          ))
+        }
+      </div>
+
+      <nav aria-label="モバイルナビゲーション">
+        <ul class="divide-y divide-primary/10">
+          {
+            groups.map((g) => (
+              <li class="py-3">
+                <p
+                  class:list={[
+                    'flex items-center gap-2 px-1 pb-1 font-serif text-sm font-medium',
+                    g.primary ? 'text-accent-strong' : 'text-primary',
+                    "before:text-xs before:content-['▲']",
+                  ]}
+                >
+                  {g.label}
+                </p>
+                <ul class="flex flex-col">
+                  {g.items.map((i) => (
+                    <li>
+                      <a
+                        href={i.path}
+                        aria-current={isActivePath(i.path) ? 'page' : undefined}
+                        {...(i.external
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                        class:list={[
+                          'flex items-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                          isActivePath(i.path)
+                            ? 'font-medium text-primary'
+                            : 'text-body',
+                        ]}
+                      >
+                        {i.title}
+                        {i.external && (
+                          <span
+                            aria-hidden="true"
+                            class="text-xs text-primary/50"
+                          >
+                            ↗
+                          </span>
+                        )}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </Container>
+  </div>
+</header>
+
+<script>
+  import { initSiteHeaderNav } from './siteHeaderNav'
+
+  initSiteHeaderNav()
+</script>
