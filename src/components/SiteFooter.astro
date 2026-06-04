@@ -44,7 +44,7 @@ const linkClass = (active: boolean) =>
   ].join(' ')
 ---
 
-<footer class="shrink-0 border-t-4 border-sunlight bg-primary-deep text-white">
+<footer class="shrink-0 border-t-2 border-sunlight bg-primary-deep text-white">
   <Container size="wide" class="py-8 sm:py-10">
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
       <!-- ブランド -->
@@ -79,14 +79,14 @@ const linkClass = (active: boolean) =>
                   >
                     {/* 二重の山アイコン (奥=ティール / 手前=陽光・現在ページはコーラル) */}
                     <svg
-                      class="h-3 w-[1.15rem] shrink-0"
-                      viewBox="0 0 22 15"
+                      class="h-3.5 w-[1.04rem] shrink-0"
+                      viewBox="0 0 19 16"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path d="M1 14L8 3L15 14Z" fill="#44b08c" />
+                      <path d="M1 15L7.5 1L14 15Z" fill="#44b08c" />
                       <path
-                        d="M9 14L15 6L21 14Z"
+                        d="M7 15L12 7.5L17 15Z"
                         fill={active ? '#f06b4b' : '#ffc24b'}
                       />
                     </svg>
