@@ -236,7 +236,8 @@ const halfMonth = z
   .min(1.0)
   .max(12.5)
   .refine((n) => n % 0.5 === 0, {
-    message: '値は 1.0〜12.5 の 0.5 刻み（整数=上旬, .5=下旬）で指定してください',
+    message:
+      '値は 1.0〜12.5 の 0.5 刻み（整数=上旬, .5=下旬）で指定してください',
   })
 
 const crops = defineCollection({
