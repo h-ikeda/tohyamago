@@ -333,11 +333,14 @@ npm run typecheck     # astro check による型チェック
 npm test              # Vitest を 1 回実行
 npm run test:watch    # Vitest ウォッチモード
 npm run test:coverage # カバレッジ付きで実行
+npm run test:e2e      # Playwright (実ブラウザ E2E, e2e/ 配下)
 ```
 
 - **Linter**: ESLint 9 (flat config, `eslint.config.js`)。TypeScript / React / React Hooks / jsx-a11y / Astro 対応。整形系ルールは `eslint-config-prettier` で無効化し Prettier に委譲。日本語コンテンツの全角スペースを許容するため `no-irregular-whitespace` は無効。
 - **Formatter**: Prettier (`.prettierrc.json`)。セミコロンなし・シングルクォート。`.astro` は `prettier-plugin-astro` で整形。対象外は `.prettierignore`。
-- **テスト**: Vitest + Testing Library (jsdom)。React アイランドの代表的な「動き」と「スタイリング」を `src/**/*.test.tsx` に配置。UI は今後大きく変わるため、現時点では網羅より代表ケースの確認を重視する。
+- **テスト (方針)**: リグレッションテストは可能な限りコードを広くカバーする。ブラウザ依存の不具合 (NG) を修正したときは、その再発防止として実ブラウザテストを追加する。
+  - **単体/結合 (jsdom)**: Vitest + Testing Library。React アイランドや DOM ロジックの「動き」と「スタイリング」を `src/**/*.{test,spec}.{ts,tsx}` に配置。インライン `<script>` のロジックは `*.ts` モジュールへ分離してテスト可能にする (例: `SiteHeader.astro` の挙動は `siteHeaderNav.ts` に分離し `siteHeaderNav.test.ts` で検証)。
+  - **E2E (実ブラウザ)**: Playwright (`playwright.config.ts` / `e2e/*.spec.ts`)。jsdom が扱えないレイアウト・重なり順 (z-index/stacking) など、描画を伴う回帰のみを対象とする。CI では `e2e` ジョブで `npx playwright install --with-deps chromium` 後に実行する。
 
 ## ビルド時の補助処理
 
