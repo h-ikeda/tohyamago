@@ -17,9 +17,9 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
 
-  // React アイランド (.tsx / .jsx)
+  // React アイランド (.tsx / .jsx) — ルート直下の設定ファイルには適用しない
   {
-    files: ['**/*.{ts,tsx,js,jsx}'],
+    files: ['src/**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
       globals: { ...globals.browser },
     },

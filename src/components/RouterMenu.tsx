@@ -73,6 +73,7 @@ export default function RouterMenu({
       {(phase === 'open' || phase === 'opening') && (
         <button
           type="button"
+          tabIndex={-1}
           aria-label="メニューを閉じる"
           className="fixed inset-0 z-10"
           onClick={cancel}
