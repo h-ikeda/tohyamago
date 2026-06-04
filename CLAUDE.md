@@ -115,7 +115,7 @@ tohyamago/
 | 支える           | 寄付 / 入会案内                     | 寄付・会員支援者 |
 | （フッター）     | 定款 / 公告 / 特商法表記 / 法人概要 | 法令・信頼性     |
 
-- 現行の左下フローティング「目次」(`RouterMenu.tsx`) は、**ヘッダーナビ (`SiteHeader.astro`) へ再編**する（README ロードマップ Phase 2）。移行期間は両立可、最終的にヘッダー＋フッターへ寄せる。
+- 現行の左下フローティング「法令」(`RouterMenu.tsx`、旧「目次」) は、**ヘッダーナビ (`SiteHeader.astro`) へ再編**する（README ロードマップ Phase 2）。ヘッダーで網羅したページは `RouterMenu` から外し、法令系の文書（定款 / 公告 / 特商法表記）のみを残す。移行期間は両立可、最終的にヘッダー＋フッターへ寄せる。
 - ヘッダーは常時「**参加する / 寄付**」の 2 CTA をボタン表示し、どのページからもゴール導線に届くようにする。
 
 ### ページ一覧（新構成）
@@ -353,4 +353,4 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
   - Tailwind の `before:` / `after:` 疑似要素で border-trick を利用して描画
 - フォントウェイト: light (`:root` に `font-weight: var(--font-weight-light)` を設定)
 - レスポンシブ: モバイルファーストで設計
-- ナビゲーション: 左下フローティングボタン「目次」を押してメニューを展開
+- ナビゲーション: グローバルナビは `SiteHeader.astro`。左下フローティングボタン「法令」(`RouterMenu`) は法令系文書（定款 / 公告 / 特商法表記）への補助導線
