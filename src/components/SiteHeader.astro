@@ -261,65 +261,7 @@ const ctaVariants = {
 </header>
 
 <script>
-  // モバイルメニューの開閉
-  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]')
-  const panel = document.querySelector<HTMLElement>('[data-mobile-nav]')
+  import { initSiteHeaderNav } from './siteHeaderNav'
 
-  toggle?.addEventListener('click', () => {
-    if (!panel) return
-    const willOpen = panel.hasAttribute('hidden')
-    panel.toggleAttribute('hidden', !willOpen)
-    toggle.setAttribute('aria-expanded', String(willOpen))
-  })
-
-  // デスクトップドロップダウン (ディスクロージャー)。
-  // マウスのホバー表示は CSS の group-hover が担う。クリック / Enter / Space /
-  // タッチでは data-open と aria-expanded を同時にトグルし、
-  // 「見た目の開閉」と「支援技術への通知」を常に一致させる。
-  document
-    .querySelectorAll<HTMLButtonElement>('[data-dropdown-trigger]')
-    .forEach((btn) => {
-      const li = btn.closest('li')
-      if (!li) return
-      const setOpen = (open: boolean) => {
-        btn.setAttribute('aria-expanded', String(open))
-        li.toggleAttribute('data-open', open)
-      }
-      btn.addEventListener('click', () =>
-        setOpen(btn.getAttribute('aria-expanded') !== 'true'),
-      )
-      // フォーカスが項目の外へ移ったら閉じる (キーボードでの Tab 離脱・外クリック)
-      li.addEventListener('focusout', (e) => {
-        if (!li.contains(e.relatedTarget as Node | null)) setOpen(false)
-      })
-      // Escape で閉じ、フォーカスをトリガーへ戻す
-      li.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          setOpen(false)
-          btn.focus()
-        }
-      })
-    })
-
-  // メニュー外をクリック/タップしたら、開いている他のドロップダウンを閉じる
-  // (フォーカスを取得しないタッチ端末でのフォールバック)
-  document.addEventListener('click', (e) => {
-    document
-      .querySelectorAll<HTMLButtonElement>('[data-dropdown-trigger]')
-      .forEach((btn) => {
-        const li = btn.closest('li')
-        if (!li || li.contains(e.target as Node | null)) return
-        btn.setAttribute('aria-expanded', 'false')
-        li.removeAttribute('data-open')
-      })
-  })
-
-  // Escape でモバイルパネルを閉じ、フォーカスを開閉ボタンへ戻す
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && panel && !panel.hasAttribute('hidden')) {
-      panel.setAttribute('hidden', '')
-      toggle?.setAttribute('aria-expanded', 'false')
-      toggle?.focus()
-    }
-  })
+  initSiteHeaderNav()
 </script>
