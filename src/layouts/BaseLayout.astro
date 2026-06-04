@@ -1,6 +1,6 @@
 ---
 import SiteHeader from '~/components/SiteHeader.astro'
-import RouterMenu from '~/components/RouterMenu.tsx'
+import SiteFooter from '~/components/SiteFooter.astro'
 import '~/styles/global.css'
 
 interface Props {
@@ -32,44 +32,32 @@ const currentPath = Astro.url.pathname
   </head>
   <body>
     <SiteHeader currentPath={currentPath} />
-    <main
-      class:list={[
-        'grow overflow-auto',
-        !fullscreen && [
-          'after:sticky',
-          'after:bottom-0',
-          'after:bg-gradient-to-t',
-          'after:from-base',
-          'after:to-transparent',
-          'after:opacity-90',
-          'after:w-full',
-          'after:h-20',
-          'after:block',
-          'before:top-0',
-          'before:bg-gradient-to-b',
-          'before:from-primary',
-          'before:to-transparent',
-          'before:w-full',
-          'before:h-8',
-          'before:opacity-10',
-          'before:block',
-        ],
-      ]}
-    >
-      <slot />
-    </main>
-    <RouterMenu client:load currentPath={currentPath} />
-    <footer
-      class="text-sm py-2.5 border-t-4 border-sunlight bg-primary-deep text-white relative
-             before:border-x-[0.58rem] before:border-b-[1rem] before:border-x-transparent before:border-b-sunlight before:absolute before:right-3.5 before:bottom-3
-             after:border-x-[0.58rem] after:border-b-[1rem] after:border-x-transparent after:border-b-accent after:absolute after:right-2 after:bottom-2 after:scale-110 after:origin-bottom-right"
-    >
-      <a
-        href="/"
-        class="mx-auto w-fit block hover:opacity-80 transition-opacity"
-      >
-        一般社団法人遠山郷応援会
-      </a>
-    </footer>
+    {
+      fullscreen ? (
+        <main class="grow overflow-auto">
+          <slot />
+        </main>
+      ) : (
+        <main class="flex grow flex-col overflow-auto">
+          {/* grow で短いページでもフッターをビューポート下端へ押し下げる */}
+          <div
+            class:list={[
+              'grow',
+              'before:top-0',
+              'before:bg-gradient-to-b',
+              'before:from-primary',
+              'before:to-transparent',
+              'before:w-full',
+              'before:h-8',
+              'before:opacity-10',
+              'before:block',
+            ]}
+          >
+            <slot />
+          </div>
+          <SiteFooter currentPath={currentPath} />
+        </main>
+      )
+    }
   </body>
 </html>

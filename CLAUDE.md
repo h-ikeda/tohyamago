@@ -50,11 +50,10 @@ tohyamago/
 │   │   ├── public_notices.astro# 公告 (URL 固定・変更禁止)
 │   │   └── notation.astro      # 特定商取引法に基づく表記
 │   ├── layouts/
-│   │   └── BaseLayout.astro    # 共通レイアウト + フッター + RouterMenu
+│   │   └── BaseLayout.astro    # 共通レイアウト (SiteHeader + SiteFooter)
 │   ├── components/
 │   │   ├── SiteHeader.astro    # グローバルナビ (新規, ジャーナリー導線ヘッダー)
-│   │   ├── RouterMenu.tsx      # フローティングメニュー (React, client:load)
-│   │   ├── RouterMenu.test.tsx # RouterMenu のテスト (Vitest)
+│   │   ├── SiteFooter.astro    # 共通フッター (法令・規約 / 法人概要。旧 RouterMenu の収れん先)
 │   │   ├── HomeTabs.tsx        # 近況/予定タブ (React, client:load, hash 同期)
 │   │   ├── HomeTabs.test.tsx   # HomeTabs のテスト (Vitest)
 │   │   ├── JourneyCards.astro  # トップの3導線カード (新規: 参加/購入/支える)
@@ -115,7 +114,7 @@ tohyamago/
 | 支える           | 寄付 / 入会案内                     | 寄付・会員支援者 |
 | （フッター）     | 定款 / 公告 / 特商法表記 / 法人概要 | 法令・信頼性     |
 
-- 現行の左下フローティング「法令」(`RouterMenu.tsx`、旧「目次」) は、**ヘッダーナビ (`SiteHeader.astro`) へ再編**する（README ロードマップ Phase 2）。ヘッダーで網羅したページは `RouterMenu` から外し、法令系の文書（定款 / 公告 / 特商法表記）のみを残す。移行期間は両立可、最終的にヘッダー＋フッターへ寄せる。
+- かつての左下フローティング「法令」(`RouterMenu.tsx`、旧「目次」) は廃止し、**ヘッダーナビ (`SiteHeader.astro`) とフッター (`SiteFooter.astro`) へ収れん済み**（README ロードマップ Phase 2 / 実装ステップ 10）。ジャーナリー導線はヘッダーが担い、法令系の文書（定款 / 公告 / 特商法表記）と法人概要はフッターへ整理した。
 - ヘッダーは常時「**参加する / 寄付**」の 2 CTA をボタン表示し、どのページからもゴール導線に届くようにする。
 
 ### ページ一覧（新構成）
@@ -283,14 +282,14 @@ const events = defineCollection({
 ### ナビゲーション再設計（`SiteHeader.astro`）
 
 - 上記「グローバルナビ」を実装。ドロップダウン（活動を知る／参加する／支える）＋常時表示 CTA（参加する・寄付）。
-- `BaseLayout.astro` に組み込み、`RouterMenu` から段階移行。`currentPath` でアクティブ表示。
-- a11y: キーボード操作・フォーカスリング・`aria-current`。モバイルはハンバーガー or 既存フローティングを当面併用。
+- `BaseLayout.astro` に組み込み（`RouterMenu` からの移行は完了）。`currentPath` でアクティブ表示。
+- a11y: キーボード操作・フォーカスリング・`aria-current`。モバイルはハンバーガーで全項目を展開する。
 
 ## 実装ステップ（段階的コーディング手順）
 
 各ステップは独立リリース可能。**静的構成のまま**進め、決済（Stripe）・認証（Clerk）は README ロードマップ Phase 4/5 に従い後段でハイブリッド化する。
 
-1. **ナビ基盤**: `SiteHeader.astro` を新設し `BaseLayout` に組込み（ジャーナリー導線＋常時 CTA）。既存 `RouterMenu` は当面併存。
+1. **ナビ基盤**: `SiteHeader.astro` を新設し `BaseLayout` に組込み（ジャーナリー導線＋常時 CTA）。旧 `RouterMenu` はステップ 10 で廃止。
 2. **始まり物語**: `story.astro` を新設（既存記事の写真・引用を活用）。`purpose → story → join` の導線を張る。
 3. **参加案内**: `join.astro` を新設（参加の流れ・FAQ・アクセス・持ち物、activo CTA を集約）。`HomeTabs` の「予定」タブから activo 導線を移設。
 4. **農作業カレンダー（データ）**: `content.config.ts` に `crops` / `events` コレクションを追加し、`src/content/crops`・`src/content/events` にシードデータを投入。
@@ -299,7 +298,7 @@ const events = defineCollection({
 7. **トップ刷新**: `index.astro` にヒーロー＋3 導線カード（`JourneyCards.astro`）＋近況/カレンダー/物語の各プレビューを配置。
 8. **寄付**: `support.astro` を新設（当面は案内のみ）。Stripe 導線は Phase 4 で実装。
 9. **記事個別ページ（任意）**: `news/[slug].astro` を追加し SEO/共有を改善。
-10. **ナビ統合の仕上げ**: `RouterMenu` をヘッダー/フッターへ収れん。フッターに法人情報（定款・公告・特商法・法人概要）を整理。
+10. **ナビ統合の仕上げ**: `RouterMenu` を廃止し、ヘッダー (`SiteHeader.astro`) とフッター (`SiteFooter.astro`) へ収れん。フッターに法人情報（定款・公告・特商法・法人概要）を整理。
 
 > 各ステップ完了時に `npm run lint` / `format:check` / `typecheck` / `test` / `build` を通すこと。新規 React island には代表的な Vitest テストを添える。
 
@@ -353,4 +352,4 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
   - Tailwind の `before:` / `after:` 疑似要素で border-trick を利用して描画
 - フォントウェイト: light (`:root` に `font-weight: var(--font-weight-light)` を設定)
 - レスポンシブ: モバイルファーストで設計
-- ナビゲーション: グローバルナビは `SiteHeader.astro`。左下フローティングボタン「法令」(`RouterMenu`) は法令系文書（定款 / 公告 / 特商法表記）への補助導線
+- ナビゲーション: グローバルナビ（ジャーナリー導線）は `SiteHeader.astro`、法令系文書（定款 / 公告 / 特商法表記）と法人概要は `SiteFooter.astro` に整理（旧フローティング `RouterMenu` は廃止）
