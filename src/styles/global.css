@@ -38,58 +38,6 @@
   font-weight: var(--font-weight-light);
 }
 
-/* RouterMenu アニメーション */
-@keyframes rm-btn-enter-v {
-  from {
-    transform: scaleY(0) translateY(-100%);
-    transform-origin: top;
-  }
-  to {
-    transform: scaleY(1) translateY(0);
-    transform-origin: top;
-  }
-}
-@keyframes rm-btn-enter-next {
-  from {
-    transform: scaleY(0) translateY(100%);
-    transform-origin: bottom;
-  }
-  to {
-    transform: scaleY(1) translateY(0);
-    transform-origin: bottom;
-  }
-}
-@keyframes rm-menu-enter {
-  from {
-    transform: scaleY(0) translateY(100%);
-    transform-origin: bottom;
-  }
-  to {
-    transform: scaleY(1) translateY(0);
-    transform-origin: bottom;
-  }
-}
-@keyframes rm-menu-leave-v {
-  from {
-    transform: scaleY(1) translateY(0);
-    transform-origin: bottom;
-  }
-  to {
-    transform: scaleY(0) translateY(100%);
-    transform-origin: bottom;
-  }
-}
-@keyframes rm-menu-leave-next {
-  from {
-    transform: scaleY(1) translateY(0);
-    transform-origin: top;
-  }
-  to {
-    transform: scaleY(0) translateY(-100%);
-    transform-origin: top;
-  }
-}
-
 body {
   height: 100dvh;
   display: flex;
