@@ -35,8 +35,6 @@ const legalLinks = [
   { path: '/notation', title: '特定商取引法に基づく表記' },
 ]
 
-const year = new Date().getFullYear()
-
 const linkClass = (active: boolean) =>
   [
     'inline-flex items-center gap-2 py-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sunlight',
@@ -122,9 +120,5 @@ const inlineLinkClass =
         </address>
       </div>
     </div>
-
-    <p class="mt-8 border-t border-white/15 pt-6 text-xs text-white/60">
-      © {year} 一般社団法人遠山郷応援会
-    </p>
   </Container>
 </footer>
