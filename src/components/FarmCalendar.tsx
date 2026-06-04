@@ -1,11 +1,14 @@
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 
 /**
  * FarmCalendar — 農作業ガントチャート (React island)。
  *
- * 横軸＝1〜12 月 (半月粒度＝24 列)、縦軸＝作物。各作業を期間バーで表示し、
- * 地域イベントを別レーンに重畳する。当月をハイライトし「今・近いうちに
- * 参加できる作業」へ視線を誘導する。バーのクリックで詳細＋参加 CTA を開く。
+ * 横軸＝1〜12 月 (半月粒度＝24 列)、縦軸＝作物。各作業を 1 作業 1 行の期間バーで
+ * 表示し、地域イベントを別レーンに重畳する。当月をハイライトし「今・近いうちに
+ * 参加できる作業」へ視線を誘導する。バーの選択で詳細＋参加 CTA を開く。
+ *
+ * モバイルでバー幅が狭くても読めるよう、ラベルはバーの中ではなく横に置く
+ * (バーが年末に寄る場合は左側)。月ごとの縦線と作物ごとの区切り線で見やすくする。
  *
  * データは calendar.astro が getCollection('crops'|'events') で取得し props で渡す。
  */
@@ -67,24 +70,11 @@ export function formatPeriod(start: number, end: number): string {
 }
 
 /**
- * 重なり合う期間を縦に積むためのレーン割当 (区間分割の貪欲法)。
- * 同じレーンには期間が重ならない項目だけを載せる。
+ * バーのラベルを左右どちらに置くかを決める。年末 (11 月以降に終わる) バーは
+ * 右へ出すと見切れるため左側に置く。
  */
-export function assignLanes<T extends { start: number; end: number }>(
-  items: T[],
-): { item: T; lane: number }[] {
-  const sorted = [...items].sort((a, b) => a.start - b.start || a.end - b.end)
-  const laneEnds: number[] = []
-  return sorted.map((item) => {
-    const from = startColumn(item.start)
-    let lane = laneEnds.findIndex((end) => end <= from)
-    if (lane === -1) {
-      lane = laneEnds.length
-      laneEnds.push(0)
-    }
-    laneEnds[lane] = endColumn(item.end)
-    return { item, lane }
-  })
+export function labelOnLeft(end: number): boolean {
+  return endColumn(end) >= 22
 }
 
 const MONTH_LABELS = Array.from({ length: 12 }, (_, i) => `${i + 1}月`)
@@ -114,36 +104,49 @@ export default function FarmCalendar({
   currentMonth = new Date().getMonth() + 1,
 }: Props) {
   const detailId = useId()
+  const detailRef = useRef<HTMLDivElement>(null)
   const [selected, setSelected] = useState<SelectedTask | null>(null)
 
-  // 作物・イベントの行配置を明示的に計算する (レーン重なりを縦に積む)。
-  // 行 1 は月ヘッダー。各ブロックは直前ブロックの末尾から積み上げる。
+  // 選択された作業の詳細が画面外にあれば、その位置までスクロールして気付かせる。
+  useEffect(() => {
+    if (!selected || !detailRef.current) return
+    try {
+      detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    } catch {
+      // scrollIntoView 未実装の環境 (jsdom 等) は無視する。
+    }
+  }, [selected])
+
+  // 1 作業 1 行で行配置を計算する (各ブロックは直前ブロックの末尾から積み上げる)。
+  // 行 1 は月ヘッダー。
   const { cropBlocks, eventBlock, lastRow } = useMemo(() => {
-    const computed = [...crops]
+    const prepared = [...crops]
       .sort((a, b) => a.order - b.order)
       .map((crop) => {
-        const lanes = assignLanes(crop.tasks)
-        const laneCount = Math.max(1, ...lanes.map((l) => l.lane + 1))
-        return { crop, lanes, laneCount }
+        const tasks = [...crop.tasks].sort(
+          (a, b) => a.start - b.start || a.end - b.end,
+        )
+        return { crop, tasks, rowCount: Math.max(1, tasks.length) }
       })
 
-    const blocks = computed.map((block, i) => ({
+    const blocks = prepared.map((block, i) => ({
       ...block,
-      startRow: computed.slice(0, i).reduce((row, b) => row + b.laneCount, 2),
+      startRow: prepared.slice(0, i).reduce((row, b) => row + b.rowCount, 2),
     }))
 
-    const eventLanes = assignLanes(events)
-    const eventLaneCount = Math.max(1, ...eventLanes.map((l) => l.lane + 1))
-    const eventStartRow = computed.reduce((row, b) => row + b.laneCount, 2)
-    const evt = {
-      lanes: eventLanes,
-      laneCount: eventLaneCount,
-      startRow: eventStartRow,
-    }
+    const eventList = [...events].sort(
+      (a, b) => a.start - b.start || a.end - b.end,
+    )
+    const eventStartRow = prepared.reduce((row, b) => row + b.rowCount, 2)
+    const eventRowCount = Math.max(1, eventList.length)
     return {
       cropBlocks: blocks,
-      eventBlock: evt,
-      lastRow: eventStartRow + eventLaneCount,
+      eventBlock: {
+        events: eventList,
+        rowCount: eventRowCount,
+        startRow: eventStartRow,
+      },
+      lastRow: eventStartRow + eventRowCount,
     }
   }, [crops, events])
 
@@ -154,22 +157,48 @@ export default function FarmCalendar({
     <div>
       <div className="overflow-x-auto pb-2">
         <div
-          className="grid min-w-[48rem] items-stretch"
+          className="grid min-w-[44rem] items-stretch"
           style={{
-            gridTemplateColumns: `minmax(5.5rem, max-content) repeat(${MONTH_COLUMNS}, minmax(1.1rem, 1fr))`,
-            gridAutoRows: '2.25rem',
+            gridTemplateColumns: `minmax(5.5rem, max-content) repeat(${MONTH_COLUMNS}, minmax(1rem, 1fr))`,
+            gridAutoRows: '2.5rem',
           }}
         >
           {/* 当月ハイライト帯 (ヘッダー下から最下行まで) */}
           <div
             data-testid="current-month-band"
             aria-hidden="true"
-            className="pointer-events-none rounded-md bg-sunlight-soft/60"
+            className="pointer-events-none rounded-md bg-sunlight-soft/50"
             style={{ gridColumn: bandColumn, gridRow: `2 / ${lastRow}` }}
           />
 
+          {/* 月ごとの縦グリッド線 */}
+          {MONTH_LABELS.map((label, i) => (
+            <div
+              key={`vline-${label}`}
+              aria-hidden="true"
+              className="pointer-events-none border-l border-primary/10"
+              style={{ gridColumn: 2 + i * 2, gridRow: `1 / ${lastRow}` }}
+            />
+          ))}
+          {/* 右端の閉じ線 */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none border-r border-primary/10"
+            style={{ gridColumn: '25 / 26', gridRow: `1 / ${lastRow}` }}
+          />
+
+          {/* 作物・イベントブロックの区切り線 (先頭以外の各ブロック上端) */}
+          {[...cropBlocks.slice(1), eventBlock].map((block, i) => (
+            <div
+              key={`sep-${i}`}
+              aria-hidden="true"
+              className="pointer-events-none self-start border-t border-primary/15"
+              style={{ gridColumn: '1 / -1', gridRow: block.startRow }}
+            />
+          ))}
+
           {/* ヘッダー: 月ラベル */}
-          <div className="sticky left-0 z-10 bg-base" style={{ gridRow: 1 }} />
+          <div className="sticky left-0 z-20 bg-base" style={{ gridRow: 1 }} />
           {MONTH_LABELS.map((label, i) => (
             <div
               key={label}
@@ -185,13 +214,13 @@ export default function FarmCalendar({
           ))}
 
           {/* 作物の行 */}
-          {cropBlocks.map(({ crop, lanes, laneCount, startRow }) => (
+          {cropBlocks.map(({ crop, tasks, rowCount, startRow }) => (
             <div key={crop.id} style={{ display: 'contents' }}>
               <div
-                className="sticky left-0 z-10 flex items-center gap-1 bg-base pr-2 text-sm text-body"
+                className="sticky left-0 z-20 flex items-center gap-1 bg-base pr-2 text-sm text-body"
                 style={{
                   gridColumn: 1,
-                  gridRow: `${startRow} / span ${laneCount}`,
+                  gridRow: `${startRow} / span ${rowCount}`,
                 }}
               >
                 {crop.emoji && (
@@ -201,15 +230,15 @@ export default function FarmCalendar({
                 )}
                 <span className="font-serif">{crop.name}</span>
               </div>
-              {lanes.map(({ item, lane }) => (
+              {tasks.map((task, i) => (
                 <TaskBar
-                  key={`${crop.id}-${item.label}-${item.start}`}
+                  key={`${crop.id}-${task.label}-${task.start}`}
                   crop={crop}
-                  task={item}
-                  row={startRow + lane}
+                  task={task}
+                  row={startRow + i}
                   isSelected={
                     selected?.cropName === crop.name &&
-                    selected?.task.label === item.label
+                    selected?.task.label === task.label
                   }
                   detailId={detailId}
                   onSelect={setSelected}
@@ -220,34 +249,48 @@ export default function FarmCalendar({
 
           {/* イベントレーン */}
           <div
-            className="sticky left-0 z-10 flex items-center bg-base pr-2 text-sm text-body"
+            className="sticky left-0 z-20 flex items-center bg-base pr-2 text-sm text-body"
             style={{
               gridColumn: 1,
-              gridRow: `${eventBlock.startRow} / span ${eventBlock.laneCount}`,
+              gridRow: `${eventBlock.startRow} / span ${eventBlock.rowCount}`,
             }}
           >
             <span className="font-serif">地域の行事</span>
           </div>
-          {eventBlock.lanes.map(({ item, lane }) => (
+          {eventBlock.events.map((event, i) => (
             <EventBar
-              key={item.id}
-              event={item}
-              row={eventBlock.startRow + lane}
+              key={event.id}
+              event={event}
+              row={eventBlock.startRow + i}
             />
           ))}
         </div>
       </div>
 
-      {/* 凡例 */}
-      <Legend crops={cropBlocks.map((b) => b.crop)} />
-
-      {/* 選択中の作業の詳細 */}
-      <div id={detailId} aria-live="polite" className="mt-4">
+      {/* 選択中の作業の詳細 (カレンダー直下。選択時にここへスクロール) */}
+      <div ref={detailRef} id={detailId} aria-live="polite" className="mt-5">
         {selected && (
           <TaskDetail selected={selected} onClose={() => setSelected(null)} />
         )}
       </div>
+
+      {/* 凡例 */}
+      <Legend crops={cropBlocks.map((b) => b.crop)} />
     </div>
+  )
+}
+
+/** バーの横に置くラベル。狭いバーでも読めるよう、バーの外側へオーバーフローさせる。 */
+function BarLabel({ end, children }: { end: number; children: string }) {
+  const left = labelOnLeft(end)
+  return (
+    <span
+      className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-body ${
+        left ? 'right-full mr-1.5 text-right' : 'left-full ml-1.5'
+      }`}
+    >
+      {children}
+    </span>
   )
 }
 
@@ -266,12 +309,11 @@ function TaskBar({
   detailId: string
   onSelect: (s: SelectedTask) => void
 }) {
-  // ボランティア歓迎の作業は塗りで強調、それ以外は淡色＋枠線で控えめに。
+  // ボランティア歓迎の作業は塗りで強調、それ以外は淡色＋破線で控えめに。
   const style = task.volunteer
-    ? { backgroundColor: crop.color, color: '#fff' }
+    ? { backgroundColor: crop.color }
     : {
-        backgroundColor: `${crop.color}1f`,
-        color: crop.color,
+        backgroundColor: `${crop.color}26`,
         border: `1px dashed ${crop.color}`,
       }
   return (
@@ -292,7 +334,7 @@ function TaskBar({
           task,
         })
       }
-      className={`my-0.5 flex h-7 items-center gap-1 self-center overflow-hidden whitespace-nowrap rounded-full px-2 text-xs font-medium transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+      className={`relative my-1 flex h-6 items-center justify-center self-center overflow-visible rounded-full transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
         isSelected ? 'ring-2 ring-accent ring-offset-1' : ''
       }`}
       style={{
@@ -302,11 +344,11 @@ function TaskBar({
       }}
     >
       {task.volunteer && (
-        <span aria-hidden="true" className="shrink-0">
+        <span aria-hidden="true" className="text-[0.7rem] leading-none">
           🙌
         </span>
       )}
-      <span className="overflow-hidden text-ellipsis">{task.label}</span>
+      <BarLabel end={task.end}>{task.label}</BarLabel>
     </button>
   )
 }
@@ -316,20 +358,20 @@ function EventBar({ event, row }: { event: CalendarEvent; row: number }) {
     <div
       data-testid="event-bar"
       title={event.note}
-      className="my-0.5 flex h-7 items-center gap-1 self-center overflow-hidden whitespace-nowrap rounded-md border border-dashed border-sky bg-sky-soft px-2 text-xs text-primary-deep"
+      className="relative my-1 flex h-6 items-center justify-center self-center overflow-visible rounded-md border border-dashed border-sky bg-sky-soft text-xs text-primary-deep"
       style={{ gridColumn: barColumn(event.start, event.end), gridRow: row }}
     >
-      <span aria-hidden="true" className="shrink-0">
+      <span aria-hidden="true" className="text-[0.7rem] leading-none">
         ◆
       </span>
-      <span className="overflow-hidden text-ellipsis">{event.name}</span>
+      <BarLabel end={event.end}>{event.name}</BarLabel>
     </div>
   )
 }
 
 function Legend({ crops }: { crops: CalendarCrop[] }) {
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-body">
+    <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-body">
       {crops.map((crop) => (
         <span key={crop.id} className="flex items-center gap-1">
           <span
@@ -364,9 +406,12 @@ function TaskDetail({
   const { cropName, emoji, color, task } = selected
   return (
     <div
-      className="rounded-3xl border border-primary/10 bg-surface p-5 shadow-sm"
+      className="rounded-3xl border border-primary/10 bg-surface p-5 shadow-lg"
       style={{ borderTopColor: color, borderTopWidth: '4px' }}
     >
+      <span className="mb-3 flex w-fit items-center gap-1 rounded-full bg-sunlight-soft px-3 py-0.5 font-serif text-xs tracking-wide text-primary-deep before:text-[0.6rem] before:text-accent-strong before:content-['▲']">
+        選択中の作業
+      </span>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-serif text-lg text-primary">

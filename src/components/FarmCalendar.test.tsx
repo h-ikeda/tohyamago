@@ -8,7 +8,7 @@ import FarmCalendar, {
   endColumn,
   formatHalfMonth,
   formatPeriod,
-  assignLanes,
+  labelOnLeft,
 } from './FarmCalendar'
 
 const crops: CalendarCrop[] = [
@@ -65,17 +65,11 @@ describe('FarmCalendar の純粋関数', () => {
     expect(formatPeriod(4.0, 4.5)).toBe('4月上旬〜4月下旬')
   })
 
-  it('assignLanes は重なる期間を別レーンに、重ならない期間は同レーンに積む', () => {
-    const result = assignLanes([
-      { start: 4.0, end: 7.0 },
-      { start: 5.0, end: 6.0 },
-      { start: 8.0, end: 9.0 },
-    ])
-    const laneOf = (start: number) =>
-      result.find((r) => r.item.start === start)!.lane
-    expect(laneOf(4.0)).toBe(0)
-    expect(laneOf(5.0)).toBe(1) // 4.0 と重なるので別レーン
-    expect(laneOf(8.0)).toBe(0) // 4.0 と重ならないので同レーンに戻る
+  it('labelOnLeft は年末に終わるバーのラベルを左側に寄せる', () => {
+    expect(labelOnLeft(5.5)).toBe(false) // 5月下旬 → 右
+    expect(labelOnLeft(10.5)).toBe(false) // 10月下旬 → 右
+    expect(labelOnLeft(11.0)).toBe(true) // 11月上旬 → 左
+    expect(labelOnLeft(12.5)).toBe(true) // 12月下旬 → 左
   })
 })
 
