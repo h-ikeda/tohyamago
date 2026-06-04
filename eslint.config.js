@@ -29,7 +29,9 @@ export default tseslint.config(
       'jsx-a11y': jsxA11y,
     },
     settings: {
-      react: { version: 'detect' },
+      // version: 'detect' は ESLint 10 で削除された context.getFilename() を呼んで
+      // クラッシュするため、React バージョンを明示指定する。
+      react: { version: '19.2' },
     },
     rules: {
       ...react.configs.flat.recommended.rules,

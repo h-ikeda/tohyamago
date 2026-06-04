@@ -335,7 +335,7 @@ npm run test:coverage # カバレッジ付きで実行
 npm run test:e2e      # Playwright (実ブラウザ E2E, e2e/ 配下)
 ```
 
-- **Linter**: ESLint 9 (flat config, `eslint.config.js`)。TypeScript / React / React Hooks / jsx-a11y / Astro 対応。整形系ルールは `eslint-config-prettier` で無効化し Prettier に委譲。日本語コンテンツの全角スペースを許容するため `no-irregular-whitespace` は無効。
+- **Linter**: ESLint 10 (flat config, `eslint.config.js`)。TypeScript / React / React Hooks / jsx-a11y / Astro 対応。整形系ルールは `eslint-config-prettier` で無効化し Prettier に委譲。日本語コンテンツの全角スペースを許容するため `no-irregular-whitespace` は無効。`eslint-plugin-react` / `eslint-plugin-jsx-a11y` は ESLint 10 を peerDependencies に明記していないため `.npmrc` の `legacy-peer-deps=true` で peer 競合を許容している (正式対応までの暫定措置)。なお `eslint-plugin-react` の `version: 'detect'` は ESLint 10 で削除された `context.getFilename()` を呼びクラッシュするため、`eslint.config.js` で React バージョンを明示指定している。
 - **Formatter**: Prettier (`.prettierrc.json`)。セミコロンなし・シングルクォート。`.astro` は `prettier-plugin-astro` で整形。対象外は `.prettierignore`。
 - **テスト (方針)**: リグレッションテストは可能な限りコードを広くカバーする。ブラウザ依存の不具合 (NG) を修正したときは、その再発防止として実ブラウザテストを追加する。
   - **単体/結合 (jsdom)**: Vitest + Testing Library。React アイランドや DOM ロジックの「動き」と「スタイリング」を `src/**/*.{test,spec}.{ts,tsx}` に配置。インライン `<script>` のロジックは `*.ts` モジュールへ分離してテスト可能にする (例: `SiteHeader.astro` の挙動は `siteHeaderNav.ts` に分離し `siteHeaderNav.test.ts` で検証)。
