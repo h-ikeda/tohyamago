@@ -11,11 +11,23 @@ const links = [
 
 type Phase = 'closed' | 'opening' | 'open' | 'closing-v' | 'closing-next'
 
-export default function RouterMenu({ currentPath = '/' }: { currentPath?: string }) {
+export default function RouterMenu({
+  currentPath = '/',
+}: {
+  currentPath?: string
+}) {
   const [phase, setPhase] = useState<Phase>('closed')
 
-  const menuVisible = phase === 'opening' || phase === 'open' || phase === 'closing-v' || phase === 'closing-next'
-  const btnVisible  = phase === 'closed' || phase === 'opening' || phase === 'closing-v' || phase === 'closing-next'
+  const menuVisible =
+    phase === 'opening' ||
+    phase === 'open' ||
+    phase === 'closing-v' ||
+    phase === 'closing-next'
+  const btnVisible =
+    phase === 'closed' ||
+    phase === 'opening' ||
+    phase === 'closing-v' ||
+    phase === 'closing-next'
 
   const open = useCallback(() => setPhase('opening'), [])
 
@@ -37,27 +49,34 @@ export default function RouterMenu({ currentPath = '/' }: { currentPath?: string
     return currentPath === path
   }
 
-  const menuAnim = phase === 'opening'
-    ? 'rm-menu-enter 0.2s forwards'
-    : phase === 'closing-v'
-      ? 'rm-menu-leave-v 0.2s forwards'
-      : phase === 'closing-next'
-        ? 'rm-menu-leave-next 0.2s forwards'
-        : undefined
+  const menuAnim =
+    phase === 'opening'
+      ? 'rm-menu-enter 0.2s forwards'
+      : phase === 'closing-v'
+        ? 'rm-menu-leave-v 0.2s forwards'
+        : phase === 'closing-next'
+          ? 'rm-menu-leave-next 0.2s forwards'
+          : undefined
 
-  const btnAnim = phase === 'closed'
-    ? undefined
-    : phase === 'opening'
-      ? 'rm-menu-leave-next 0.2s forwards'
-      : phase === 'closing-next'
-        ? 'rm-btn-enter-next 0.2s forwards'
-        : 'rm-btn-enter-v 0.2s forwards'
+  const btnAnim =
+    phase === 'closed'
+      ? undefined
+      : phase === 'opening'
+        ? 'rm-menu-leave-next 0.2s forwards'
+        : phase === 'closing-next'
+          ? 'rm-btn-enter-next 0.2s forwards'
+          : 'rm-btn-enter-v 0.2s forwards'
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop (メニュー外クリックで閉じる) */}
       {(phase === 'open' || phase === 'opening') && (
-        <nav className="fixed inset-0 z-10" onClick={cancel} />
+        <button
+          type="button"
+          aria-label="メニューを閉じる"
+          className="fixed inset-0 z-10"
+          onClick={cancel}
+        />
       )}
 
       {/* 目次ボタン */}
@@ -76,7 +95,6 @@ export default function RouterMenu({ currentPath = '/' }: { currentPath?: string
 
       {/* メニュー */}
       <menu
-        onClick={next}
         onAnimationEnd={onMenuAnimEnd}
         style={{
           display: menuVisible ? undefined : 'none',
@@ -85,9 +103,13 @@ export default function RouterMenu({ currentPath = '/' }: { currentPath?: string
         className="fixed left-4 z-20 bottom-4 bg-primary-deep flex flex-col rounded-xl border border-primary-soft text-white shadow-xl"
       >
         {links.map((link) => (
-          <li key={link.path} className="border-b border-primary-soft last:border-none">
+          <li
+            key={link.path}
+            className="border-b border-primary-soft last:border-none"
+          >
             <a
               href={link.path}
+              onClick={next}
               className={[
                 'flex px-5 py-2 gap-2 transition-colors hover:bg-white/15',
                 isActive(link.path)

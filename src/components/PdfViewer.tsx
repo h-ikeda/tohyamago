@@ -13,10 +13,12 @@ export default function PdfViewer({ src, filename, licenseKey }: Props) {
     if (!containerRef.current) return
     const el = containerRef.current
     let destroyed = false
-    import('@pdftron/pdfjs-express-viewer').then(({ default: PdfjsExpressViewer }) => {
-      if (destroyed) return
-      PdfjsExpressViewer({ licenseKey, initialDoc: src, filename }, el)
-    })
+    import('@pdftron/pdfjs-express-viewer').then(
+      ({ default: PdfjsExpressViewer }) => {
+        if (destroyed) return
+        PdfjsExpressViewer({ licenseKey, initialDoc: src, filename }, el)
+      },
+    )
     return () => {
       destroyed = true
       el.innerHTML = ''
