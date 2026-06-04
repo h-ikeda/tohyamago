@@ -15,7 +15,7 @@ export default function RouterMenu({ currentPath = '/' }: { currentPath?: string
   const [phase, setPhase] = useState<Phase>('closed')
 
   const menuVisible = phase === 'opening' || phase === 'open' || phase === 'closing-v' || phase === 'closing-next'
-  const btnVisible  = phase === 'closed' || phase === 'closing-v' || phase === 'closing-next'
+  const btnVisible  = phase === 'closed' || phase === 'opening' || phase === 'closing-v' || phase === 'closing-next'
 
   const open = useCallback(() => setPhase('opening'), [])
 
@@ -47,9 +47,11 @@ export default function RouterMenu({ currentPath = '/' }: { currentPath?: string
 
   const btnAnim = phase === 'closed'
     ? undefined
-    : phase === 'closing-next'
-      ? 'rm-btn-enter-next 0.2s forwards'
-      : 'rm-btn-enter-v 0.2s forwards'
+    : phase === 'opening'
+      ? 'rm-menu-leave-next 0.2s forwards'
+      : phase === 'closing-next'
+        ? 'rm-btn-enter-next 0.2s forwards'
+        : 'rm-btn-enter-v 0.2s forwards'
 
   return (
     <>

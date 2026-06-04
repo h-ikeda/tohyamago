@@ -3,11 +3,10 @@ import { useState, useEffect, type ReactNode } from 'react'
 export default function HomeTabs({ feed }: { feed?: ReactNode }) {
   const [activeTab, setActiveTab] = useState<'feed' | 'events'>('feed')
 
-  const syncFromHash = () => {
-    setActiveTab(window.location.hash === '#events' ? 'events' : 'feed')
-  }
-
   useEffect(() => {
+    const syncFromHash = () => {
+      setActiveTab(window.location.hash === '#events' ? 'events' : 'feed')
+    }
     syncFromHash()
     window.addEventListener('hashchange', syncFromHash)
     return () => window.removeEventListener('hashchange', syncFromHash)
