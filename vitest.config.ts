@@ -14,8 +14,12 @@ export default getViteConfig({
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
-      // テスト本体や型定義などカバレッジ対象外のファイルを除外する。
-      exclude: ['src/**/*.{test,spec}.{ts,tsx}', 'src/types/**'],
+      // テスト本体・型定義・設定ファイル (テスト可能なロジックを持たない) を除外する。
+      exclude: [
+        'src/**/*.{test,spec}.{ts,tsx}',
+        'src/types/**',
+        'src/content.config.ts',
+      ],
     },
   },
 })
