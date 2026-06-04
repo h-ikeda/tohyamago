@@ -12,15 +12,17 @@
  * 装飾要素のため aria-hidden。団体名は隣接テキストで読み上げられる。
  * favicon (public/favicon.svg) も同じ意匠で展開している。
  */
-interface Props {
-  class?: string
-}
+import type { HTMLAttributes } from 'astro/types'
 
-const { class: className } = Astro.props
+// class 以外の任意の SVG 属性 (id / style 等) も型安全にフォワードできるようにする
+type Props = HTMLAttributes<'svg'>
+
+const { class: className, ...rest } = Astro.props
 ---
 
 <svg
   class={className}
+  {...rest}
   viewBox="0 0 40 40"
   role="img"
   aria-hidden="true"
