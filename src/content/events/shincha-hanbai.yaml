@@ -1,7 +1,7 @@
-name: 新茶の販売
+name: 新茶販売開始
 start: 6.0
-end: 6.1
+end: 6.0
 category: 販売
 location: オンライン（成果品ショップ）
 url: https://shop.tohyamago.org
-note: 手摘み・加工した新茶を数量限定で販売します。
+note: 手摘み・加工した新茶の販売を開始します（在庫がある間は通年で購入可能）。

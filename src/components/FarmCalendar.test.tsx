@@ -40,6 +40,13 @@ const events: CalendarEvent[] = [
     category: '地域行事',
     note: '国指定重要無形民俗文化財。',
   },
+  {
+    id: 'momijigari',
+    name: 'もみじ狩り',
+    start: 10.2,
+    end: 10.2,
+    category: '地域行事',
+  },
 ]
 
 describe('FarmCalendar の純粋関数 (36 列・旬粒度)', () => {
@@ -99,12 +106,22 @@ describe('FarmCalendar コンポーネント', () => {
     expect(screen.queryByText('🙌')).not.toBeInTheDocument()
   })
 
-  it('地域イベントを描画する', () => {
+  it('期間のある行事は塗りバー (四角)、単発の行事は◆マークのみで描画する', () => {
     render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
-    const eventBar = screen.getByTestId('event-bar')
-    expect(eventBar.textContent).toContain('霜月祭り')
-    // 12月上旬 → 列 34 (+1=35) から、12月下旬 (列 36) の終端 37 (+1=38) まで
-    expect(eventBar.style.gridColumn).toBe('35 / 38')
+    const bars = screen.getAllByTestId('event-bar')
+
+    // 霜月祭り (期間) は塗りバー。12月上旬(+1=35)〜12月下旬の終端(+1=38)
+    const shimotsuki = bars.find((b) => b.textContent?.includes('霜月祭り'))!
+    expect(shimotsuki.dataset.single).toBe('false')
+    expect(shimotsuki.className).toContain('bg-sky')
+    expect(shimotsuki.className).not.toContain('dashed')
+    expect(shimotsuki.style.gridColumn).toBe('35 / 38')
+
+    // もみじ狩り (単発) は◆マークのみ (塗りバーにしない)
+    const momiji = bars.find((b) => b.textContent?.includes('もみじ狩り'))!
+    expect(momiji.dataset.single).toBe('true')
+    expect(momiji.textContent).toContain('◆')
+    expect(momiji.className).not.toContain('bg-sky')
   })
 
   it('バーをタップするとタップ付近にポップオーバーで詳細と CTA が開く', async () => {

@@ -386,16 +386,25 @@ function TaskBar({
 }
 
 function EventBar({ event, row }: { event: CalendarEvent; row: number }) {
+  // 単発の行事 (start === end) は ◆ マークのみ、期間のある行事は塗りバー (四角)。
+  const single = event.start === event.end
   return (
     <div
       data-testid="event-bar"
+      data-single={single}
       title={event.note}
-      className="relative my-1 flex h-6 items-center justify-center self-center overflow-visible rounded-md border border-dashed border-sky bg-sky-soft text-xs text-primary-deep"
+      className={`relative my-1 flex h-6 items-center self-center overflow-visible text-xs ${
+        single
+          ? 'justify-center text-sky'
+          : 'justify-center rounded-none bg-sky text-white'
+      }`}
       style={{ gridColumn: barColumn(event.start, event.end), gridRow: row }}
     >
-      <span aria-hidden="true" className="text-[0.7rem] leading-none">
-        ◆
-      </span>
+      {single && (
+        <span aria-hidden="true" className="text-sm leading-none">
+          ◆
+        </span>
+      )}
       <BarLabel end={event.end}>{event.name}</BarLabel>
     </div>
   )
@@ -424,11 +433,11 @@ function Legend({ crops }: { crops: CalendarCrop[] }) {
         ))}
       </span>
       <span className="flex items-center gap-1">
-        <span
-          aria-hidden="true"
-          className="inline-block h-3 w-3 rounded-sm border border-dashed border-sky bg-sky-soft"
-        />
-        地域の行事
+        <span aria-hidden="true" className="text-sky">
+          ◆
+        </span>
+        <span aria-hidden="true" className="inline-block h-3 w-4 bg-sky" />
+        地域の行事・販売
       </span>
     </div>
   )
