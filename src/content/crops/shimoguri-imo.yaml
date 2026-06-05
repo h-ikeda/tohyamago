@@ -11,7 +11,7 @@ tasks:
   - label: 土寄せ・除草
     start: 5.1 # 5月中旬から初夏にかけて繰り返し
     end: 7.0
-    intensity: medium
+    intensity: light
     note: 苗の生育に合わせて土寄せと草取りを行います。GW頃から畑へ通います。
   - label: 収穫（芋掘り）
     start: 7.1 # 7月中旬〜8月上旬

@@ -6,7 +6,7 @@ tasks:
   - label: 種蒔き
     start: 5.1 # 5月中旬〜下旬
     end: 5.2
-    intensity: medium
+    intensity: light
     note: 鳥よけネットを張って大豆を蒔きます。2〜3週間で立派な苗に育つ予定。
   - label: 草刈り・管理
     start: 7.0

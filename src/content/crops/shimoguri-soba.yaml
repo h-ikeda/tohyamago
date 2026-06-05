@@ -11,7 +11,7 @@ tasks:
   - label: 草刈り・管理
     start: 8.0
     end: 9.2
-    intensity: medium
+    intensity: light
     note: 真夏〜初秋の畑の草刈り。9月には白い蕎麦の花が咲き揃います。
   - label: 収穫（刈り取り）
     start: 10.0 # 10月上旬
