@@ -4,9 +4,13 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
+
+// useSyncExternalStore 用: 現在月は変化を購読する必要がないため何もしない。
+const subscribeNoop = () => () => {}
 
 /**
  * FarmCalendar — 農作業ガントチャート (React island)。
@@ -126,15 +130,32 @@ interface Props {
 }
 
 export default function FarmCalendar({
-  crops,
-  events,
-  currentMonth = new Date().getMonth() + 1,
+  crops = [],
+  events = [],
+  currentMonth,
 }: Props) {
   const detailId = useId()
   const [detail, setDetail] = useState<{
     data: SelectedTask
     rect: DOMRect
+    trigger: HTMLButtonElement | null
   } | null>(null)
+
+  // 現在月は SSR (ビルド時) と CSR (閲覧時) で結果が変わりハイドレーション
+  // ミスマッチを招く。useSyncExternalStore でサーバーでは null、クライアント
+  // ではマウント後に当月を返すことで、警告なく安全に切り替える。
+  // テストでは currentMonth で固定できる。
+  const activeMonth = useSyncExternalStore(
+    subscribeNoop,
+    () => currentMonth ?? new Date().getMonth() + 1,
+    () => currentMonth ?? null,
+  )
+
+  // 詳細ポップオーバーを閉じる。開いたバーへフォーカスを戻す (a11y)。
+  const closeDetail = () => {
+    detail?.trigger?.focus()
+    setDetail(null)
+  }
 
   // 1 作業 1 行で行配置を計算する (各ブロックは直前ブロックの末尾から積み上げる)。
   // 行 1 は月ヘッダー。
@@ -169,7 +190,7 @@ export default function FarmCalendar({
   ]
 
   // 当月の 3 列 (上旬・中旬・下旬) を覆うハイライト帯の grid-column。ラベル列ぶん +1。
-  const bandColumn = `${2 + (currentMonth - 1) * 3} / span 3`
+  const bandColumn = activeMonth ? `${2 + (activeMonth - 1) * 3} / span 3` : ''
 
   const isSelected = (cropName: string, task: CalendarTask) =>
     detail?.data.cropName === cropName && detail?.data.task.label === task.label
@@ -185,12 +206,14 @@ export default function FarmCalendar({
           }}
         >
           {/* 当月ハイライト帯 (ヘッダー下から最下行まで) */}
-          <div
-            data-testid="current-month-band"
-            aria-hidden="true"
-            className="pointer-events-none rounded-md bg-sunlight-soft/50"
-            style={{ gridColumn: bandColumn, gridRow: `2 / ${lastRow}` }}
-          />
+          {activeMonth && (
+            <div
+              data-testid="current-month-band"
+              aria-hidden="true"
+              className="pointer-events-none rounded-md bg-sunlight-soft/50"
+              style={{ gridColumn: bandColumn, gridRow: `2 / ${lastRow}` }}
+            />
+          )}
 
           {/* 月ごとの縦グリッド線 */}
           {MONTH_LABELS.map((label, i) => (
@@ -224,7 +247,7 @@ export default function FarmCalendar({
             <div
               key={label}
               className={`flex items-end justify-center pb-1 font-serif text-xs ${
-                i + 1 === currentMonth
+                activeMonth != null && i + 1 === activeMonth
                   ? 'font-medium text-accent-strong'
                   : 'text-primary/70'
               }`}
@@ -294,7 +317,7 @@ export default function FarmCalendar({
           id={detailId}
           detail={detail.data}
           rect={detail.rect}
-          onClose={() => setDetail(null)}
+          onClose={closeDetail}
         />
       )}
     </div>
@@ -339,7 +362,11 @@ function TaskBar({
   row: number
   selected: boolean
   detailId: string
-  onSelect: (s: { data: SelectedTask; rect: DOMRect }) => void
+  onSelect: (s: {
+    data: SelectedTask
+    rect: DOMRect
+    trigger: HTMLButtonElement
+  }) => void
 }) {
   const meta = INTENSITY_META[task.intensity]
   return (
@@ -360,6 +387,7 @@ function TaskBar({
             task,
           },
           rect: e.currentTarget.getBoundingClientRect(),
+          trigger: e.currentTarget,
         })
       }
       className={`relative my-1 flex h-6 items-center justify-center self-center overflow-visible rounded-full transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${

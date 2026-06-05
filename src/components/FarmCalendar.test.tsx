@@ -143,14 +143,17 @@ describe('FarmCalendar コンポーネント', () => {
     expect(joinCta).toHaveAttribute('href', '/join')
   })
 
-  it('ポップオーバーは閉じるボタンで閉じられる', async () => {
+  it('ポップオーバーは閉じるボタンで閉じ、フォーカスを元のバーへ戻す', async () => {
     const user = userEvent.setup()
     render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
 
-    await user.click(screen.getByRole('button', { name: /植付け/ }))
+    const planting = screen.getByRole('button', { name: /植付け/ })
+    await user.click(planting)
     expect(screen.getByRole('dialog')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: '閉じる' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    // a11y: 閉じたら開いたバーへフォーカスが戻る
+    expect(planting).toHaveFocus()
   })
 })
