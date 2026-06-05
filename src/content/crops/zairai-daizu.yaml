@@ -16,10 +16,10 @@ tasks:
   - label: 収穫・はざかけ
     start: 11.0 # 11月上旬
     end: 11.1
-    intensity: hard
+    intensity: light
     note: 刈り取った大豆を「はざかけ」で天日乾燥させます。
   - label: 脱穀
     start: 11.2 # 11月下旬〜12月上旬
     end: 12.0
-    intensity: hard
+    intensity: medium
     note: その年の〆作業。乾いた大豆を脱穀して仕上げます。

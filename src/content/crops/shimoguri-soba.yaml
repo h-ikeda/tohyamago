@@ -6,12 +6,12 @@ tasks:
   - label: 種蒔き
     start: 7.1 # 7月中旬〜下旬。芋の収穫後、同じ畑に蒔く
     end: 7.2
-    intensity: medium
+    intensity: light
     note: 下栗芋を収穫した畑にそのまま蕎麦を蒔きます。皆で1日で仕上げます。
   - label: 草刈り・管理
     start: 8.0
     end: 9.2
-    intensity: medium
+    intensity: light
     note: 真夏〜初秋の畑の草刈り。9月には白い蕎麦の花が咲き揃います。
   - label: 収穫（刈り取り）
     start: 10.0 # 10月上旬
@@ -21,5 +21,5 @@ tasks:
   - label: 脱穀
     start: 10.2 # 10月下旬
     end: 11.0
-    intensity: hard
+    intensity: medium
     note: 乾燥させた蕎麦から実を落とします。冬には新蕎麦を味わう会も。
