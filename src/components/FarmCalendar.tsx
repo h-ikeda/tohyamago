@@ -296,7 +296,7 @@ export default function FarmCalendar({
               gridRow: `${eventBlock.startRow} / span ${eventBlock.rowCount}`,
             }}
           >
-            <span className="font-serif">地域の行事</span>
+            <span className="font-serif">季節の催し</span>
           </div>
           {eventBlock.events.map((event, i) => (
             <EventBar
@@ -465,7 +465,7 @@ function Legend({ crops }: { crops: CalendarCrop[] }) {
           ◆
         </span>
         <span aria-hidden="true" className="inline-block h-3 w-4 bg-sky" />
-        地域の行事・販売
+        季節の催し
       </span>
     </div>
   )
