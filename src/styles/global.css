@@ -38,8 +38,20 @@
   font-weight: var(--font-weight-light);
 }
 
+html {
+  /* sticky ヘッダーぶん、アンカー (#feed 等) のスクロール到達位置を下げる */
+  scroll-padding-top: 5rem;
+}
+
+/*
+ * 標準的な sticky-footer レイアウト。
+ * 文書フローのまま min-height で「最低でもビューポート高」を確保し、
+ * main を flex-grow させることで、短いページでもフッターが下端に収まる。
+ * (旧実装の「body 固定高 + main 内部スクロール + grow スペーサー」の入れ子を解消)
+ */
 body {
-  height: 100dvh;
+  min-height: 100vh; /* dvh 未対応ブラウザ向けフォールバック */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background-color: var(--color-base);
@@ -47,4 +59,14 @@ body {
   font-family: var(--font-sans);
   text-align: justify;
   margin: 0;
+}
+
+/*
+ * 全画面ページ (PDF ビューワー等)。ビューポート高に固定して内部だけをスクロールさせ、
+ * 子コンポーネント (PdfViewer の h-full) が高さを解決できるようにする。
+ */
+body.is-fullscreen {
+  height: 100vh; /* dvh 未対応ブラウザ向けフォールバック */
+  height: 100dvh;
+  overflow: hidden;
 }

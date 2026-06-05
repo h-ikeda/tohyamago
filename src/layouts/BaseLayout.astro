@@ -30,21 +30,22 @@ const currentPath = Astro.url.pathname
       rel="stylesheet"
     />
   </head>
-  <body>
+  <body class={fullscreen ? 'is-fullscreen' : undefined}>
     <SiteHeader currentPath={currentPath} />
     {
       fullscreen ? (
-        <main class="grow overflow-auto">
+        /* 確定高さの body 内で grow + min-h-0。子の h-full が高さを解決できる */
+        <main class="min-h-0 grow overflow-hidden">
           <slot />
         </main>
       ) : (
-        <main class="flex grow flex-col overflow-auto">
-          {/* grow で短いページでもフッターをビューポート下端へ押し下げる */}
-          <div class="grow">
+        /* main を grow させると、短いページでも SiteFooter が下端に収まる */
+        <Fragment>
+          <main class="grow">
             <slot />
-          </div>
+          </main>
           <SiteFooter currentPath={currentPath} />
-        </main>
+        </Fragment>
       )
     }
   </body>

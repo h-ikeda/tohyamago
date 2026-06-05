@@ -200,6 +200,19 @@ describe('initSiteHeaderNav — モバイルパネル', () => {
     expect(menuToggle.getAttribute('aria-expanded')).toBe('false')
   })
 
+  // リグレッション: スクロールして閉じたあと開き直すと、前回のスクロール
+  // 位置が残らず先頭に戻ること (直感に沿う初期状態で開く)。
+  it('開き直すとスクロール位置が先頭に戻る', () => {
+    const { menuToggle, mobilePanel } = setup()
+
+    fireClick(menuToggle, 1) // 開く
+    mobilePanel.scrollTop = 120 // 下までスクロールした状態を再現
+    fireClick(menuToggle, 1) // 閉じる
+    fireClick(menuToggle, 1) // 開き直す
+
+    expect(mobilePanel.scrollTop).toBe(0)
+  })
+
   it('Escape でモバイルパネルが閉じ、フォーカスが開閉ボタンへ戻る', () => {
     const { menuToggle, mobilePanel } = setup()
 

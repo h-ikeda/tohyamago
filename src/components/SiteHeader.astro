@@ -83,7 +83,7 @@ const ctaVariants = {
 ---
 
 <header
-  class="relative z-40 shrink-0 border-b border-primary/10 bg-base/95 shadow-sm backdrop-blur"
+  class="sticky top-0 z-40 flex max-h-[100dvh] shrink-0 flex-col border-b border-primary/10 bg-base/95 shadow-sm backdrop-blur"
 >
   <Container size="wide" class="flex items-center justify-between gap-4 py-3">
     <!-- ロゴ (遠山郷の重なる稜線 + 陽光 + コーラルの頂) -->
@@ -192,7 +192,7 @@ const ctaVariants = {
     id="site-mobile-nav"
     data-mobile-nav
     hidden
-    class="border-t border-primary/10 bg-surface lg:hidden"
+    class="min-h-0 overflow-y-auto overscroll-contain border-t border-primary/10 bg-surface lg:hidden"
   >
     <Container size="wide" class="py-4">
       <!-- CTA (最優先導線を上部に) -->

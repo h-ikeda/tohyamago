@@ -25,6 +25,8 @@ export function initSiteHeaderNav(scope: ParentNode = document): void {
     const willOpen = panel.hasAttribute('hidden')
     panel.toggleAttribute('hidden', !willOpen)
     toggle.setAttribute('aria-expanded', String(willOpen))
+    // 開き直したときは前回のスクロール位置を引き継がず先頭に戻す
+    if (willOpen) panel.scrollTop = 0
   })
 
   // デスクトップドロップダウン (ディスクロージャー)
