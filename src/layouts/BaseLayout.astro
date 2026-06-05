@@ -40,19 +40,7 @@ const currentPath = Astro.url.pathname
       ) : (
         <main class="flex grow flex-col overflow-auto">
           {/* grow で短いページでもフッターをビューポート下端へ押し下げる */}
-          <div
-            class:list={[
-              'grow',
-              'before:top-0',
-              'before:bg-gradient-to-b',
-              'before:from-primary',
-              'before:to-transparent',
-              'before:w-full',
-              'before:h-8',
-              'before:opacity-10',
-              'before:block',
-            ]}
-          >
+          <div class="grow">
             <slot />
           </div>
           <SiteFooter currentPath={currentPath} />
