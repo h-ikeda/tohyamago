@@ -1,11 +1,307 @@
 ---
+import { Image } from 'astro:assets'
 import BaseLayout from '~/layouts/BaseLayout.astro'
-import ComingSoon from '~/components/ComingSoon.astro'
+import Container from '~/components/Container.astro'
+import SectionHeading from '~/components/SectionHeading.astro'
+import Card from '~/components/Card.astro'
+import Button from '~/components/Button.astro'
+import farmImage from '~/assets/farm.jpg'
+
+const ACTIVO_URL = 'https://activo.jp/s/a/119414'
+
+// 参加までの流れ (初参加の不安を解消し activo 応募へ送客する 4 ステップ)
+const steps = [
+  {
+    title: '募集を見つける',
+    body: 'ボランティア募集ページ（activo）や農作業カレンダーで、気になる作業・日程を探します。経験や年齢は問いません。',
+  },
+  {
+    title: '申し込む',
+    body: '募集ページからお申し込みください。当日の集合場所・時間・持ち物など、詳しいご案内をお送りします。ご質問もお気軽にどうぞ。',
+  },
+  {
+    title: '現地へ向かう',
+    body: '当日は集合場所へお越しください。アクセスに不安があれば、申し込み時にご相談ください。送迎や乗り合わせを調整できる場合があります。',
+  },
+  {
+    title: '一緒に作業する',
+    body: 'スタッフや常連の参加者が作業を丁寧にお伝えします。無理のない範囲で、休憩を取りながら一緒に体を動かしましょう。',
+  },
+]
+
+// 持ち物
+const bringItems = [
+  { label: '飲み物', note: '水分補給はこまめに。夏場は多めに。' },
+  { label: '昼食', note: '半日以上の作業のとき。現地に売店はありません。' },
+  {
+    label: '軍手・作業用手袋',
+    note: '貸し出しもありますが、手に合うものがあると安心。',
+  },
+  { label: 'タオル・着替え', note: '汗や汚れに備えて。' },
+  { label: '帽子', note: '日差し・虫よけに。' },
+  { label: '雨具', note: '山の天気は変わりやすいので念のため。' },
+]
+
+// 服装
+const wearItems = [
+  '長袖・長ズボン（日差し・虫・草かぶれを防ぎます）',
+  '汚れてもよい動きやすい服',
+  '履き慣れた運動靴、または長靴（ぬかるみ対策）',
+  '寒暖差に対応できる羽織りもの（朝晩は冷えます）',
+]
+
+// よくある質問
+const faqs = [
+  {
+    q: '農作業の経験がなくても参加できますか？',
+    a: 'もちろんです。初めての方こそ歓迎しています。作業はその場で丁寧にお伝えしますので、道具の使い方が分からなくても心配いりません。',
+  },
+  {
+    q: '一人でも参加できますか？',
+    a: 'はい、お一人での参加も大歓迎です。年齢や立場の違う参加者が集まりますので、自然と会話が生まれます。ご家族・ご友人とのご参加も歓迎です。',
+  },
+  {
+    q: '体力に自信がありません。大丈夫でしょうか？',
+    a: '作業は無理のない範囲で構いません。休憩を取りながら、できることをお願いしています。重い作業ばかりではなく、手作業中心の回もあります。',
+  },
+  {
+    q: '何時間くらいかかりますか？',
+    a: '作業内容によって異なります。半日（午前のみ）の回もあれば、一日かけて行う回もあります。詳しい時間は募集ごとにご案内します。',
+  },
+  {
+    q: '雨の日はどうなりますか？',
+    a: '天候により中止・延期する場合があります。前日〜当日に判断し、お申し込みの方へご連絡します。',
+  },
+  {
+    q: '費用はかかりますか？',
+    a: '農作業ボランティアへの参加自体に参加費は基本的にかかりません。現地までの交通費・食事代などはご負担ください。詳しくは各募集ページをご確認ください。',
+  },
+  {
+    q: '子ども連れでも参加できますか？',
+    a: '作業内容によります。お子さま連れをご希望の場合は、申し込み時にご相談ください。安全に配慮できる回をご案内します。',
+  },
+]
 ---
 
 <BaseLayout title="はじめての方へ">
-  <ComingSoon
-    title="はじめての方へ"
-    description="参加の流れ・持ち物・服装・アクセス・よくある質問をまとめた参加案内を準備中です。"
-  />
+  <!-- ヒーロー: 初参加のハードルを下げる歓迎メッセージ -->
+  <section
+    class="relative overflow-hidden bg-gradient-to-b from-sky-soft via-base to-base px-4 pt-12 pb-10 text-center sm:pt-16"
+  >
+    <span
+      class="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full bg-sunlight-soft px-4 py-1 font-serif text-sm tracking-wide text-primary-deep
+             before:text-xs before:text-accent-strong before:content-['▲']"
+    >
+      はじめての方へ
+    </span>
+    <h1
+      class="font-serif text-3xl font-medium leading-snug text-primary md:text-4xl"
+    >
+      畑へ、はじめの一歩を
+    </h1>
+    <p
+      class="mx-auto mt-5 max-w-xl text-left leading-loose text-body sm:text-center"
+    >
+      農作業の経験がなくても、お一人でも大丈夫。遠山郷の畑では、年齢も立場もさまざまな人が集まって、一緒に体を動かしています。「ちょっと気になる」その気持ちだけで、十分はじめられます。
+    </p>
+    <div class="mx-auto mt-8 w-full max-w-3xl">
+      <Image
+        src={farmImage}
+        alt="遠山郷の農地と山並み"
+        class="aspect-video w-full rounded-3xl object-cover shadow-lg ring-1 ring-primary/10"
+      />
+    </div>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <Button href={ACTIVO_URL}>ボランティア募集を見る</Button>
+      <Button href="/calendar" variant="outline">農作業カレンダー</Button>
+    </div>
+  </section>
+
+  <Container size="wide" class="py-12 md:py-16">
+    <!-- こんな方を歓迎します -->
+    <section class="mb-16">
+      <SectionHeading as="h2" align="left" class="mb-6"
+        >こんな方を歓迎します</SectionHeading
+      >
+      <div class="grid gap-4 sm:grid-cols-3">
+        {
+          [
+            {
+              emoji: '🌱',
+              text: '農作業ははじめて。土に触れる暮らしに興味がある',
+            },
+            {
+              emoji: '🤝',
+              text: '地域や人とのゆるいつながりを持ちたい',
+            },
+            {
+              emoji: '⛰️',
+              text: '遠山郷の自然や暮らしを、体験として知りたい',
+            },
+          ].map((item) => (
+            <Card class="border-t-4 border-t-primary-soft px-6 py-6 text-center">
+              <span class="text-3xl" aria-hidden="true">
+                {item.emoji}
+              </span>
+              <p class="mt-3 leading-relaxed text-body">{item.text}</p>
+            </Card>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- 参加までの流れ -->
+    <section class="mb-16">
+      <SectionHeading as="h2" align="left" class="mb-6"
+        >参加までの流れ</SectionHeading
+      >
+      <ol class="grid gap-4 sm:grid-cols-2">
+        {
+          steps.map((step, i) => (
+            <li>
+              <Card class="h-full border-l-4 border-l-accent px-6 py-6 md:px-8">
+                <div class="flex items-center gap-3">
+                  <span
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-strong font-serif text-lg font-medium text-white"
+                    aria-hidden="true"
+                  >
+                    {i + 1}
+                  </span>
+                  <h3 class="font-serif text-lg font-medium text-primary">
+                    {step.title}
+                  </h3>
+                </div>
+                <p class="mt-3 leading-loose text-body">{step.body}</p>
+              </Card>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <!-- 持ち物・服装 -->
+    <section class="mb-16">
+      <SectionHeading as="h2" align="left" class="mb-6"
+        >持ち物・服装</SectionHeading
+      >
+      <div class="grid gap-6 md:grid-cols-2">
+        <Card class="border-t-4 border-t-sunlight px-6 py-6 md:px-8">
+          <SectionHeading as="h3" level="sub" align="left" class="mb-4"
+            >持ち物</SectionHeading
+          >
+          <ul class="space-y-3">
+            {
+              bringItems.map((item) => (
+                <li class="flex gap-3 leading-relaxed text-body">
+                  <span
+                    class="mt-2 h-0 w-0 shrink-0 border-x-[0.3rem] border-b-[0.5rem] border-x-transparent border-b-accent"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    <span class="font-medium text-primary-deep">
+                      {item.label}
+                    </span>
+                    <span class="text-sm text-body/80"> — {item.note}</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </Card>
+
+        <Card class="border-t-4 border-t-primary-soft px-6 py-6 md:px-8">
+          <SectionHeading as="h3" level="sub" align="left" class="mb-4"
+            >服装</SectionHeading
+          >
+          <ul class="space-y-3">
+            {
+              wearItems.map((item) => (
+                <li class="flex gap-3 leading-relaxed text-body">
+                  <span
+                    class="mt-2 h-0 w-0 shrink-0 border-x-[0.3rem] border-b-[0.5rem] border-x-transparent border-b-primary-soft"
+                    aria-hidden="true"
+                  />
+                  <span>{item}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-4 text-sm leading-relaxed text-body/80">
+            動きやすく、汚れても気にならない服装がおすすめです。山あいは標高が高く、平地より気温が低めです。
+          </p>
+        </Card>
+      </div>
+    </section>
+
+    <!-- アクセス -->
+    <section class="mb-16">
+      <SectionHeading as="h2" align="left" class="mb-6">アクセス</SectionHeading
+      >
+      <Card class="border-l-4 border-l-sky px-6 py-6 md:px-8">
+        <div class="space-y-4 leading-loose text-body">
+          <p class="indent-4">
+            活動の舞台は、長野県飯田市の<span
+              class="font-medium text-primary-deep">遠山郷・下栗の里</span
+            >を中心とした地域です。赤石山脈（南アルプス）の西麓に位置する山あいの里で、「日本のチロル」とも呼ばれる急傾斜地に畑が広がっています。
+          </p>
+          <p class="indent-4">
+            公共交通の便は限られるため、<span
+              class="font-medium text-primary-deep"
+              >お車でお越しになる方が多い</span
+            >地域です。集合場所や所要時間は活動によって異なりますので、お申し込み後のご案内でご確認ください。アクセスや乗り合わせについては、申し込み時にお気軽にご相談ください。
+          </p>
+        </div>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <Button href="/calendar" variant="outline"
+            >農作業カレンダーを見る</Button
+          >
+          <Button href={ACTIVO_URL}>募集ページで詳細を見る</Button>
+        </div>
+      </Card>
+    </section>
+
+    <!-- よくある質問 -->
+    <section class="mb-16">
+      <SectionHeading as="h2" align="left" class="mb-6"
+        >よくある質問</SectionHeading
+      >
+      <div class="space-y-3">
+        {
+          faqs.map((faq) => (
+            <details class="group rounded-2xl border border-primary/10 bg-surface px-6 py-4 shadow-sm transition-shadow open:shadow-md">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                <span class="flex items-start gap-2">
+                  <span class="text-accent-strong" aria-hidden="true">
+                    Q.
+                  </span>
+                  {faq.q}
+                </span>
+                <span
+                  class="h-0 w-0 shrink-0 border-x-[0.3rem] border-t-[0.4rem] border-x-transparent border-t-primary transition-transform duration-200 group-open:rotate-180"
+                  aria-hidden="true"
+                />
+              </summary>
+              <p class="mt-3 leading-loose text-body">{faq.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- 最後の一押し CTA -->
+    <section
+      class="rounded-3xl border border-primary/10 bg-gradient-to-br from-sunlight-soft/60 to-surface px-6 py-10 text-center md:px-12"
+    >
+      <SectionHeading as="h2" align="center" class="mb-4"
+        >畑でお待ちしています</SectionHeading
+      >
+      <p class="mx-auto max-w-xl leading-loose text-body">
+        気になる作業が見つかったら、まずは気軽にお申し込みください。ご質問だけでも歓迎です。あなたのはじめの一歩を、遠山郷でお待ちしています。
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <Button href={ACTIVO_URL}>ボランティア募集を見る</Button>
+        <Button href="/story" variant="outline">活動の始まりを知る</Button>
+      </div>
+    </section>
+  </Container>
 </BaseLayout>
