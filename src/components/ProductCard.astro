@@ -23,18 +23,23 @@ const { name, emoji, color, tagline, story, makes, season } = Astro.props
 ---
 
 <Card as="article" hover class="flex h-full flex-col">
-  <!-- カラーヘッダー: 作物ごとの基調色で成果品を一目で見分ける -->
+  <!-- カラーヘッダー: 作物ごとの基調色で成果品を一目で見分ける。
+       不透明度は color-mix で適用し、3桁hex/rgb/CSS変数など任意のカラー指定にも耐える。 -->
   <div
     class="flex items-center gap-4 px-6 py-5"
-    style={`background: linear-gradient(135deg, ${color}24, transparent)`}
+    style={`background: linear-gradient(135deg, color-mix(in srgb, ${color} 14%, transparent), transparent)`}
   >
-    <span
-      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl shadow-sm"
-      style={`background-color: ${color}26`}
-      aria-hidden="true"
-    >
-      {emoji}
-    </span>
+    {
+      emoji && (
+        <span
+          class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl shadow-sm"
+          style={`background-color: color-mix(in srgb, ${color} 15%, transparent)`}
+          aria-hidden="true"
+        >
+          {emoji}
+        </span>
+      )
+    }
     <div>
       <h2 class="font-serif text-xl font-medium text-primary">{name}</h2>
       <p class="mt-1 text-sm leading-relaxed text-body/80">{tagline}</p>

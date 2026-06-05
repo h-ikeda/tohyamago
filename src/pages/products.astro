@@ -79,7 +79,13 @@ const cropById = new Map(
 const products = showcase
   .map((item) => {
     const crop = cropById.get(item.id)
-    if (!crop) return null
+    // ID 不整合 (タイポやデータ削除) はビルド時に即エラーにし、
+    // 成果品が静かに消えるのを防ぐ。
+    if (!crop) {
+      throw new Error(
+        `[products.astro] ID "${item.id}" に対応する作物が crops コレクションに見つかりません。コンテンツファイルまたは showcase の ID を確認してください。`,
+      )
+    }
     return {
       ...item,
       name: crop.name,
@@ -88,7 +94,6 @@ const products = showcase
       order: crop.order,
     }
   })
-  .filter((p): p is NonNullable<typeof p> => p !== null)
   .sort((a, b) => a.order - b.order)
 ---
 
