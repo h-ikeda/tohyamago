@@ -6,7 +6,7 @@ tasks:
   - label: 植付け
     start: 3.2 # 3月下旬〜4月上旬 (実績: 3/30 前後)
     end: 4.0
-    intensity: medium
+    intensity: light
     note: 種芋（二度芋）の植付け。1時間半ほどの作業で、初参加の方も歓迎です。
   - label: 土寄せ・除草
     start: 5.1 # 5月中旬から初夏にかけて繰り返し
