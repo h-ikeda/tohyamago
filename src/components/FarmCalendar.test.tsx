@@ -156,4 +156,72 @@ describe('FarmCalendar コンポーネント', () => {
     // a11y: 閉じたら開いたバーへフォーカスが戻る
     expect(planting).toHaveFocus()
   })
+
+  it('Escape キーでポップオーバーを閉じられる', async () => {
+    const user = userEvent.setup()
+    render(<FarmCalendar crops={crops} events={events} currentMonth={5} />)
+
+    await user.click(screen.getByRole('button', { name: /植付け/ }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('複数の作物を order 順に積み上げて描画する (emoji なしも許容)', () => {
+    const multi: CalendarCrop[] = [
+      {
+        id: 'b',
+        name: 'ビー',
+        color: '#111111',
+        order: 2,
+        tasks: [{ label: '作業B', start: 6.0, end: 6.1, intensity: 'light' }],
+      },
+      {
+        id: 'a',
+        name: 'エー',
+        emoji: '🅰️',
+        color: '#222222',
+        order: 1,
+        tasks: [{ label: '作業A', start: 3.0, end: 3.1, intensity: 'medium' }],
+      },
+    ]
+    render(<FarmCalendar crops={multi} events={[]} currentMonth={5} />)
+
+    // 2 作物ぶんの作業バーが描画される (作物名は凡例にも出るためボタンで判定)
+    const a = screen.getByRole('button', { name: /作業A/ })
+    const b = screen.getByRole('button', { name: /作業B/ })
+    expect(a).toBeInTheDocument()
+    expect(b).toBeInTheDocument()
+    // order 昇順 (エー=order1 → ビー=order2) で行が積み上がる
+    expect(a.style.gridRow).toBe('2')
+    expect(b.style.gridRow).toBe('3')
+  })
+
+  it('currentMonth 未指定でも当月のハイライト帯を描画する', () => {
+    render(<FarmCalendar crops={crops} events={events} />)
+    // クライアントでは実行時の当月が使われ、帯が描画される
+    expect(screen.getByTestId('current-month-band')).toBeInTheDocument()
+  })
+
+  it('note のない作業でも詳細と CTA を表示する', async () => {
+    const user = userEvent.setup()
+    const noNote: CalendarCrop[] = [
+      {
+        id: 'x',
+        name: 'エックス',
+        color: '#333333',
+        order: 1,
+        tasks: [{ label: '作業X', start: 4.0, end: 4.1, intensity: 'light' }],
+      },
+    ]
+    render(<FarmCalendar crops={noNote} events={[]} currentMonth={5} />)
+
+    await user.click(screen.getByRole('button', { name: /作業X/ }))
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).toHaveTextContent('作業強度 軽め')
+    expect(
+      screen.getByRole('link', { name: '参加の流れを見る' }),
+    ).toBeInTheDocument()
+  })
 })
