@@ -1,0 +1,47 @@
+name: Antigravity Automated Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+# Workload Identity（ADC）を使用するために必須のパーミッション設定
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. ソースコードを取得
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Google Cloud への認証（ここで裏側でADCファイルが自動生成されます）
+      - name: Authenticate to Google Cloud via ADC
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      # 3. 新しい Antigravity CLI のインストール
+      - name: Install Antigravity CLI
+        run: |
+          curl -fsSL https://antigravity.google/install.sh | bash
+          echo "$HOME/.antigravity/bin" >> $GITHUB_PATH
+
+      # 4. エージェントによる自動レビュー実行
+      - name: Run Antigravity Reviewer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          
+          # Antigravityは上記ステップで作成されたADCを自動検知して起動します
+          antigravity run "GitHubのPR #${PR_NUMBER} の差分を解析し、バグの可能性やコードの改善点があれば、該当行に直接修正案を含むレビューコメントを投稿してください。"
