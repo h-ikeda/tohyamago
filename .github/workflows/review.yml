@@ -43,4 +43,4 @@ jobs:
           PR_NUMBER=${{ github.event.pull_request.number }}
           
           # Antigravityは上記ステップで作成されたADCを自動検知して起動します
-          agy run --non-interactive "GitHubのPR #${PR_NUMBER} の差分を解析し、バグの可能性やコードの改善点があれば、該当行に直接修正案を含むレビューコメントを投稿してください。"
+          agy run -p "GitHubのPR #${PR_NUMBER} の差分を解析し、バグの可能性やコードの改善点があれば、該当行に直接修正案を含むレビューコメントを投稿してください。"
