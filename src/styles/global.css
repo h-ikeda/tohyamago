@@ -57,6 +57,7 @@ body {
   background-color: var(--color-base);
   color: var(--color-body);
   font-family: var(--font-sans);
+  line-height: 1.7;
   text-align: justify;
   margin: 0;
 }
