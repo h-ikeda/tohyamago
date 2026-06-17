@@ -1,36 +1,171 @@
 ---
 import { Image } from 'astro:assets'
+import { getCollection } from 'astro:content'
 import BaseLayout from '~/layouts/BaseLayout.astro'
-import HomeTabs from '~/components/HomeTabs.tsx'
+import Container from '~/components/Container.astro'
+import SectionHeading from '~/components/SectionHeading.astro'
+import Button from '~/components/Button.astro'
+import Card from '~/components/Card.astro'
+import JourneyCards from '~/components/JourneyCards.astro'
 import Posts from '~/components/Posts.astro'
+import { upcomingTasks } from '~/components/homeTasks'
 import farmImage from '~/assets/farm.jpg'
+import mountsImage from '~/assets/mounts.jpg'
+
+// 「今、畑でできること」: 農作業カレンダー (crops) から当月 (無ければ最も近い先の月) に
+// 参加できる作業を抽出する。ビルド時の月を起点にするため、季節に追従して自動更新される。
+const crops = (await getCollection('crops')).map((entry) => ({
+  id: entry.id,
+  ...entry.data,
+}))
+const currentMonth = new Date().getMonth() + 1
+const preview = upcomingTasks(crops, currentMonth)
+const isThisMonth = preview.month === currentMonth
+// 表示は数件にとどめ、全体はカレンダーへ誘導する
+const previewTasks = preview.tasks.slice(0, 6)
+const moreCount = preview.tasks.length - previewTasks.length
+
+const intensityLabel: Record<string, string> = {
+  light: '軽め',
+  medium: 'ふつう',
+  hard: 'しっかり',
+}
 ---
 
 <BaseLayout>
+  <!-- ヒーロー: 秘境の空気感を写真で伝えつつ、最優先導線「参加する」へ送り出す -->
   <section
     class="relative overflow-hidden bg-gradient-to-b from-sky-soft via-base to-base px-4 pt-14 pb-12 text-center sm:pt-20"
   >
     <span
       class="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full bg-sunlight-soft px-4 py-1 font-serif text-sm tracking-wide text-primary-deep
-             before:content-['▲'] before:text-xs before:text-accent-strong"
+             before:text-xs before:text-accent-strong before:content-['▲']"
     >
       秘境の息遣いと、守る人の想いを伝える
     </span>
     <h1
-      class="font-serif font-medium text-primary text-3xl leading-snug md:text-5xl"
+      class="font-serif text-3xl font-medium leading-snug text-primary md:text-5xl"
     >
-      一般社団法人遠山郷応援会
+      天空の里の畑を、<wbr />みんなで耕す
     </h1>
+    <p class="mx-auto mt-5 max-w-xl leading-loose text-body">
+      長野県・遠山郷の下栗の里。標高千メートルの急斜面に連なる畑を、地域の人とボランティアで守り継いでいます。一般社団法人遠山郷応援会の活動の入口です。
+    </p>
     <div class="mx-auto mt-8 w-full max-w-4xl">
       <Image
         src={farmImage}
-        alt="遠山郷の農地と山並み"
+        alt="遠山郷の急斜面に広がる畑と山並み"
+        loading="eager"
+        fetchpriority="high"
         class="aspect-video w-full rounded-3xl object-cover shadow-lg ring-1 ring-primary/10"
       />
     </div>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <Button href="/join">畑に参加する</Button>
+      <Button href="/calendar" variant="outline">畑の一年を見る</Button>
+    </div>
   </section>
-  <div class="h-10"></div>
-  <HomeTabs client:load>
-    <Posts slot="feed" />
-  </HomeTabs>
+
+  <Container size="wide" class="py-12 md:py-16">
+    <!-- 3 導線カード (参加 / 成果品 / 支える) -->
+    <section class="mb-16">
+      <SectionHeading as="h2" class="mb-8">やってみたいことから</SectionHeading>
+      <JourneyCards />
+    </section>
+
+    <!-- 今、畑でできること (農作業カレンダーへの誘導) -->
+    <section class="mb-16">
+      <div
+        class="rounded-3xl border border-primary/10 bg-gradient-to-br from-surface to-sunlight-soft/30 px-6 py-8 shadow-sm md:px-10"
+      >
+        <SectionHeading as="h2" align="left" class="mb-2">
+          {isThisMonth ? `今月` : `まもなく`}、畑でできること
+        </SectionHeading>
+        <p class="mb-6 text-sm leading-relaxed text-body/80">
+          {
+            isThisMonth
+              ? `${preview.month}月に参加できる作業です。`
+              : `${preview.month}月から参加できる作業です。`
+          }気になる作業があれば、ぜひ畑へ。
+        </p>
+        {
+          previewTasks.length > 0 ? (
+            <ul class="grid gap-3 sm:grid-cols-2">
+              {previewTasks.map((task) => (
+                <li class="flex gap-3 rounded-2xl border border-primary/10 bg-surface px-4 py-3">
+                  <span
+                    aria-hidden="true"
+                    class="mt-1 h-3 w-3 shrink-0 rounded-full"
+                    style={`background-color:${task.color}`}
+                  />
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span class="font-medium text-primary">
+                        {task.emoji} {task.cropName}
+                      </span>
+                      <span class="text-body">{task.label}</span>
+                      <span class="rounded-full bg-primary/5 px-2 py-0.5 text-xs text-body/70">
+                        {intensityLabel[task.intensity]}
+                      </span>
+                    </div>
+                    {task.note && (
+                      <p class="mt-1 text-sm leading-relaxed text-body/80">
+                        {task.note}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="leading-loose text-body">
+              年間の農作業の予定は、農作業カレンダーでご覧いただけます。
+            </p>
+          )
+        }
+        {
+          moreCount > 0 && (
+            <p class="mt-3 text-sm text-body/70">
+              ほか {moreCount} 件の作業もカレンダーに掲載しています。
+            </p>
+          )
+        }
+        <div class="mt-6 flex flex-wrap gap-3">
+          <Button href="/calendar">農作業カレンダー</Button>
+          <Button href="/join" variant="outline">はじめての方へ</Button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 始まり物語 teaser -->
+    <section class="mb-16">
+      <Card class="overflow-hidden md:grid md:grid-cols-2">
+        <Image
+          src={mountsImage}
+          alt="遠山郷の山並みと谷あいの里"
+          class="aspect-video h-full w-full object-cover md:aspect-auto"
+        />
+        <div class="flex flex-col justify-center gap-3 px-6 py-8 md:px-10">
+          <SectionHeading as="h2" level="sub" align="left">
+            一枚の貼り紙から
+          </SectionHeading>
+          <p class="leading-loose text-body">
+            「二度芋を、つくってみませんか」——たった一枚の貼り紙から始まった、ある秘境通いの物語。私たちがどうやって遠山郷とつながり、畑を続けてきたのかを、読み物としてお届けします。
+          </p>
+          <div class="mt-2">
+            <Button href="/story" variant="outline">始まりの物語を読む</Button>
+          </div>
+        </div>
+      </Card>
+    </section>
+
+    <!-- 近況 (アンカー #feed: ヘッダー・物語ページから参照) -->
+    <section id="feed" class="scroll-mt-24">
+      <SectionHeading as="h2" class="mb-2">近況</SectionHeading>
+      <p class="mb-8 text-center text-sm leading-relaxed text-body/80">
+        畑や地域でのできごとを随時お届けしています。
+      </p>
+      <Posts />
+    </section>
+  </Container>
 </BaseLayout>

@@ -54,9 +54,9 @@ tohyamago/
 │   ├── components/
 │   │   ├── SiteHeader.astro    # グローバルナビ (新規, ジャーナリー導線ヘッダー)
 │   │   ├── SiteFooter.astro    # 共通フッター (法令・規約 / 法人概要。旧 RouterMenu の収れん先)
-│   │   ├── HomeTabs.tsx        # 近況/予定タブ (React, client:load, hash 同期)
-│   │   ├── HomeTabs.test.tsx   # HomeTabs のテスト (Vitest)
 │   │   ├── JourneyCards.astro  # トップの3導線カード (新規: 参加/購入/支える)
+│   │   ├── homeTasks.ts        # トップ「今、畑でできること」抽出ロジック (crops から当月作業)
+│   │   ├── homeTasks.test.ts   # homeTasks のテスト (Vitest)
 │   │   ├── FarmCalendar.tsx    # 農作業ガントチャート (新規, React island)
 │   │   ├── FarmCalendar.test.tsx # FarmCalendar のテスト (新規, Vitest)
 │   │   ├── ProductCard.astro   # 成果品カード (新規)
@@ -136,11 +136,10 @@ tohyamago/
 | `/public_notices` | `public_notices.astro` | 現行 | —                | 公告。**URL は法人登記に記載のため変更禁止**                                                  |
 | `/notation`       | `notation.astro`       | 現行 | —                | 特定商取引法に基づく表記                                                                      |
 
-#### 近況 / 予定タブの扱い（`HomeTabs.tsx`）
+#### 近況 / 予定の扱い
 
-- 「近況」フィードは維持（トップのプレビュー＋将来 `/news` 等のアーカイブ）。
-- 「予定」タブは activo へのリンクのみで情報量が薄いため、**`/calendar`（農作業カレンダー）へ発展的に統合**する。activo の募集 CTA は `/join` に集約する。
-- 既存の `HomeTabs` の hash 同期テストは、タブ構成変更時に追従して更新する。
+- 「近況」フィードは維持（トップ末尾の `#feed` セクションで `Posts.astro` を描画。ヘッダー・物語ページの `/#feed` アンカーの着地点）。
+- かつての「近況 / 予定」タブ（旧 `HomeTabs.tsx`）は廃止。情報量の薄かった「予定」タブは **`/calendar`（農作業カレンダー）と、トップの「今、畑でできること」プレビュー（`homeTasks.ts`）へ発展的に統合**した。activo の募集 CTA は `/join` に集約している。
 
 ## 記事 (Content Collection)
 
@@ -291,9 +290,9 @@ const events = defineCollection({
 
 1. **ナビ基盤**: `SiteHeader.astro` を新設し `BaseLayout` に組込み（ジャーナリー導線＋常時 CTA）。旧 `RouterMenu` はステップ 10 で廃止。
 2. **始まり物語**: `story.astro` を新設（既存記事の写真・引用を活用）。`purpose → story → join` の導線を張る。
-3. **参加案内**: `join.astro` を新設（参加の流れ・FAQ・アクセス・持ち物、activo CTA を集約）。`HomeTabs` の「予定」タブから activo 導線を移設。
+3. **参加案内**: `join.astro` を新設（参加の流れ・FAQ・アクセス・持ち物、activo CTA を集約）。旧「予定」タブの activo 導線をここへ移設。
 4. **農作業カレンダー（データ）**: `content.config.ts` に `crops` / `events` コレクションを追加し、`src/content/crops`・`src/content/events` にシードデータを投入。
-5. **農作業カレンダー（UI）**: `FarmCalendar.tsx` ＋ `calendar.astro` を実装。トップ（`index.astro`）に「今参加できる作業」プレビューを追加。`HomeTabs` の「予定」をカレンダーへ統合。
+5. **農作業カレンダー（UI）**: `FarmCalendar.tsx` ＋ `calendar.astro` を実装。トップ（`index.astro`）に「今、畑でできること」プレビュー（`homeTasks.ts`）を追加し、旧「予定」タブをカレンダーへ統合。
 6. **成果品**: `products.astro` ＋ `ProductCard.astro` を新設（下栗芋・茶・蕎麦・大豆のストーリー → shop へ送客）。
 7. **トップ刷新**: `index.astro` にヒーロー＋3 導線カード（`JourneyCards.astro`）＋近況/カレンダー/物語の各プレビューを配置。
 8. **寄付**: `support.astro` を新設（当面は案内のみ）。Stripe 導線は Phase 4 で実装。
