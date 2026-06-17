@@ -1,7 +1,7 @@
 import type { CalendarCrop, Intensity } from './FarmCalendar'
 
 /**
- * homeTasks — トップページ「今、畑でできること」プレビュー用のロジック。
+ * homeTasks — トップページ「今月の活動」プレビュー用のロジック。
  *
  * 農作業カレンダー (crops コレクション) から「指定月に参加できる作業」を抽出する。
  * Astro フロントマター (ビルド時) で使うが、月またぎや境界の判定を回帰テストできるよう

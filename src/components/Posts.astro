@@ -3,9 +3,17 @@ import { Image } from 'astro:assets'
 import { getCollection, render } from 'astro:content'
 import Card from '~/components/Card.astro'
 
-const posts = (await getCollection('posts')).sort(
+interface Props {
+  /** 表示件数の上限。未指定なら全件 (近況アーカイブ /news 用)。トップは最新数件のダイジェスト。 */
+  limit?: number
+}
+
+const { limit } = Astro.props
+
+const sorted = (await getCollection('posts')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 )
+const posts = limit ? sorted.slice(0, limit) : sorted
 
 const dateFormat = (date: Date) => {
   const year = date.getFullYear()

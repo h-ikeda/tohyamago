@@ -36,7 +36,7 @@ tohyamago/
 ├── package.json
 ├── src/
 │   ├── pages/                  # ファイルベースルーティング
-│   │   ├── index.astro         # トップ (ヒーロー + 3導線 + 近況/カレンダー誘導)
+│   │   ├── index.astro         # トップ (ヒーロー + 3導線 + 今できる活動 + 物語teaser + 近況ダイジェスト)
 │   │   ├── purpose.astro       # 活動趣旨
 │   │   ├── story.astro         # 活動の始まり物語 (新規)
 │   │   ├── join.astro          # はじめての方へ / 参加案内 (新規)
@@ -44,6 +44,7 @@ tohyamago/
 │   │   ├── products.astro      # 成果品紹介 → shop (新規)
 │   │   ├── support.astro       # 寄付案内 (新規, Phase 4)
 │   │   ├── membership.astro    # 入会案内
+│   │   ├── news.astro          # 近況アーカイブ (新規, 全記事一覧。トップはダイジェストのみ)
 │   │   ├── news/
 │   │   │   └── [slug].astro     # 記事個別ページ (新規, SEO/共有用・任意)
 │   │   ├── articles.astro      # 定款 (PDF, fullscreen)
@@ -55,8 +56,9 @@ tohyamago/
 │   │   ├── SiteHeader.astro    # グローバルナビ (新規, ジャーナリー導線ヘッダー)
 │   │   ├── SiteFooter.astro    # 共通フッター (法令・規約 / 法人概要。旧 RouterMenu の収れん先)
 │   │   ├── JourneyCards.astro  # トップの3導線カード (新規: 参加/購入/支える)
-│   │   ├── homeTasks.ts        # トップ「今、畑でできること」抽出ロジック (crops から当月作業)
+│   │   ├── homeTasks.ts        # トップ「今月の活動」抽出ロジック (crops から当月作業)
 │   │   ├── homeTasks.test.ts   # homeTasks のテスト (Vitest)
+│   │   #  ↑ 旧 HomeTabs.tsx / HomeTabs.test.tsx (近況/予定タブ) は廃止・削除済み (「近況 / 予定の扱い」参照)
 │   │   ├── FarmCalendar.tsx    # 農作業ガントチャート (新規, React island)
 │   │   ├── FarmCalendar.test.tsx # FarmCalendar のテスト (新規, Vitest)
 │   │   ├── ProductCard.astro   # 成果品カード (新規)
@@ -121,25 +123,27 @@ tohyamago/
 
 > 区分: 現行=既存維持, 変更=既存を改修, 新規=新設。「現状のコンテンツは全て含める」方針のため既存ページは削除しない。
 
-| パス              | コンポーネント         | 区分 | 主ターゲット     | 説明                                                                                          |
-| ----------------- | ---------------------- | ---- | ---------------- | --------------------------------------------------------------------------------------------- |
-| `/`               | `index.astro`          | 変更 | 全員             | ヒーロー＋3 導線カード＋近況プレビュー＋今参加できる作業（カレンダー誘導）＋始まり物語 teaser |
-| `/purpose`        | `purpose.astro`        | 現行 | 参加・支援       | 活動趣旨（ミッション・ビジョン）                                                              |
-| `/story`          | `story.astro`          | 新規 | 参加・支援       | **活動の始まり物語**（初期エピソードで活動の性質への理解を助ける）                            |
-| `/join`           | `join.astro`           | 新規 | 新規ボランティア | **はじめての方へ**（参加の流れ・FAQ・アクセス・持ち物・服装・activo 募集導線）                |
-| `/calendar`       | `calendar.astro`       | 新規 | 参加者＋運営     | **農作業カレンダー**（作物 × 作業時期のガント＋地域イベント重畳）                             |
-| `/products`       | `products.astro`       | 新規 | 購入支援者       | 成果品紹介（下栗芋・茶・蕎麦・大豆のストーリー）→ shop.tohyamago.org                          |
-| `/support`        | `support.astro`        | 新規 | 寄付支援者       | 寄付案内（単発／継続）。Stripe 導線は Phase 4 で実装                                          |
-| `/membership`     | `membership.astro`     | 現行 | 会員支援者       | 入会案内（権限・年会費・入会手続き）                                                          |
-| `/news/[slug]`    | `news/[slug].astro`    | 新規 | 全員             | 記事個別ページ（共有・SEO 用、任意）。一覧/近況は従来どおり `Posts.astro`                     |
-| `/articles`       | `articles.astro`       | 現行 | —                | 定款（PDF ビューワー、fullscreen）                                                            |
-| `/public_notices` | `public_notices.astro` | 現行 | —                | 公告。**URL は法人登記に記載のため変更禁止**                                                  |
-| `/notation`       | `notation.astro`       | 現行 | —                | 特定商取引法に基づく表記                                                                      |
+| パス              | コンポーネント         | 区分 | 主ターゲット     | 説明                                                                                        |
+| ----------------- | ---------------------- | ---- | ---------------- | ------------------------------------------------------------------------------------------- |
+| `/`               | `index.astro`          | 変更 | 全員             | ヒーロー＋3 導線カード＋今できる活動（カレンダー誘導）＋始まり物語 teaser＋近況ダイジェスト |
+| `/purpose`        | `purpose.astro`        | 現行 | 参加・支援       | 活動趣旨（ミッション・ビジョン）                                                            |
+| `/story`          | `story.astro`          | 新規 | 参加・支援       | **活動の始まり物語**（初期エピソードで活動の性質への理解を助ける）                          |
+| `/join`           | `join.astro`           | 新規 | 新規ボランティア | **はじめての方へ**（参加の流れ・FAQ・アクセス・持ち物・服装・activo 募集導線）              |
+| `/calendar`       | `calendar.astro`       | 新規 | 参加者＋運営     | **農作業カレンダー**（作物 × 作業時期のガント＋地域イベント重畳）                           |
+| `/products`       | `products.astro`       | 新規 | 購入支援者       | 成果品紹介（下栗芋・茶・蕎麦・大豆のストーリー）→ shop.tohyamago.org                        |
+| `/support`        | `support.astro`        | 新規 | 寄付支援者       | 寄付案内（単発／継続）。Stripe 導線は Phase 4 で実装                                        |
+| `/membership`     | `membership.astro`     | 現行 | 会員支援者       | 入会案内（権限・年会費・入会手続き）                                                        |
+| `/news`           | `news.astro`           | 新規 | 全員             | **近況アーカイブ**（全記事一覧。`Posts.astro` 全件）。トップは最新数件のダイジェストのみ    |
+| `/news/[slug]`    | `news/[slug].astro`    | 新規 | 全員             | 記事個別ページ（共有・SEO 用、任意）                                                        |
+| `/articles`       | `articles.astro`       | 現行 | —                | 定款（PDF ビューワー、fullscreen）                                                          |
+| `/public_notices` | `public_notices.astro` | 現行 | —                | 公告。**URL は法人登記に記載のため変更禁止**                                                |
+| `/notation`       | `notation.astro`       | 現行 | —                | 特定商取引法に基づく表記                                                                    |
 
 #### 近況 / 予定の扱い
 
-- 「近況」フィードは維持（トップ末尾の `#feed` セクションで `Posts.astro` を描画。ヘッダー・物語ページの `/#feed` アンカーの着地点）。
-- かつての「近況 / 予定」タブ（旧 `HomeTabs.tsx`）は廃止。情報量の薄かった「予定」タブは **`/calendar`（農作業カレンダー）と、トップの「今、畑でできること」プレビュー（`homeTasks.ts`）へ発展的に統合**した。activo の募集 CTA は `/join` に集約している。
+- **近況アーカイブは `/news`（`news.astro`）に集約**し、`Posts.astro` で全記事を描画する。トップ（`index.astro`）は記事が長くなりすぎないよう **最新数件のダイジェスト（`<Posts limit={3} />`）のみ**を載せ、「これまでの活動をもっと見る」CTA で `/news` へ誘導する。ヘッダーナビ「近況」も `/news` を指す。
+- トップ末尾の近況ダイジェストには `id="feed"` を残し、旧 `/#feed` ブックマークの着地点として後方互換を保つ（新規リンクは `/news` を使う）。
+- かつての「近況 / 予定」タブ（旧 `HomeTabs.tsx`）は廃止。情報量の薄かった「予定」タブは **`/calendar`（農作業カレンダー）と、トップの「今できる活動」プレビュー（`homeTasks.ts`）へ発展的に統合**した。activo の募集 CTA は `/join` に集約している。
 
 ## 記事 (Content Collection)
 
@@ -288,11 +292,13 @@ const events = defineCollection({
 
 各ステップは独立リリース可能。**静的構成のまま**進め、決済（Stripe）・認証（Clerk）は README ロードマップ Phase 4/5 に従い後段でハイブリッド化する。
 
+> **進捗メモ**: ステップ 1〜10 は実装済み（静的構成での骨格は一巡）。以降は各ページのコピー・データ拡充と、Phase 4/5（決済・認証）でのハイブリッド化が中心。本節は「何を・どの順で作るか」の設計意図として残す。
+
 1. **ナビ基盤**: `SiteHeader.astro` を新設し `BaseLayout` に組込み（ジャーナリー導線＋常時 CTA）。旧 `RouterMenu` はステップ 10 で廃止。
 2. **始まり物語**: `story.astro` を新設（既存記事の写真・引用を活用）。`purpose → story → join` の導線を張る。
 3. **参加案内**: `join.astro` を新設（参加の流れ・FAQ・アクセス・持ち物、activo CTA を集約）。旧「予定」タブの activo 導線をここへ移設。
 4. **農作業カレンダー（データ）**: `content.config.ts` に `crops` / `events` コレクションを追加し、`src/content/crops`・`src/content/events` にシードデータを投入。
-5. **農作業カレンダー（UI）**: `FarmCalendar.tsx` ＋ `calendar.astro` を実装。トップ（`index.astro`）に「今、畑でできること」プレビュー（`homeTasks.ts`）を追加し、旧「予定」タブをカレンダーへ統合。
+5. **農作業カレンダー（UI）**: `FarmCalendar.tsx` ＋ `calendar.astro` を実装。トップ（`index.astro`）に「今月の活動」プレビュー（`homeTasks.ts`）を追加し、旧「予定」タブをカレンダーへ統合。
 6. **成果品**: `products.astro` ＋ `ProductCard.astro` を新設（下栗芋・茶・蕎麦・大豆のストーリー → shop へ送客）。
 7. **トップ刷新**: `index.astro` にヒーロー＋3 導線カード（`JourneyCards.astro`）＋近況/カレンダー/物語の各プレビューを配置。
 8. **寄付**: `support.astro` を新設（当面は案内のみ）。Stripe 導線は Phase 4 で実装。
@@ -353,3 +359,13 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
 - フォントウェイト: light (`:root` に `font-weight: var(--font-weight-light)` を設定)
 - レスポンシブ: モバイルファーストで設計
 - ナビゲーション: グローバルナビ（ジャーナリー導線）は `SiteHeader.astro`、法令系文書（定款 / 公告 / 特商法表記）と法人概要は `SiteFooter.astro` に整理（旧フローティング `RouterMenu` は廃止）
+
+## コピー（文章）の方針
+
+サイト全体で維持する、UI コピーのトーン指針。**見出し・CTA・カード・リード文・ナビ項目など、運営が書くサイトの「地の文」全般に適用する。**
+
+- **「行動」にフォーカスし、「畑」という場所・モノを強調しすぎない。**「畑」「土」「耕す」に寄りすぎると、農作業そのものが目的の限定的な活動に見えてしまう。私たちの本質は **景観・暮らし・文化を守り継ぐ活動と、そこに集う人のつながり** にある。
+  - 例: 「畑に参加する」→「**活動に参加する**」、「畑の一年」→「**活動の一年**」、「今、畑でできること」→「**今月の活動**」、「畑を続けてきた」→「**活動を続けてきた**」。
+  - 「畑」「収穫」「お茶摘み」などの具体語は、活動内容を説明する文脈では引き続き使ってよい（×全面禁止）。あくまで**前面の見出し・CTA で過度に繰り返さない**のが趣旨。
+- 来訪者の **行動（参加する・知る・支える・買う）** を主語に据え、各ページに「次の一歩」の CTA を置く（情報設計の原則と整合）。
+- **例外**: 既存の記事 (`src/content/posts/`) の本文、および読み物として書かれた始まり物語 (`/story`) の地の文は、書き手の表現をそのまま尊重し、この指針による機械的な置換は行わない。画像の `alt` も事実の描写を優先する。

@@ -9,10 +9,11 @@ import Card from '~/components/Card.astro'
 import JourneyCards from '~/components/JourneyCards.astro'
 import Posts from '~/components/Posts.astro'
 import { upcomingTasks } from '~/components/homeTasks'
+import type { Intensity } from '~/components/FarmCalendar'
 import farmImage from '~/assets/farm.jpg'
 import mountsImage from '~/assets/mounts.jpg'
 
-// 「今、畑でできること」: 農作業カレンダー (crops) から当月 (無ければ最も近い先の月) に
+// 「今月の活動」: 農作業カレンダー (crops) から当月 (無ければ最も近い先の月) に
 // 参加できる作業を抽出する。ビルド時の月を起点にするため、季節に追従して自動更新される。
 const crops = (await getCollection('crops')).map((entry) => ({
   id: entry.id,
@@ -25,7 +26,7 @@ const isThisMonth = preview.month === currentMonth
 const previewTasks = preview.tasks.slice(0, 6)
 const moreCount = preview.tasks.length - previewTasks.length
 
-const intensityLabel: Record<string, string> = {
+const intensityLabel: Record<Intensity, string> = {
   light: '軽め',
   medium: 'ふつう',
   hard: 'しっかり',
@@ -46,10 +47,10 @@ const intensityLabel: Record<string, string> = {
     <h1
       class="font-serif text-3xl font-medium leading-snug text-primary md:text-5xl"
     >
-      天空の里の畑を、<wbr />みんなで耕す
+      秘境の里を、<wbr />ともに守り継ぐ
     </h1>
     <p class="mx-auto mt-5 max-w-xl leading-loose text-body">
-      長野県・遠山郷の下栗の里。標高千メートルの急斜面に連なる畑を、地域の人とボランティアで守り継いでいます。一般社団法人遠山郷応援会の活動の入口です。
+      長野県・遠山郷の下栗の里。標高千メートルの里に受け継がれてきた景観と暮らしを、地域の人とボランティアが力を合わせて次の世代へつないでいます。一般社団法人遠山郷応援会の活動の入口です。
     </p>
     <div class="mx-auto mt-8 w-full max-w-4xl">
       <Image
@@ -61,8 +62,8 @@ const intensityLabel: Record<string, string> = {
       />
     </div>
     <div class="mt-8 flex flex-wrap justify-center gap-3">
-      <Button href="/join">畑に参加する</Button>
-      <Button href="/calendar" variant="outline">畑の一年を見る</Button>
+      <Button href="/join">活動に参加する</Button>
+      <Button href="/calendar" variant="outline">活動の一年を見る</Button>
     </div>
   </section>
 
@@ -73,20 +74,20 @@ const intensityLabel: Record<string, string> = {
       <JourneyCards />
     </section>
 
-    <!-- 今、畑でできること (農作業カレンダーへの誘導) -->
+    <!-- 今できる活動 (農作業カレンダーへの誘導) -->
     <section class="mb-16">
       <div
         class="rounded-3xl border border-primary/10 bg-gradient-to-br from-surface to-sunlight-soft/30 px-6 py-8 shadow-sm md:px-10"
       >
         <SectionHeading as="h2" align="left" class="mb-2">
-          {isThisMonth ? `今月` : `まもなく`}、畑でできること
+          {isThisMonth ? `今月の活動` : `まもなく始まる活動`}
         </SectionHeading>
         <p class="mb-6 text-sm leading-relaxed text-body/80">
           {
             isThisMonth
               ? `${preview.month}月に参加できる作業です。`
               : `${preview.month}月から参加できる作業です。`
-          }気になる作業があれば、ぜひ畑へ。
+          }気になる作業があれば、ぜひお気軽にご参加ください。
         </p>
         {
           previewTasks.length > 0 ? (
@@ -150,7 +151,7 @@ const intensityLabel: Record<string, string> = {
             一枚の貼り紙から
           </SectionHeading>
           <p class="leading-loose text-body">
-            「二度芋を、つくってみませんか」——たった一枚の貼り紙から始まった、ある秘境通いの物語。私たちがどうやって遠山郷とつながり、畑を続けてきたのかを、読み物としてお届けします。
+            「二度芋を、つくってみませんか」——たった一枚の貼り紙から始まった、ある秘境通いの物語。私たちがどうやって遠山郷とつながり、活動を続けてきたのかを、読み物としてお届けします。
           </p>
           <div class="mt-2">
             <Button href="/story" variant="outline">始まりの物語を読む</Button>
@@ -159,13 +160,19 @@ const intensityLabel: Record<string, string> = {
       </Card>
     </section>
 
-    <!-- 近況 (アンカー #feed: ヘッダー・物語ページから参照) -->
+    <!-- 近況ダイジェスト: 最新数件のみを載せ、続きは近況アーカイブ /news へ誘導する。
+         id="feed" は旧 /#feed ブックマーク互換のためのアンカー。 -->
     <section id="feed" class="scroll-mt-24">
       <SectionHeading as="h2" class="mb-2">近況</SectionHeading>
       <p class="mb-8 text-center text-sm leading-relaxed text-body/80">
-        畑や地域でのできごとを随時お届けしています。
+        活動のようすを随時お届けしています。
       </p>
-      <Posts />
+      <Posts limit={3} />
+      <div class="mt-8 flex justify-center">
+        <Button href="/news" variant="outline"
+          >これまでの活動をもっと見る</Button
+        >
+      </div>
     </section>
   </Container>
 </BaseLayout>

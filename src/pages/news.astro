@@ -1,0 +1,34 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro'
+import Container from '~/components/Container.astro'
+import SectionHeading from '~/components/SectionHeading.astro'
+import Posts from '~/components/Posts.astro'
+
+// 近況アーカイブ。トップには最新数件のダイジェストのみを載せ、全件はこのページへ集約する。
+---
+
+<BaseLayout title="近況">
+  <section
+    class="bg-gradient-to-b from-sky-soft via-base to-base px-4 pt-12 pb-8 text-center sm:pt-16"
+  >
+    <span
+      class="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full bg-sunlight-soft px-4 py-1 font-serif text-sm tracking-wide text-primary-deep
+             before:text-xs before:text-accent-strong before:content-['▲']"
+    >
+      近況
+    </span>
+    <h1
+      class="font-serif text-3xl font-medium leading-snug text-primary md:text-4xl"
+    >
+      これまでの歩み
+    </h1>
+    <p class="mx-auto mt-5 max-w-2xl leading-loose text-body">
+      遠山郷での活動のようすを、折々につづってきた記録です。下から順に、これまでの歩みをたどれます。
+    </p>
+  </section>
+
+  <Container class="py-12 md:py-16">
+    <SectionHeading as="h2" class="mb-8 sr-only">活動の記録</SectionHeading>
+    <Posts />
+  </Container>
+</BaseLayout>
