@@ -26,6 +26,7 @@ export const STORY_NOTE =
 
 const JOIN_URL = '/join'
 
+/** n を [min, max] の範囲に丸める (ページ番号の範囲外アクセス対策)。 */
 function clamp(n: number, min: number, max: number) {
   return Math.min(Math.max(n, min), max)
 }

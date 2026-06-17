@@ -126,4 +126,31 @@ describe('StoryReader', () => {
     const narration = screen.getByText('ある年の冬。')
     expect(narration.className).toContain('indent-4')
   })
+
+  it('章ジャンプ用ドットで任意のページへ移動できる', async () => {
+    const user = userEvent.setup()
+    render(<StoryReader pages={pages} />)
+
+    // 各章のドットには「kicker　title」のタイトルが付く (該当章のドットを掴む)
+    await user.click(screen.getByTitle(/エピローグ/))
+
+    expect(
+      screen.getByRole('heading', { name: '畑は、続いていく' }),
+    ).toBeInTheDocument()
+    expect(window.location.hash).toBe('#p3')
+  })
+
+  it('空文字列の段落は情景の「間」としてスペーサー描画される', () => {
+    const pagesWithSpacer: StoryPage[] = [
+      {
+        kicker: 'テスト',
+        title: 'テストの章',
+        paragraphs: ['最初の段落', '', '二番目の段落'],
+      },
+    ]
+    const { container } = render(<StoryReader pages={pagesWithSpacer} />)
+
+    const spacers = container.querySelectorAll('div.h-3[aria-hidden="true"]')
+    expect(spacers).toHaveLength(1)
+  })
 })
