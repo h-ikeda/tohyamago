@@ -1,0 +1,138 @@
+---
+/**
+ * JourneyCards — トップの 3 導線カード (参加 / 成果品 / 支える)。
+ *
+ * 団体組織図ではなく「来訪者のやりたいこと」で章立てする (CLAUDE.md ジャーナリー導線)。
+ * ゴール優先度の最も高い「参加する」を featured で強調し、視線を最初に集める。
+ * カード全体をリンクにして、どこをタップしても次の一歩へ進めるようにする。
+ */
+import Card from '~/components/Card.astro'
+
+interface Journey {
+  href: string
+  external?: boolean
+  emoji: string
+  label: string
+  title: string
+  desc: string
+  cta: string
+  /** アイコン円・ホバー時のアクセント色 (Tailwind クラス) */
+  tint: string
+  featured?: boolean
+}
+
+const journeys: Journey[] = [
+  {
+    href: '/join',
+    emoji: '🌱',
+    label: '参加する',
+    title: '活動に参加する',
+    desc: '植え付け・草取り・収穫・お茶摘み。仲間同士で教え合い、地域の方々の力も借りながら進めます。初めての方も、まずは一日、活動に加わってみませんか。',
+    cta: 'はじめての方へ',
+    tint: 'accent',
+    featured: true,
+  },
+  {
+    href: '/products',
+    emoji: '🍵',
+    label: '成果品',
+    title: '遠山郷の味を買う',
+    desc: '下栗芋・蕎麦・大豆・お茶。皆で活動するなかで実った収穫の一部を、この土地ならではの味としてお分けしています。',
+    cta: '成果品を見る',
+    tint: 'sunlight',
+  },
+  {
+    href: '/support',
+    emoji: '🤝',
+    label: '支える',
+    title: '活動を応援する',
+    desc: '寄付や入会で、遠山郷の景観と暮らしを守る活動を支えられます。離れていても、谷とつながる方法があります。',
+    cta: '支え方を見る',
+    tint: 'sky',
+  },
+]
+
+// tint ごとの配色 (アイコン円の背景/文字、featured 枠線、CTA 矢印色)
+const tints = {
+  accent: {
+    icon: 'bg-accent-soft/40 text-accent-strong',
+    ring: 'ring-2 ring-accent-strong/30',
+    cta: 'text-accent-strong',
+  },
+  sunlight: {
+    icon: 'bg-sunlight-soft text-primary-deep',
+    ring: '',
+    cta: 'text-primary-deep',
+  },
+  sky: {
+    icon: 'bg-sky-soft text-primary-deep',
+    ring: '',
+    cta: 'text-primary-deep',
+  },
+}
+---
+
+<ul class="grid gap-5 sm:grid-cols-3">
+  {
+    journeys.map((j) => {
+      const t = tints[j.tint as keyof typeof tints]
+      return (
+        <li
+          class:list={['sm:flex', j.featured && 'sm:col-span-3 lg:col-span-1']}
+        >
+          <Card
+            as="div"
+            hover
+            class:list={['group flex w-full flex-col', j.featured && t.ring]}
+          >
+            <a
+              href={j.href}
+              {...(j.external
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {})}
+              class="flex h-full flex-col gap-3 p-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <div class="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl',
+                    t.icon,
+                  ]}
+                >
+                  {j.emoji}
+                </span>
+                <span
+                  class:list={[
+                    'flex items-center gap-1.5 font-serif text-sm font-medium tracking-wide text-primary-deep',
+                    "before:text-xs before:text-accent-strong before:content-['▲']",
+                  ]}
+                >
+                  {j.label}
+                  {j.featured && (
+                    <span class="rounded-full bg-accent-strong px-2 py-0.5 text-[0.65rem] font-medium text-white">
+                      なかま募集中
+                    </span>
+                  )}
+                </span>
+              </div>
+              <h3 class="font-serif text-xl font-medium text-primary">
+                {j.title}
+              </h3>
+              <p class="grow text-sm leading-relaxed text-body">{j.desc}</p>
+              <span
+                class:list={[
+                  'mt-1 inline-flex items-center gap-1.5 text-sm font-medium transition-transform group-hover:translate-x-0.5',
+                  t.cta,
+                ]}
+              >
+                {j.cta}
+                <span aria-hidden="true">→</span>
+              </span>
+            </a>
+          </Card>
+        </li>
+      )
+    })
+  }
+</ul>

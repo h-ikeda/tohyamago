@@ -147,7 +147,7 @@ export default function StoryReader({ pages }: { pages: StoryPage[] }) {
               </a>
               <a
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-accent-strong bg-surface px-8 py-3 font-medium text-accent-strong transition-all hover:-translate-y-0.5 hover:bg-accent-strong hover:text-white hover:shadow-lg"
-                href="/#feed"
+                href="/news"
               >
                 その後の近況を見る
               </a>
