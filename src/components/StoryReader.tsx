@@ -135,14 +135,14 @@ export default function StoryReader({ pages }: { pages: StoryPage[] }) {
         {isLast && (
           <div className="mt-10 rounded-2xl bg-sunlight-soft/60 px-6 py-7 text-center">
             <p className="font-serif text-lg text-primary-deep">
-              物語の続きは、畑にあります。
+              物語の続きは、ここにあります。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               <a
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-accent-strong px-8 py-3 font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
                 href={JOIN_URL}
               >
-                あなたも畑へ
+                あなたも耕してみる
               </a>
               <a
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-accent-strong bg-surface px-8 py-3 font-medium text-accent-strong transition-all hover:-translate-y-0.5 hover:bg-accent-strong hover:text-white hover:shadow-lg"

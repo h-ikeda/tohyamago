@@ -79,7 +79,7 @@ describe('StoryReader', () => {
     expect(screen.getByRole('button', { name: '次の話' })).toBeDisabled()
 
     // 参加への CTA が出る
-    const cta = screen.getByRole('link', { name: 'あなたも畑へ' })
+    const cta = screen.getByRole('link', { name: 'あなたも耕してみる' })
     expect(cta).toHaveAttribute('href', '/join')
   })
 
