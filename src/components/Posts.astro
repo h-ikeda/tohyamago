@@ -2,19 +2,27 @@
 import { Image } from 'astro:assets'
 import { getCollection, render } from 'astro:content'
 import Card from '~/components/Card.astro'
+import NewsCta from '~/components/NewsCta.astro'
+import { ctaPositions } from '~/components/postCtaLayout'
 
 interface Props {
   /** 表示件数の上限。未指定なら全件 (近況アーカイブ /news 用)。トップは最新数件のダイジェスト。 */
   limit?: number
+  /** 記事 ctaEvery 件ごとに「次は、あなたの番です」CTA を差し込む (近況アーカイブ用)。0/未指定で無効。 */
+  ctaEvery?: number
 }
 
-const { limit } = Astro.props
+const { limit, ctaEvery = 0 } = Astro.props
 
 const sorted = (await getCollection('posts')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 )
 // limit は 0 も有効な境界値 (0 件) として扱うため、undefined 判定で全件と区別する。
 const posts = limit === undefined ? sorted : sorted.slice(0, limit)
+
+// 一覧が長い近況アーカイブでは、一定間隔で CTA を再登場させて
+// 「末尾まで読まないと参加導線に出会えない」状態を防ぐ。
+const ctaAfter = ctaPositions(posts.length, ctaEvery)
 
 const dateFormat = (date: Date) => {
   const year = date.getFullYear()
@@ -34,22 +42,25 @@ const rendered = await Promise.all(
 
 <section class="mx-auto grid w-full max-w-2xl gap-5 px-4 sm:px-6">
   {
-    rendered.map(({ post, Content }) => (
-      <Card as="article" hover class="px-6 pt-4 pb-5">
-        <time class="mb-2 block font-mono text-xs font-medium text-accent-strong">
-          {dateFormat(post.data.date)}
-        </time>
-        <div class="post-body text-justify leading-relaxed text-body">
-          <Content />
-        </div>
-        {post.data.images.map((img) => (
-          <Image
-            src={img}
-            alt=""
-            class="mt-4 aspect-video w-full rounded-xl border border-primary/10 object-cover saturate-[0.85]"
-          />
-        ))}
-      </Card>
+    rendered.map(({ post, Content }, index) => (
+      <Fragment>
+        <Card as="article" hover class="px-6 pt-4 pb-5">
+          <time class="mb-2 block font-mono text-xs font-medium text-accent-strong">
+            {dateFormat(post.data.date)}
+          </time>
+          <div class="post-body text-justify leading-relaxed text-body">
+            <Content />
+          </div>
+          {post.data.images.map((img) => (
+            <Image
+              src={img}
+              alt=""
+              class="mt-4 aspect-video w-full rounded-xl border border-primary/10 object-cover saturate-[0.85]"
+            />
+          ))}
+        </Card>
+        {ctaAfter.has(index) && <NewsCta compact />}
+      </Fragment>
     ))
   }
 </section>

@@ -66,7 +66,10 @@ tohyamago/
 │   │   ├── Card.astro          # 共通 UI プリミティブ (カード)
 │   │   ├── Container.astro     # 共通 UI プリミティブ (コンテナ幅)
 │   │   ├── SectionHeading.astro# 共通 UI プリミティブ (▲ 見出し)
-│   │   ├── Posts.astro         # Content Collection から記事を描画
+│   │   ├── Posts.astro         # Content Collection から記事を描画 (ctaEvery で記事間に NewsCta を挿入)
+│   │   ├── NewsCta.astro        # 「次は、あなたの番です」CTA (記事間 compact / 末尾 full で再利用)
+│   │   ├── postCtaLayout.ts     # 記事間 CTA の挿入位置を決める純粋関数
+│   │   ├── postCtaLayout.test.ts# postCtaLayout のテスト (Vitest)
 │   │   └── PdfViewer.tsx       # PDF.js Express ラッパー (React, client:only)
 │   ├── content.config.ts       # Content Collection スキーマ (posts / crops / events)
 │   ├── content/
@@ -142,6 +145,7 @@ tohyamago/
 #### 近況 / 予定の扱い
 
 - **近況アーカイブは `/news`（`news.astro`）に集約**し、`Posts.astro` で全記事を描画する。トップ（`index.astro`）は記事が長くなりすぎないよう **最新数件のダイジェスト（`<Posts limit={3} />`）のみ**を載せ、「これまでの活動をもっと見る」CTA で `/news` へ誘導する。ヘッダーナビ「近況」も `/news` を指す。
+- 全記事一覧（130 件超）は縦に非常に長く、末尾の「次は、あなたの番です」CTA に辿り着けない問題があったため、`<Posts ctaEvery={12} />` で **一定間隔（12 件ごと）に `NewsCta`（compact）を差し込み**、どこまで読んでも参加・支援への一歩に出会えるようにしている。挿入位置は純粋関数 `postCtaLayout.ts`（`ctaPositions`）が決定し、最終記事直後は末尾の本 CTA（`NewsCta` full）と重複しないよう除外する。
 - トップ末尾の近況ダイジェストには `id="feed"` を残し、旧 `/#feed` ブックマークの着地点として後方互換を保つ（新規リンクは `/news` を使う）。
 - かつての「近況 / 予定」タブ（旧 `HomeTabs.tsx`）は廃止。情報量の薄かった「予定」タブは **`/calendar`（農作業カレンダー）と、トップの「今月の活動」プレビュー（`homeTasks.ts`）へ発展的に統合**した。activo の募集 CTA は `/join` に集約している。
 
