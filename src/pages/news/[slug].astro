@@ -61,6 +61,8 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
               <Image
                 src={img}
                 alt=""
+                sizes="(min-width: 768px) 720px, 100vw"
+                data-fade-in
                 class="w-full rounded-2xl border border-primary/10 object-cover saturate-[0.9]"
               />
             ))}

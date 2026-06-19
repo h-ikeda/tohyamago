@@ -31,6 +31,8 @@ const thumbnail = post.data.images[0]
         <Image
           src={thumbnail}
           alt=""
+          sizes="(min-width: 640px) 360px, 100vw"
+          data-fade-in
           class="aspect-video w-full border-b border-primary/10 object-cover saturate-[0.85]"
         />
       )

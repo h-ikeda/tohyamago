@@ -58,6 +58,7 @@ const intensityLabel: Record<Intensity, string> = {
         alt="遠山郷の急斜面に広がる畑と山並み"
         loading="eager"
         fetchpriority="high"
+        sizes="(min-width: 896px) 896px, 100vw"
         class="aspect-video w-full rounded-3xl object-cover shadow-lg ring-1 ring-primary/10"
       />
     </div>
@@ -146,6 +147,8 @@ const intensityLabel: Record<Intensity, string> = {
         <Image
           src={mountsImage}
           alt="遠山郷の山並みと谷あいの里"
+          sizes="(min-width: 768px) 50vw, 100vw"
+          data-fade-in
           class="aspect-video h-full w-full object-cover md:aspect-auto"
         />
         <div class="flex flex-col justify-center gap-3 px-6 py-8 md:px-10">

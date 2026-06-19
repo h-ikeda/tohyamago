@@ -82,6 +82,8 @@ tohyamago/
 │   │   ├── NewsCta.astro        # 「次は、あなたの番です」CTA (記事間 compact / 末尾 full で再利用)
 │   │   ├── postCtaLayout.ts     # 記事間 CTA の挿入位置を決める純粋関数
 │   │   ├── postCtaLayout.test.ts# postCtaLayout のテスト (Vitest)
+│   │   ├── imageFadeIn.ts       # 写真のフェードイン制御 (新規, クライアント側。低速回線の遅延感をやわらげる)
+│   │   ├── imageFadeIn.test.ts  # imageFadeIn のテスト (Vitest, jsdom)
 │   │   └── PdfViewer.tsx       # PDF.js Express ラッパー (React, client:only)
 │   ├── content.config.ts       # Content Collection スキーマ (posts / crops / events)
 │   ├── content/
@@ -380,6 +382,9 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
 - フォントウェイト: light (`:root` に `font-weight: var(--font-weight-light)` を設定)
 - レスポンシブ: モバイルファーストで設計
 - ナビゲーション: グローバルナビ（ジャーナリー導線）は `SiteHeader.astro`、法令系文書（定款 / 公告 / 特商法表記）と法人概要は `SiteFooter.astro` に整理（旧フローティング `RouterMenu` は廃止）
+- 画像（モバイル回線の体感速度）: `astro:assets` の `<Image>` を使い、`astro.config.mjs` の `image.layout='constrained'` ＋ `responsiveStyles` でレスポンシブ画像（`srcset`/`sizes`、出力は既定の webp）を**全画像で自動生成**する。画面・回線に応じた最小解像度が配信され、モバイルの転送量を抑える。グリッドやカラム内など表示幅が小さい画像には `sizes` を明示して候補選択を最適化する（例: PostCard サムネイルは `(min-width: 640px) 360px, 100vw`）。
+  - ファーストビュー（LCP）の画像のみ `loading="eager"` ＋ `fetchpriority="high"`。それ以外は Astro 既定の `loading="lazy"` ＋ `decoding="async"`。`<Image>` は `width`/`height` を自動付与するためレイアウトシフト（CLS）も防げる。
+  - 体感の「遅延感」対策として、未読込の写真は一旦透明にし読み込み完了でふわっと表示する（旧プログレッシブ JPEG/インターレースの現代的代替。webp は真のプログレッシブが効かないため表示の滑らかさで補う）。`data-fade-in` 属性を付けた `<Image>` を `imageFadeIn.ts` が制御し、JS 無効時は `html.js` ゲートにより通常表示にフォールバックする。
 
 ## コピー（文章）の方針
 

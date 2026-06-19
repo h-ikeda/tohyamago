@@ -20,6 +20,11 @@ const currentPath = Astro.url.pathname
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 画像フェードイン (imageFadeIn) のゲート。描画前に同期実行し、JS 有効時のみ
+         未読込画像を透明化する。JS 無効ならクラスが付かず画像はそのまま表示される。 -->
+    <script is:inline>
+      document.documentElement.classList.add('js')
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{fullTitle}</title>
     <!-- タイポグラフィ: 見出し Noto Serif JP / 本文 Noto Sans JP (light 基調) -->
@@ -48,5 +53,9 @@ const currentPath = Astro.url.pathname
         </Fragment>
       )
     }
+    <script>
+      import { initImageFadeIn } from '~/components/imageFadeIn'
+      initImageFadeIn()
+    </script>
   </body>
 </html>
