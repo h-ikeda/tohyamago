@@ -10,7 +10,7 @@ import JourneyCards from '~/components/JourneyCards.astro'
 import Posts from '~/components/Posts.astro'
 import { upcomingTasks } from '~/components/homeTasks'
 import type { Intensity } from '~/components/FarmCalendar'
-import heroImage from '~/assets/hero.png'
+import heroImage from '~/assets/hero-photo.jpg'
 import mountsImage from '~/assets/mounts.jpg'
 
 // 「今月の活動」: 農作業カレンダー (crops) から当月 (無ければ最も近い先の月) に
@@ -40,7 +40,7 @@ const intensityLabel: Record<Intensity, string> = {
     <!-- 背景写真 (絶対配置でセクション全体を覆う) -->
     <BlurImage
       src={heroImage}
-      alt="遠山郷の重なる山並みと段々畑、昇る朝日を描いたイラスト"
+      alt="遠山郷の急斜面に広がる畑と山並み"
       loading="eager"
       fetchpriority="high"
       fade={false}
