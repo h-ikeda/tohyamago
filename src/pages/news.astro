@@ -2,9 +2,8 @@
 import BaseLayout from '~/layouts/BaseLayout.astro'
 import Container from '~/components/Container.astro'
 import SectionHeading from '~/components/SectionHeading.astro'
-import Button from '~/components/Button.astro'
-import Card from '~/components/Card.astro'
 import Posts from '~/components/Posts.astro'
+import NewsCta from '~/components/NewsCta.astro'
 
 // 近況アーカイブ。トップには最新数件のダイジェストのみを載せ、全件はこのページへ集約する。
 ---
@@ -31,23 +30,11 @@ import Posts from '~/components/Posts.astro'
 
   <Container class="py-12 md:py-16">
     <SectionHeading as="h2" class="mb-8 sr-only">活動の記録</SectionHeading>
-    <Posts />
+    <!-- 記事が 130 件超と長いため、一定間隔で CTA を差し込み、
+         どこまで読んでも参加・支援への一歩に出会えるようにする。 -->
+    <Posts ctaEvery={12} />
 
-    <!-- 次の一歩 CTA: 読んだあと参加・支援へ送り出す (情報設計の原則「各ページに CTA」) -->
-    <Card
-      as="section"
-      class="mt-14 bg-gradient-to-br from-sunlight-soft/60 to-surface px-6 py-10 text-center md:px-12"
-    >
-      <SectionHeading as="h2" align="center" class="mb-4"
-        >次は、あなたの番です</SectionHeading
-      >
-      <p class="mx-auto max-w-xl leading-loose text-body">
-        記事の一場面に「いいな」と思ったら、ぜひ現地へ。初めての方も大歓迎です。あなたの参加が、この物語の続きになります。
-      </p>
-      <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <Button href="/join">活動に参加する</Button>
-        <Button href="/support" variant="outline">活動を支える</Button>
-      </div>
-    </Card>
+    <!-- 次の一歩 CTA: 読了後に参加・支援へ送り出す本 CTA (情報設計の原則「各ページに CTA」) -->
+    <NewsCta class="mt-14" />
   </Container>
 </BaseLayout>
