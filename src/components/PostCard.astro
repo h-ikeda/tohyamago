@@ -5,8 +5,8 @@
  * カード全体が記事個別ページ (/news/[slug]) へのリンクになっており、
  * タップで続きを読める。高さがほぼ揃うよう抜粋は line-clamp で行数を制限する。
  */
-import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
+import BlurImage from '~/components/BlurImage.astro'
 import Card from '~/components/Card.astro'
 import { postExcerpt } from '~/components/postExcerpt'
 import { formatPostDate } from '~/components/postDate'
@@ -28,12 +28,12 @@ const thumbnail = post.data.images[0]
   >
     {
       thumbnail && (
-        <Image
+        <BlurImage
           src={thumbnail}
           alt=""
           sizes="(min-width: 640px) 360px, 100vw"
-          data-fade-in
-          class="aspect-video w-full border-b border-primary/10 object-cover saturate-[0.85]"
+          class="aspect-video w-full border-b border-primary/10"
+          imgClass="h-full w-full object-cover saturate-[0.85]"
         />
       )
     }

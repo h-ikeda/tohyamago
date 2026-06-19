@@ -1,6 +1,6 @@
 ---
-import { Image } from 'astro:assets'
 import BaseLayout from '~/layouts/BaseLayout.astro'
+import BlurImage from '~/components/BlurImage.astro'
 import Container from '~/components/Container.astro'
 import StoryReader, { type StoryPage } from '~/components/StoryReader.tsx'
 import mountsImage from '~/assets/mounts.jpg'
@@ -132,12 +132,12 @@ const pages: StoryPage[] = [
       />私たちがどうやって遠山郷とつながり、畑を続けてきたのか――その物語をお届けします。
     </p>
     <div class="mx-auto mt-8 w-full max-w-3xl">
-      <Image
+      <BlurImage
         src={mountsImage}
         alt="遠山郷の山並みと谷あいの里"
         sizes="(min-width: 768px) 768px, 100vw"
-        data-fade-in
-        class="aspect-video w-full rounded-3xl object-cover shadow-lg ring-1 ring-primary/10"
+        class="aspect-video w-full overflow-hidden rounded-3xl shadow-lg ring-1 ring-primary/10"
+        imgClass="h-full w-full object-cover"
       />
     </div>
   </section>

@@ -1,0 +1,64 @@
+---
+/**
+ * BlurImage — ブラー placeholder (LQIP / blur-up) 付きのレスポンシブ画像。
+ *
+ * 読み込み前に極小画像をぼかした下絵 (base64 data URI) を即時表示し、
+ * 本画像が読み込まれたらその上にフェードインさせて遅延感を消す。
+ * 下絵は blurPlaceholder.ts がビルド時に生成する。レスポンシブ画像
+ * (srcset/sizes) は astro.config.mjs の image.layout 設定で自動付与される。
+ *
+ * 形状 (角丸・枠線・アスペクト・影) はラッパー (`class`) に、画像の見え方
+ * (object-fit・彩度フィルタ等) は `imgClass` に分けて渡す。ラッパーが下絵の
+ * 背景を持ち、本画像がその上を覆う構造のため、角丸クリップには overflow-hidden
+ * を含むコンテナ (例: Card) かラッパー自身の overflow-hidden が必要。
+ */
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
+import { getBlurDataURL } from './blurPlaceholder'
+
+interface Props {
+  src: ImageMetadata
+  alt: string
+  sizes?: string
+  loading?: 'eager' | 'lazy'
+  fetchpriority?: 'high' | 'low' | 'auto'
+  /**
+   * 本画像をフェードインさせるか。既定 true。
+   * ファーストビュー (LCP) の画像は opacity アニメーションが計測に響くため
+   * false にして下絵の上へ即時表示する。
+   */
+  fade?: boolean
+  /** ラッパー (形状・余白・アスペクト・枠線など) に付けるクラス */
+  class?: string
+  /** 本画像 (object-fit やフィルタ) に付けるクラス */
+  imgClass?: string
+}
+
+const {
+  src,
+  alt,
+  sizes,
+  loading,
+  fetchpriority,
+  fade = true,
+  class: className = '',
+  imgClass = '',
+} = Astro.props
+
+const blur = await getBlurDataURL(src)
+---
+
+<div
+  class:list={['lqip', className]}
+  style={blur ? `background-image:url(${blur})` : undefined}
+>
+  <Image
+    src={src}
+    alt={alt}
+    sizes={sizes}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    data-fade-in={fade ? '' : undefined}
+    class:list={['lqip-img', imgClass]}
+  />
+</div>
