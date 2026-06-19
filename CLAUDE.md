@@ -83,9 +83,10 @@ tohyamago/
 │   │   ├── postCtaLayout.ts     # 記事間 CTA の挿入位置を決める純粋関数
 │   │   ├── postCtaLayout.test.ts# postCtaLayout のテスト (Vitest)
 │   │   ├── BlurImage.astro      # ブラー placeholder (LQIP/blur-up) 付き画像ラッパー (新規)
-│   │   ├── blurPlaceholder.ts   # ビルド時に元画像から極小ぼかし下絵 (base64) を生成 (新規, sharp。サーバー側のみ)
-│   │   ├── imageFadeIn.ts       # 写真のフェードイン制御 (新規, クライアント側。低速回線の遅延感をやわらげる)
-│   │   ├── imageFadeIn.test.ts  # imageFadeIn のテスト (Vitest, jsdom)
+│   │   ├── blur-placeholder.ts  # ビルド時に元画像から極小ぼかし下絵 (base64) を生成 (新規, sharp。サーバー側のみ)
+│   │   ├── blur-placeholder.test.ts # blur-placeholder のテスト (Vitest, sharp モック)
+│   │   ├── image-fade-in.ts     # 写真のフェードイン制御 (新規, クライアント側。低速回線の遅延感をやわらげる)
+│   │   ├── image-fade-in.test.ts # image-fade-in のテスト (Vitest, jsdom)
 │   │   └── PdfViewer.tsx       # PDF.js Express ラッパー (React, client:only)
 │   ├── content.config.ts       # Content Collection スキーマ (posts / crops / events)
 │   ├── content/
@@ -386,10 +387,10 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
 - ナビゲーション: グローバルナビ（ジャーナリー導線）は `SiteHeader.astro`、法令系文書（定款 / 公告 / 特商法表記）と法人概要は `SiteFooter.astro` に整理（旧フローティング `RouterMenu` は廃止）
 - 画像（モバイル回線の体感速度）: `astro:assets` の `<Image>` を使い、`astro.config.mjs` の `image.layout='constrained'` ＋ `responsiveStyles` でレスポンシブ画像（`srcset`/`sizes`、出力は既定の webp）を**全画像で自動生成**する。画面・回線に応じた最小解像度が配信され、モバイルの転送量を抑える。グリッドやカラム内など表示幅が小さい画像には `sizes` を明示して候補選択を最適化する（例: PostCard サムネイルは `(min-width: 640px) 360px, 100vw`）。
   - ファーストビュー（LCP）の画像のみ `loading="eager"` ＋ `fetchpriority="high"`。それ以外は Astro 既定の `loading="lazy"` ＋ `decoding="async"`。`<Image>` は `width`/`height` を自動付与するためレイアウトシフト（CLS）も防げる。
-  - 写真は **ブラー placeholder（LQIP / blur-up）** で表示し体感の「遅延感」を消す。`BlurImage.astro`（`<Image>` のラッパー）を使うと、ビルド時に `blurPlaceholder.ts`（sharp）が元画像から極小（幅 ~20px）のぼかし下絵を base64 data URI 化してラッパー背景に即時表示し、本画像はその上にフェードインして覆う。低速回線でも白い空白やカクッとした差し込みが起きない（旧プログレッシブ JPEG/インターレースの現代的代替。webp は真のプログレッシブが効かないため下絵＋フェードで補う）。
+  - 写真は **ブラー placeholder（LQIP / blur-up）** で表示し体感の「遅延感」を消す。`BlurImage.astro`（`<Image>` のラッパー）を使うと、ビルド時に `blur-placeholder.ts`（sharp）が元画像から極小（幅 ~20px）のぼかし下絵を base64 data URI 化してラッパー背景に即時表示し、本画像はその上にフェードインして覆う。低速回線でも白い空白やカクッとした差し込みが起きない（旧プログレッシブ JPEG/インターレースの現代的代替。webp は真のプログレッシブが効かないため下絵＋フェードで補う）。
     - `BlurImage` は形状（角丸・枠線・アスペクト・影）を `class`、画像の見え方（object-fit・彩度）を `imgClass` に分けて受け取る。角丸クリップには `overflow-hidden` を含むコンテナ（例: `Card`）かラッパー自身の `overflow-hidden` が要る。
-    - フェードインは `data-fade-in` 属性を `imageFadeIn.ts` が制御し、JS 無効時は `html.js` ゲートで通常表示にフォールバックする。LCP 画像は `fade={false}` で opacity アニメーションを避け、下絵の上へ即時表示する。
-    - `blurPlaceholder.ts` は Astro が画像メタデータに保持する元ファイルパス（`fsPath`）を sharp で読む。サーバー（ビルド / dev）側でのみ評価され、クライアントへは出力しない。
+    - フェードインは `data-fade-in` 属性を `image-fade-in.ts` が制御し、JS 無効時は `html.js` ゲートで通常表示にフォールバックする。LCP 画像は `fade={false}` で opacity アニメーションを避け、下絵の上へ即時表示する。
+    - `blur-placeholder.ts` は Astro が画像メタデータに保持する元ファイルパス（`fsPath`）を sharp で読む。サーバー（ビルド / dev）側でのみ評価され、クライアントへは出力しない。
 
 ## コピー（文章）の方針
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { initImageFadeIn } from './imageFadeIn'
+import { initImageFadeIn } from './image-fade-in'
 
 /**
  * jsdom では HTMLImageElement の complete / naturalWidth は読み取り専用かつ

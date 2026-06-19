@@ -20,7 +20,7 @@ const currentPath = Astro.url.pathname
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- 画像フェードイン (imageFadeIn) のゲート。描画前に同期実行し、JS 有効時のみ
+    <!-- 画像フェードイン (image-fade-in) のゲート。描画前に同期実行し、JS 有効時のみ
          未読込画像を透明化する。JS 無効ならクラスが付かず画像はそのまま表示される。 -->
     <script is:inline>
       document.documentElement.classList.add('js')
@@ -54,7 +54,7 @@ const currentPath = Astro.url.pathname
       )
     }
     <script>
-      import { initImageFadeIn } from '~/components/imageFadeIn'
+      import { initImageFadeIn } from '~/components/image-fade-in'
       initImageFadeIn()
     </script>
   </body>

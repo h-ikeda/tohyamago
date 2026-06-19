@@ -13,7 +13,7 @@ vi.mock('sharp', () => ({
 }))
 
 import sharp from 'sharp'
-import { getBlurDataURL } from './blurPlaceholder'
+import { getBlurDataURL } from './blur-placeholder'
 
 /** fsPath の有無を制御したダミー ImageMetadata を作る。 */
 function image(fsPath?: string): ImageMetadata {

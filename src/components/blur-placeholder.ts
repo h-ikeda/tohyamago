@@ -1,5 +1,5 @@
 /**
- * blurPlaceholder — ビルド時に画像の LQIP (Low Quality Image Placeholder) を生成する。
+ * blur-placeholder — ビルド時に画像の LQIP (Low Quality Image Placeholder) を生成する。
  *
  * 元画像を極小サイズ (幅 ~20px) に縮小した webp を base64 data URI 化し、
  * 本画像の読み込み前に「ぼかした下絵」として即時表示する (blur-up)。
