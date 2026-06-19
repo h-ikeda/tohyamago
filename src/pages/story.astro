@@ -135,6 +135,9 @@ const pages: StoryPage[] = [
       <BlurImage
         src={mountsImage}
         alt="遠山郷の山並みと谷あいの里"
+        loading="eager"
+        fetchpriority="high"
+        fade={false}
         sizes="(min-width: 768px) 768px, 100vw"
         class="aspect-video w-full overflow-hidden rounded-3xl shadow-lg ring-1 ring-primary/10"
         imgClass="h-full w-full object-cover"

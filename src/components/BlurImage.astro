@@ -21,6 +21,7 @@ interface Props {
   alt: string
   sizes?: string
   loading?: 'eager' | 'lazy'
+  decoding?: 'async' | 'sync' | 'auto'
   fetchpriority?: 'high' | 'low' | 'auto'
   /**
    * 本画像をフェードインさせるか。既定 true。
@@ -38,7 +39,9 @@ const {
   src,
   alt,
   sizes,
-  loading,
+  // 非 LCP 画像の既定。LCP 画像は呼び出し側で loading="eager" 等を明示する。
+  loading = 'lazy',
+  decoding = 'async',
   fetchpriority,
   fade = true,
   class: className = '',
@@ -57,6 +60,7 @@ const blur = await getBlurDataURL(src)
     alt={alt}
     sizes={sizes}
     loading={loading}
+    decoding={decoding}
     fetchpriority={fetchpriority}
     data-fade-in={fade ? '' : undefined}
     class:list={['lqip-img', imgClass]}

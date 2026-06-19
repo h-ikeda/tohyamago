@@ -46,7 +46,12 @@ export function getBlurDataURL(image: ImageMetadata): Promise<string> {
   const cached = cache.get(fsPath)
   if (cached) return cached
 
-  const result = generate(fsPath)
+  // 生成に失敗 (空文字) したらキャッシュから外し、次回の再試行を許す。
+  // 成功した data URI のみ再利用する。
+  const result = generate(fsPath).then((dataUrl) => {
+    if (!dataUrl) cache.delete(fsPath)
+    return dataUrl
+  })
   cache.set(fsPath, result)
   return result
 }
