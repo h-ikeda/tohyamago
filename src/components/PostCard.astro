@@ -36,7 +36,10 @@ const thumbnail = post.data.images[0]
       )
     }
     <div class="flex flex-1 flex-col px-5 pt-4 pb-5">
-      <time class="block font-mono text-xs font-medium text-accent-strong">
+      <time
+        class="block font-mono text-xs font-medium text-accent-strong"
+        datetime={post.data.date.toISOString()}
+      >
         {formatPostDate(post.data.date)}
       </time>
       {

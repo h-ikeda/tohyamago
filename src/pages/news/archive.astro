@@ -120,7 +120,10 @@ const seasonFilters = [
                         href={`/news/${post.id}`}
                         class="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-sunlight-soft/30 focus:outline-none focus-visible:bg-sunlight-soft/40 sm:flex-row sm:items-baseline sm:gap-4"
                       >
-                        <time class="shrink-0 font-mono text-xs font-medium text-accent-strong sm:w-36">
+                        <time
+                          class="shrink-0 font-mono text-xs font-medium text-accent-strong sm:w-36"
+                          datetime={post.data.date.toISOString()}
+                        >
                           {formatPostDate(post.data.date)}
                         </time>
                         <span class="min-w-0 flex-1 truncate leading-relaxed text-body">

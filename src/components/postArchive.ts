@@ -23,7 +23,8 @@ export function groupPostsByYear<T extends { data: { date: Date } }>(
 ): YearGroup<T>[] {
   const byYear = new Map<number, T[]>()
   for (const post of posts) {
-    const year = post.data.date.getFullYear()
+    // UTC 基準。日付は ISO 8601 (Z) 保存のため、実行 TZ に依存させない。
+    const year = post.data.date.getUTCFullYear()
     const group = byYear.get(year)
     if (group) {
       group.push(post)

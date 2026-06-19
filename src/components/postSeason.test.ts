@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { getSeason, seasonLabel, SEASONS } from './postSeason'
 
-// ローカルタイムで月日を組み立てる (getSeason は getMonth/getDate を使うため)
-const d = (month: number, day: number) => new Date(2020, month - 1, day)
+// getSeason は UTC 基準で判定するため、テストも UTC で月日を組み立てる
+const d = (month: number, day: number) =>
+  new Date(Date.UTC(2020, month - 1, day))
 
 describe('getSeason', () => {
   it('春は 3/1〜6/20 (境界を含む)', () => {

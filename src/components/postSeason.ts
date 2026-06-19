@@ -36,9 +36,12 @@ const SEASON_LABEL: Record<Season, string> = {
 /**
  * 日付を季節に分類する。月日を MMDD の整数 (例: 6/21 → 621) に直して
  * 範囲比較する。月内では日付順が崩れないため、この比較で境界を表現できる。
+ *
+ * 日付は UTC 基準で取り出す (formatPostDate / groupPostsByYear と同様)。
+ * 表示日付・年グループ・季節の基準を揃え、実行 TZ への依存を避ける。
  */
 export function getSeason(date: Date): Season {
-  const md = (date.getMonth() + 1) * 100 + date.getDate()
+  const md = (date.getUTCMonth() + 1) * 100 + date.getUTCDate()
   if (md >= 301 && md <= 620) return 'spring'
   if (md >= 621 && md <= 915) return 'summer'
   if (md >= 916 && md <= 1205) return 'autumn'
