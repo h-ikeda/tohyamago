@@ -75,6 +75,10 @@ tohyamago/
 │   │   ├── postDate.test.ts     # postDate のテスト (Vitest)
 │   │   ├── postArchive.ts       # 記事を公開年でグループ化する純粋関数 (新規, /news/archive 用)
 │   │   ├── postArchive.test.ts  # postArchive のテスト (Vitest)
+│   │   ├── postSeason.ts        # 記事日付を季節 (春夏秋冬) に分類する純粋関数 (新規)
+│   │   ├── postSeason.test.ts   # postSeason のテスト (Vitest)
+│   │   ├── newsArchiveFilter.ts # 近況アーカイブの季節フィルタ DOM 操作ロジック (新規, クライアント側)
+│   │   ├── newsArchiveFilter.test.ts # newsArchiveFilter のテスト (Vitest, jsdom)
 │   │   ├── NewsCta.astro        # 「次は、あなたの番です」CTA (記事間 compact / 末尾 full で再利用)
 │   │   ├── postCtaLayout.ts     # 記事間 CTA の挿入位置を決める純粋関数
 │   │   ├── postCtaLayout.test.ts# postCtaLayout のテスト (Vitest)
@@ -157,6 +161,7 @@ tohyamago/
   - 記事スキーマはタイトルを持たないため、一覧カードや前後記事の見出しには本文から作った抜粋を流用する。抜粋（プレーンテキスト化＋字数切り詰め）は純粋関数 `postExcerpt.ts`、日付整形は `postDate.ts` が担い、いずれも個別ページ・一覧・アーカイブで共用する。
 - **記事個別ページ `/news/[slug].astro`**: `getCollection('posts')` を新しい順に並べ `getStaticPaths` で全件生成。本文・全写真・`sourceUrl` を表示し、前後（新しい／古い）記事への導線と `/news`・`/news/archive` への戻り導線、末尾 `NewsCta`（full）を置く。
 - **近況アーカイブ `/news/archive.astro`**: ロードマップ Phase 2「年・季節・作物でのアーカイブ導線」「これまでの歩みを辿れる年表」に対応。記事スキーマにタグ・カテゴリが無いため、後方互換を保てる **公開年** を切り口に章立てする。年でグループ化する純粋関数 `postArchive.ts`（`groupPostsByYear`）を使い、年へのジャンプナビ＋年ごとの索引リスト（日付＋抜粋 1 行）で構成する。
+  - **季節フィルタ**: 季節は日付から判定できるため（スキーマ拡張不要）、年別の索引に **春夏秋冬の絞り込み**を重ねる。季節判定は純粋関数 `postSeason.ts`（`getSeason`。境界は春 3/1–6/20・夏 6/21–9/15・秋 9/16–12/5・冬 12/6–翌 2 月末で年をまたぐ）。フィルタの DOM 操作（記事の表示切替・空の年セクション/年ナビの非表示・件数更新・`aria-pressed` 同期）は `newsArchiveFilter.ts`（`applySeasonFilter`）に分離し jsdom でテストする。JS 無効時は全件表示のままのプログレッシブエンハンスメント。
 - 全記事一覧（130 件超）は縦に長く、末尾の「次は、あなたの番です」CTA に辿り着けない問題があったため、`<Posts ctaEvery={12} />` で **一定間隔（12 件ごと）に `NewsCta`（compact）を差し込み**、どこまで読んでも参加・支援への一歩に出会えるようにしている。挿入位置は純粋関数 `postCtaLayout.ts`（`ctaPositions`）が決定し、最終記事直後は末尾の本 CTA（`NewsCta` full）と重複しないよう除外する。
 - トップ末尾の近況ダイジェストには `id="feed"` を残し、旧 `/#feed` ブックマークの着地点として後方互換を保つ（新規リンクは `/news` を使う）。
 - かつての「近況 / 予定」タブ（旧 `HomeTabs.tsx`）は廃止。情報量の薄かった「予定」タブは **`/calendar`（農作業カレンダー）と、トップの「今月の活動」プレビュー（`homeTasks.ts`）へ発展的に統合**した。activo の募集 CTA は `/join` に集約している。
