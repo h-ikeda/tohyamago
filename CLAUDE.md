@@ -44,9 +44,10 @@ tohyamago/
 │   │   ├── products.astro      # 成果品紹介 → shop (新規)
 │   │   ├── support.astro       # 寄付案内 (新規, Phase 4)
 │   │   ├── membership.astro    # 入会案内
-│   │   ├── news.astro          # 近況アーカイブ (新規, 全記事一覧。トップはダイジェストのみ)
+│   │   ├── news.astro          # 近況一覧 (新規, 全記事をダイジェストカードで表示。トップは最新数件)
 │   │   ├── news/
-│   │   │   └── [slug].astro     # 記事個別ページ (新規, SEO/共有用・任意)
+│   │   │   ├── [slug].astro     # 記事個別ページ (新規, 全文＋写真＋前後記事導線。SEO/共有用)
+│   │   │   └── archive.astro    # 近況アーカイブ (新規, 公開年でまとめた索引ページ)
 │   │   ├── articles.astro      # 定款 (PDF, fullscreen)
 │   │   ├── public_notices.astro# 公告 (URL 固定・変更禁止)
 │   │   └── notation.astro      # 特定商取引法に基づく表記
@@ -66,7 +67,14 @@ tohyamago/
 │   │   ├── Card.astro          # 共通 UI プリミティブ (カード)
 │   │   ├── Container.astro     # 共通 UI プリミティブ (コンテナ幅)
 │   │   ├── SectionHeading.astro# 共通 UI プリミティブ (▲ 見出し)
-│   │   ├── Posts.astro         # Content Collection から記事を描画 (ctaEvery で記事間に NewsCta を挿入)
+│   │   ├── Posts.astro         # Content Collection からダイジェストカード一覧を描画 (PostCard のグリッド。ctaEvery で NewsCta を挿入)
+│   │   ├── PostCard.astro       # 近況一覧のダイジェストカード (新規, 抜粋＋サムネイル → /news/[slug])
+│   │   ├── postExcerpt.ts       # 記事本文から一覧用プレーンテキスト抜粋を作る純粋関数 (新規)
+│   │   ├── postExcerpt.test.ts  # postExcerpt のテスト (Vitest)
+│   │   ├── postDate.ts          # 記事日付を「YYYY年M月D日(曜)」へ整形する純粋関数 (新規)
+│   │   ├── postDate.test.ts     # postDate のテスト (Vitest)
+│   │   ├── postArchive.ts       # 記事を公開年でグループ化する純粋関数 (新規, /news/archive 用)
+│   │   ├── postArchive.test.ts  # postArchive のテスト (Vitest)
 │   │   ├── NewsCta.astro        # 「次は、あなたの番です」CTA (記事間 compact / 末尾 full で再利用)
 │   │   ├── postCtaLayout.ts     # 記事間 CTA の挿入位置を決める純粋関数
 │   │   ├── postCtaLayout.test.ts# postCtaLayout のテスト (Vitest)
@@ -126,26 +134,30 @@ tohyamago/
 
 > 区分: 現行=既存維持, 変更=既存を改修, 新規=新設。「現状のコンテンツは全て含める」方針のため既存ページは削除しない。
 
-| パス              | コンポーネント         | 区分 | 主ターゲット     | 説明                                                                                      |
-| ----------------- | ---------------------- | ---- | ---------------- | ----------------------------------------------------------------------------------------- |
-| `/`               | `index.astro`          | 変更 | 全員             | ヒーロー＋3 導線カード＋今月の活動（カレンダー誘導）＋始まり物語 teaser＋近況ダイジェスト |
-| `/purpose`        | `purpose.astro`        | 現行 | 参加・支援       | 活動趣旨（ミッション・ビジョン）                                                          |
-| `/story`          | `story.astro`          | 新規 | 参加・支援       | **活動の始まり物語**（初期エピソードで活動の性質への理解を助ける）                        |
-| `/join`           | `join.astro`           | 新規 | 新規ボランティア | **はじめての方へ**（参加の流れ・FAQ・アクセス・持ち物・服装・activo 募集導線）            |
-| `/calendar`       | `calendar.astro`       | 新規 | 参加者＋運営     | **農作業カレンダー**（作物 × 作業時期のガント＋地域イベント重畳）                         |
-| `/products`       | `products.astro`       | 新規 | 購入支援者       | 成果品紹介（下栗芋・茶・蕎麦・大豆のストーリー）→ shop.tohyamago.org                      |
-| `/support`        | `support.astro`        | 新規 | 寄付支援者       | 寄付案内（単発／継続）。Stripe 導線は Phase 4 で実装                                      |
-| `/membership`     | `membership.astro`     | 現行 | 会員支援者       | 入会案内（権限・年会費・入会手続き）                                                      |
-| `/news`           | `news.astro`           | 新規 | 全員             | **近況アーカイブ**（全記事一覧。`Posts.astro` 全件）。トップは最新数件のダイジェストのみ  |
-| `/news/[slug]`    | `news/[slug].astro`    | 新規 | 全員             | 記事個別ページ（共有・SEO 用、任意）                                                      |
-| `/articles`       | `articles.astro`       | 現行 | —                | 定款（PDF ビューワー、fullscreen）                                                        |
-| `/public_notices` | `public_notices.astro` | 現行 | —                | 公告。**URL は法人登記に記載のため変更禁止**                                              |
-| `/notation`       | `notation.astro`       | 現行 | —                | 特定商取引法に基づく表記                                                                  |
+| パス              | コンポーネント         | 区分 | 主ターゲット     | 説明                                                                                       |
+| ----------------- | ---------------------- | ---- | ---------------- | ------------------------------------------------------------------------------------------ |
+| `/`               | `index.astro`          | 変更 | 全員             | ヒーロー＋3 導線カード＋今月の活動（カレンダー誘導）＋始まり物語 teaser＋近況ダイジェスト  |
+| `/purpose`        | `purpose.astro`        | 現行 | 参加・支援       | 活動趣旨（ミッション・ビジョン）                                                           |
+| `/story`          | `story.astro`          | 新規 | 参加・支援       | **活動の始まり物語**（初期エピソードで活動の性質への理解を助ける）                         |
+| `/join`           | `join.astro`           | 新規 | 新規ボランティア | **はじめての方へ**（参加の流れ・FAQ・アクセス・持ち物・服装・activo 募集導線）             |
+| `/calendar`       | `calendar.astro`       | 新規 | 参加者＋運営     | **農作業カレンダー**（作物 × 作業時期のガント＋地域イベント重畳）                          |
+| `/products`       | `products.astro`       | 新規 | 購入支援者       | 成果品紹介（下栗芋・茶・蕎麦・大豆のストーリー）→ shop.tohyamago.org                       |
+| `/support`        | `support.astro`        | 新規 | 寄付支援者       | 寄付案内（単発／継続）。Stripe 導線は Phase 4 で実装                                       |
+| `/membership`     | `membership.astro`     | 現行 | 会員支援者       | 入会案内（権限・年会費・入会手続き）                                                       |
+| `/news`           | `news.astro`           | 新規 | 全員             | **近況一覧**（全記事をダイジェストカードで表示。`Posts.astro` 全件）。トップは最新数件のみ |
+| `/news/[slug]`    | `news/[slug].astro`    | 新規 | 全員             | 記事個別ページ（全文＋写真＋前後記事導線。共有・SEO 用）                                   |
+| `/news/archive`   | `news/archive.astro`   | 新規 | 全員             | **近況アーカイブ**（公開年でまとめた索引／年表）                                           |
+| `/articles`       | `articles.astro`       | 現行 | —                | 定款（PDF ビューワー、fullscreen）                                                         |
+| `/public_notices` | `public_notices.astro` | 現行 | —                | 公告。**URL は法人登記に記載のため変更禁止**                                               |
+| `/notation`       | `notation.astro`       | 現行 | —                | 特定商取引法に基づく表記                                                                   |
 
 #### 近況 / 予定の扱い
 
-- **近況アーカイブは `/news`（`news.astro`）に集約**し、`Posts.astro` で全記事を描画する。トップ（`index.astro`）は記事が長くなりすぎないよう **最新数件のダイジェスト（`<Posts limit={3} />`）のみ**を載せ、「これまでの活動をもっと見る」CTA で `/news` へ誘導する。ヘッダーナビ「近況」も `/news` を指す。
-- 全記事一覧（130 件超）は縦に非常に長く、末尾の「次は、あなたの番です」CTA に辿り着けない問題があったため、`<Posts ctaEvery={12} />` で **一定間隔（12 件ごと）に `NewsCta`（compact）を差し込み**、どこまで読んでも参加・支援への一歩に出会えるようにしている。挿入位置は純粋関数 `postCtaLayout.ts`（`ctaPositions`）が決定し、最終記事直後は末尾の本 CTA（`NewsCta` full）と重複しないよう除外する。
+- **近況一覧は `/news`（`news.astro`）に集約**し、`Posts.astro`（＝`PostCard` のグリッド）で全記事を描画する。各記事は本文を全文ではなく **ダイジェスト（抜粋＋サムネイル 1 枚）のカード**で見せ、概ね一定サイズに揃える。カードをタップすると **記事個別ページ `/news/[slug]`** で全文と全写真を読める。トップ（`index.astro`）は **最新数件のダイジェスト（`<Posts limit={3} />`）のみ**を載せ、「これまでの活動をもっと見る」CTA で `/news` へ誘導する。ヘッダーナビ「近況」も `/news` を指す。
+  - 記事スキーマはタイトルを持たないため、一覧カードや前後記事の見出しには本文から作った抜粋を流用する。抜粋（プレーンテキスト化＋字数切り詰め）は純粋関数 `postExcerpt.ts`、日付整形は `postDate.ts` が担い、いずれも個別ページ・一覧・アーカイブで共用する。
+- **記事個別ページ `/news/[slug].astro`**: `getCollection('posts')` を新しい順に並べ `getStaticPaths` で全件生成。本文・全写真・`sourceUrl` を表示し、前後（新しい／古い）記事への導線と `/news`・`/news/archive` への戻り導線、末尾 `NewsCta`（full）を置く。
+- **近況アーカイブ `/news/archive.astro`**: ロードマップ Phase 2「年・季節・作物でのアーカイブ導線」「これまでの歩みを辿れる年表」に対応。記事スキーマにタグ・カテゴリが無いため、後方互換を保てる **公開年** を切り口に章立てする。年でグループ化する純粋関数 `postArchive.ts`（`groupPostsByYear`）を使い、年へのジャンプナビ＋年ごとの索引リスト（日付＋抜粋 1 行）で構成する。
+- 全記事一覧（130 件超）は縦に長く、末尾の「次は、あなたの番です」CTA に辿り着けない問題があったため、`<Posts ctaEvery={12} />` で **一定間隔（12 件ごと）に `NewsCta`（compact）を差し込み**、どこまで読んでも参加・支援への一歩に出会えるようにしている。挿入位置は純粋関数 `postCtaLayout.ts`（`ctaPositions`）が決定し、最終記事直後は末尾の本 CTA（`NewsCta` full）と重複しないよう除外する。
 - トップ末尾の近況ダイジェストには `id="feed"` を残し、旧 `/#feed` ブックマークの着地点として後方互換を保つ（新規リンクは `/news` を使う）。
 - かつての「近況 / 予定」タブ（旧 `HomeTabs.tsx`）は廃止。情報量の薄かった「予定」タブは **`/calendar`（農作業カレンダー）と、トップの「今月の活動」プレビュー（`homeTasks.ts`）へ発展的に統合**した。activo の募集 CTA は `/join` に集約している。
 

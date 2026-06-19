@@ -1,8 +1,7 @@
 ---
-import { Image } from 'astro:assets'
-import { getCollection, render } from 'astro:content'
-import Card from '~/components/Card.astro'
+import { getCollection } from 'astro:content'
 import NewsCta from '~/components/NewsCta.astro'
+import PostCard from '~/components/PostCard.astro'
 import { ctaPositions } from '~/components/postCtaLayout'
 
 interface Props {
@@ -23,50 +22,17 @@ const posts = limit === undefined ? sorted : sorted.slice(0, limit)
 // 一覧が長い近況アーカイブでは、一定間隔で CTA を再登場させて
 // 「末尾まで読まないと参加導線に出会えない」状態を防ぐ。
 const ctaAfter = ctaPositions(posts.length, ctaEvery)
-
-const dateFormat = (date: Date) => {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  const weekDay = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()]
-  return `${year}年${month}月${day}日(${weekDay})`
-}
-
-const rendered = await Promise.all(
-  posts.map(async (post) => ({
-    post,
-    Content: (await render(post)).Content,
-  })),
-)
 ---
 
-<section class="mx-auto grid w-full max-w-2xl gap-5 px-4 sm:px-6">
+<section
+  class="mx-auto grid w-full max-w-3xl grid-cols-1 gap-5 px-4 sm:grid-cols-2 sm:px-6"
+>
   {
-    rendered.map(({ post, Content }, index) => (
+    posts.map((post, index) => (
       <Fragment>
-        <Card as="article" hover class="px-6 pt-4 pb-5">
-          <time class="mb-2 block font-mono text-xs font-medium text-accent-strong">
-            {dateFormat(post.data.date)}
-          </time>
-          <div class="post-body text-justify leading-relaxed text-body">
-            <Content />
-          </div>
-          {post.data.images.map((img) => (
-            <Image
-              src={img}
-              alt=""
-              class="mt-4 aspect-video w-full rounded-xl border border-primary/10 object-cover saturate-[0.85]"
-            />
-          ))}
-        </Card>
-        {ctaAfter.has(index) && <NewsCta compact />}
+        <PostCard post={post} />
+        {ctaAfter.has(index) && <NewsCta compact class="sm:col-span-2" />}
       </Fragment>
     ))
   }
 </section>
-
-<style>
-  .post-body :global(p + p) {
-    margin-top: 1em;
-  }
-</style>

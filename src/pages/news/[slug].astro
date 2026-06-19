@@ -1,0 +1,135 @@
+---
+import { Image } from 'astro:assets'
+import { getCollection, render } from 'astro:content'
+import BaseLayout from '~/layouts/BaseLayout.astro'
+import Container from '~/components/Container.astro'
+import Button from '~/components/Button.astro'
+import NewsCta from '~/components/NewsCta.astro'
+import { formatPostDate } from '~/components/postDate'
+import { postExcerpt } from '~/components/postExcerpt'
+
+// 記事個別ページ (共有・SEO 用)。全記事を新しい順に並べ、
+// 前後の記事への導線 (新しい記事 / 古い記事) も静的に用意する。
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts')).sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+  )
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      newer: posts[index - 1], // 1 つ新しい記事 (先頭なら undefined)
+      older: posts[index + 1], // 1 つ古い記事 (末尾なら undefined)
+    },
+  }))
+}
+
+const { post, newer, older } = Astro.props
+const { Content } = await render(post)
+
+// タイトルを持たないスキーマのため、抜粋を見出し的に流用する (空なら日付)。
+const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
+---
+
+<BaseLayout title={`${heading}｜近況`}>
+  <Container class="py-10 md:py-14">
+    <nav class="mb-6 text-sm">
+      <a
+        href="/news"
+        class="inline-flex items-center gap-1 text-accent-strong before:content-['←'] hover:underline"
+      >
+        近況一覧へ戻る
+      </a>
+    </nav>
+
+    <article>
+      <time
+        class="block font-mono text-sm font-medium text-accent-strong"
+        datetime={post.data.date.toISOString()}
+      >
+        {formatPostDate(post.data.date)}
+      </time>
+
+      <div class="post-body mt-5 text-justify text-lg leading-loose text-body">
+        <Content />
+      </div>
+
+      {
+        post.data.images.length > 0 && (
+          <div class="mt-8 grid gap-4">
+            {post.data.images.map((img) => (
+              <Image
+                src={img}
+                alt=""
+                class="w-full rounded-2xl border border-primary/10 object-cover saturate-[0.9]"
+              />
+            ))}
+          </div>
+        )
+      }
+
+      {
+        post.data.sourceUrl && (
+          <p class="mt-6 text-sm text-body/70">
+            <a
+              href={post.data.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-accent-strong hover:underline"
+            >
+              元の投稿を見る
+            </a>
+          </p>
+        )
+      }
+    </article>
+
+    <!-- 前後の記事への導線 (新しい / 古い) -->
+    <nav
+      class="mt-12 grid gap-3 border-t border-primary/10 pt-8 sm:grid-cols-2"
+      aria-label="前後の記事"
+    >
+      {
+        newer ? (
+          <a
+            href={`/news/${newer.id}`}
+            class="group rounded-2xl border border-primary/10 bg-surface px-5 py-4 transition-shadow hover:shadow-md"
+          >
+            <span class="block text-xs text-body/60">← 新しい記事</span>
+            <span class="mt-1 block leading-relaxed text-primary">
+              {postExcerpt(newer.body, 36) || formatPostDate(newer.data.date)}
+            </span>
+          </a>
+        ) : (
+          <span class="hidden sm:block" />
+        )
+      }
+      {
+        older && (
+          <a
+            href={`/news/${older.id}`}
+            class="group rounded-2xl border border-primary/10 bg-surface px-5 py-4 text-right transition-shadow hover:shadow-md"
+          >
+            <span class="block text-xs text-body/60">古い記事 →</span>
+            <span class="mt-1 block leading-relaxed text-primary">
+              {postExcerpt(older.body, 36) || formatPostDate(older.data.date)}
+            </span>
+          </a>
+        )
+      }
+    </nav>
+
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      <Button href="/news" variant="outline">近況一覧</Button>
+      <Button href="/news/archive" variant="outline">年別アーカイブ</Button>
+    </div>
+
+    <NewsCta class="mt-12" />
+  </Container>
+</BaseLayout>
+
+<style>
+  .post-body :global(p + p) {
+    margin-top: 1em;
+  }
+</style>
