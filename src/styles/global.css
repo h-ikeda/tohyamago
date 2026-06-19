@@ -63,6 +63,42 @@ body {
 }
 
 /*
+ * ブラー placeholder (LQIP / blur-up、BlurImage.astro と対応)。
+ * ラッパーの背景に極小画像をぼかした下絵を敷き、本画像がその上を覆う。
+ * background-size: cover で下絵を引き伸ばし、ブラウザの平滑化でぼけて見える。
+ */
+.lqip {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.lqip-img {
+  display: block;
+}
+
+/*
+ * 写真のフェードイン (image-fade-in.ts と対応)。モバイル低速回線でも画像が
+ * 「カクッ」と差し込まれず、ふわっと現れて遅延感を消すための演出。
+ * JS が有効なときだけ (html.js) 未読込画像を透明化し、読み込み完了で付く
+ * .is-loaded で表示へ戻す。JS 無効時はそのまま表示されるため安全。
+ */
+html.js img[data-fade-in]:not(.is-loaded) {
+  opacity: 0;
+}
+
+html.js img[data-fade-in] {
+  transition: opacity 0.6s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* アニメーションを抑える設定では即時表示する */
+  html.js img[data-fade-in] {
+    transition: none;
+  }
+}
+
+/*
  * 全画面ページ (PDF ビューワー等)。ビューポート高に固定して内部だけをスクロールさせ、
  * 子コンポーネント (PdfViewer の h-full) が高さを解決できるようにする。
  */

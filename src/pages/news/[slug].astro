@@ -1,6 +1,6 @@
 ---
-import { Image } from 'astro:assets'
 import { getCollection, render } from 'astro:content'
+import BlurImage from '~/components/BlurImage.astro'
 import BaseLayout from '~/layouts/BaseLayout.astro'
 import Container from '~/components/Container.astro'
 import Button from '~/components/Button.astro'
@@ -58,10 +58,12 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
         post.data.images.length > 0 && (
           <div class="mt-8 grid gap-4">
             {post.data.images.map((img) => (
-              <Image
+              <BlurImage
                 src={img}
                 alt=""
-                class="w-full rounded-2xl border border-primary/10 object-cover saturate-[0.9]"
+                sizes="(min-width: 768px) 720px, 100vw"
+                class="w-full overflow-hidden rounded-2xl border border-primary/10"
+                imgClass="w-full object-cover saturate-[0.9]"
               />
             ))}
           </div>

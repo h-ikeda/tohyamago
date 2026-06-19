@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
-import { Image } from 'astro:assets'
 import BaseLayout from '~/layouts/BaseLayout.astro'
+import BlurImage from '~/components/BlurImage.astro'
 import Container from '~/components/Container.astro'
 import SectionHeading from '~/components/SectionHeading.astro'
 import Card from '~/components/Card.astro'
@@ -119,12 +119,15 @@ const products = showcase
       皆で畑に通い、季節の作業を重ねるうちに実った、下栗芋・蕎麦・大豆・お茶。遠山郷の畑からのおすそわけをご紹介します。気に入ったものは、オンラインショップでお求めいただけます。
     </p>
     <div class="mx-auto mt-8 w-full max-w-3xl">
-      <Image
+      <BlurImage
         src={farmImage}
         alt="遠山郷の急斜面に広がる畑と山並み"
         loading="eager"
         fetchpriority="high"
-        class="aspect-video w-full rounded-3xl object-cover shadow-lg ring-1 ring-primary/10"
+        fade={false}
+        sizes="(min-width: 768px) 768px, 100vw"
+        class="aspect-video w-full overflow-hidden rounded-3xl shadow-lg ring-1 ring-primary/10"
+        imgClass="h-full w-full object-cover"
       />
     </div>
     <div class="mt-8 flex flex-wrap justify-center gap-3">

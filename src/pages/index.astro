@@ -1,7 +1,7 @@
 ---
-import { Image } from 'astro:assets'
 import { getCollection } from 'astro:content'
 import BaseLayout from '~/layouts/BaseLayout.astro'
+import BlurImage from '~/components/BlurImage.astro'
 import Container from '~/components/Container.astro'
 import SectionHeading from '~/components/SectionHeading.astro'
 import Button from '~/components/Button.astro'
@@ -53,12 +53,15 @@ const intensityLabel: Record<Intensity, string> = {
       長野県の南端、南アルプスの麓に抱かれた秘境・遠山郷。谷あいの里に受け継がれてきた景観と暮らしを、地域の人とボランティアが力を合わせて、楽しみながら次の世代へつないでいきます。
     </p>
     <div class="mx-auto mt-8 w-full max-w-4xl">
-      <Image
+      <BlurImage
         src={farmImage}
         alt="遠山郷の急斜面に広がる畑と山並み"
         loading="eager"
         fetchpriority="high"
-        class="aspect-video w-full rounded-3xl object-cover shadow-lg ring-1 ring-primary/10"
+        fade={false}
+        sizes="(min-width: 896px) 896px, 100vw"
+        class="aspect-video w-full overflow-hidden rounded-3xl shadow-lg ring-1 ring-primary/10"
+        imgClass="h-full w-full object-cover"
       />
     </div>
     <div class="mt-8 flex flex-wrap justify-center gap-3">
@@ -143,10 +146,12 @@ const intensityLabel: Record<Intensity, string> = {
     <!-- 始まり物語 teaser -->
     <section class="mb-16">
       <Card class="overflow-hidden md:grid md:grid-cols-2">
-        <Image
+        <BlurImage
           src={mountsImage}
           alt="遠山郷の山並みと谷あいの里"
-          class="aspect-video h-full w-full object-cover md:aspect-auto"
+          sizes="(min-width: 768px) 50vw, 100vw"
+          class="aspect-video h-full w-full md:aspect-auto"
+          imgClass="h-full w-full object-cover"
         />
         <div class="flex flex-col justify-center gap-3 px-6 py-8 md:px-10">
           <SectionHeading as="h2" level="sub" align="left">
