@@ -380,8 +380,21 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
 ## デザイン規則
 
 - カラーテーマ: green / lime (山・自然を想起)
-- 三角形 (▲) の装飾モチーフをロゴ・見出し・フッターに使用
-  - Tailwind の `before:` / `after:` 疑似要素で border-trick を利用して描画
+- 三角形 (▲) の装飾モチーフ
+  - **ロゴ (`SiteLogo.astro`) の「山＝▲」はブランドマークの核として維持**する。
+  - 見出し (`SectionHeading.astro`) の ▲ も当面維持（見直す場合は本節を更新）。
+  - **バッジ（ラベルピル）の ▲ は廃止**する方針 → 下記「バッジ（ラベルピル）の方針」。
+  - 描画は Tailwind の `before:` / `after:` 疑似要素で border-trick / `content` を利用。
+- **バッジ（ラベルピル）の方針**（2026-06 決定。**記録のみ。置換は今後の修正時に段階的に適用**）
+  - 団体名・小ラベルのピルは、ヒーロー (`index.astro`) で作成した **三角なしの濃緑ベタピル**に寄せる。基準スタイル:
+    `rounded-full bg-primary-deep px-4 py-1 font-serif text-sm tracking-wide text-white`（＋ `▲` は付けない）。
+    - 暗い写真の上に重ねる場合は `ring-1 ring-white/25` と `[text-shadow:0_1px_3px_rgba(15,46,33,0.6)]` を足す。明るい地色の上ではベタのまま（白文字で AA を確保）。`backdrop-blur` はベタ背景には不要。
+  - 旧スタイル（`bg-sunlight-soft` 等の淡色ピル＋ `before:content-['▲']`、`text-primary-deep` 文字）は順次これへ置換する。
+  - 置換対象（アイブロウのラベルピル）: `pages/news.astro` /
+    `pages/story.astro` / `pages/products.astro` / `pages/join.astro` /
+    `pages/news/archive.astro` / `components/ComingSoon.astro`。
+  - ▲ をラベル/見出しの**前置記号**として使う箇所（`components/JourneyCards.astro` のカードラベル、`components/NewsCta.astro` の見出し、`components/SiteHeader.astro` モバイルのグループ見出し）はピルではないため本方針の主対象ではないが、▲ を外す方向で**併せて見直してよい**（要否は個別判断）。
+  - **対象外**: `SectionHeading.astro` の見出し ▲、`SiteLogo.astro` のブランドマーク、`ProductCard.astro` の作物色スウォッチ（▲ を色見本として使用）。
 - フォントウェイト: light (`:root` に `font-weight: var(--font-weight-light)` を設定)
 - レスポンシブ: モバイルファーストで設計
 - ナビゲーション: グローバルナビ（ジャーナリー導線）は `SiteHeader.astro`、法令系文書（定款 / 公告 / 特商法表記）と法人概要は `SiteFooter.astro` に整理（旧フローティング `RouterMenu` は廃止）
