@@ -44,6 +44,11 @@ const intensityLabel: Record<Intensity, string> = {
     <div
       class="relative aspect-[16/9] w-full overflow-hidden md:absolute md:inset-0 md:-z-10 md:aspect-auto md:h-full"
     >
+      <!-- md 以上は被写体 (山並み) を下げ気味に見せるため object-position を 50% 68% にする。
+           responsiveStyles 有効時、Astro は <Image> に必ず data-astro-image-pos="center" を付与し
+           [data-astro-image-pos="center"]{object-position:center} を注入する。これは Tailwind の
+           object-* ユーティリティと specificity が同じで、注入順が後のため通常クラスでは上書きされる。
+           末尾 ! (Tailwind v4 の important 修飾) で確実に勝たせる。 -->
       <BlurImage
         src={heroImage}
         alt="遠山郷の急斜面に広がる畑と山並み"
@@ -52,7 +57,7 @@ const intensityLabel: Record<Intensity, string> = {
         fade={false}
         sizes="100vw"
         class="absolute inset-0 h-full w-full"
-        imgClass="h-full w-full object-cover object-center md:object-[50%_68%]"
+        imgClass="h-full w-full object-cover object-center md:object-[50%_68%]!"
       />
       <!-- スクリム: md 以上でのみ全面に重ね、下部の白文字の可読性 (WCAG AA) を確保する。
            スマホでは写真をそのまま見せる (テキストは下のクリーム地に置くため不要)。 -->
