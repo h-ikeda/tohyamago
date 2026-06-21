@@ -11,14 +11,14 @@ import { test, expect } from '@playwright/test'
  * カスケードレイヤー規則により、specificity に関わらず Astro 側が勝つ。結果:
  *   1. <img> の h-full が height:auto に負け、高さが制限されず原寸比で描画される
  *      → object-fit:cover のトリミングが起きず object-position が無効化される。
- *   2. md:object-[50%_68%] が data-astro-image-pos="center" に負ける。
+ *   2. md:object-[50%_38%] が data-astro-image-pos="center" に負ける。
  * いずれも ! (important) で勝たせて修正する。computed style と実レイアウトは
  * 実ブラウザでしか正しく解決できないため、ここで回帰を固定する。
  */
 
 const HERO_ALT = '遠山郷の急斜面に広がる畑と山並み'
 
-test('デスクトップでヒーロー画像が高さ制限され object-position 50% 68% が効く', async ({
+test('デスクトップでヒーロー画像が高さ制限され object-position 50% 38% が効く', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
@@ -27,11 +27,11 @@ test('デスクトップでヒーロー画像が高さ制限され object-positi
   const heroImg = page.locator(`img[alt="${HERO_ALT}"]`)
   await expect(heroImg).toBeVisible()
 
-  // object-position が中央に戻されず 50% 68% で解決されていること
+  // object-position が中央に戻されず 50% 38% で解決されていること
   const objectPosition = await heroImg.evaluate(
     (el) => getComputedStyle(el).objectPosition,
   )
-  expect(objectPosition).toBe('50% 68%')
+  expect(objectPosition).toBe('50% 38%')
 
   // 高さが制限され (h-full)、object-fit:cover のトリミングが効いていること。
   // height:auto に負けると <img> は原寸比 (4028:3120 ≒ 0.77) の高さになり、
