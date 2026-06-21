@@ -33,25 +33,30 @@ const textSize = {
   section: 'text-2xl md:text-3xl',
   sub: 'text-xl',
 }[level]
-const alignItems =
-  align === 'center' ? 'items-center text-center' : 'items-start'
+// 見出しブロック自体の左右配置 (align)。中央揃えでもブロック内の装飾線は左寄せに保つため、
+// ここで担うのは「ブロックの左右位置」だけにする。
+const justify = align === 'center' ? 'justify-center' : 'justify-start'
+// 文字列のテキスト配置。装飾線 (bar) は文字列の左端に固定したいので、
+// 縦並びコンテナの cross 軸配置とは独立に bar 側へ self-start を付ける。
+const textAlign = align === 'center' ? 'items-center text-center' : 'items-start'
 const barWidth = level === 'sub' ? 'w-10' : 'w-16'
 ---
 
-<div class:list={['flex flex-col gap-2', alignItems, className]}>
-  <Tag
-    class:list={[
-      'flex items-center gap-3 font-serif font-medium text-primary',
-      textSize,
-    ]}
-  >
+<div class:list={['flex', justify, className]}>
+  {
+    /* リーディングアイコン (三つの実) を左に置き、文字列＋装飾線の縦並びを右に置く横並び。
+      アイコンはこの行に対して self-stretch で伸び、「文字列＋装飾線を合わせた高さ」に揃う。
+      装飾線はアイコンの下へは伸ばさず、文字列の左端 (self-start) に固定するため、
+      タイトルが中央揃えでも装飾線だけは左寄せになる。 */
+  }
+  <div class="flex items-stretch gap-3">
     {
       /* 三つの実: 深緑 → 陽光 → コーラルの上昇するひし形 (実り・広がり)。
         サイズに強弱 (中→小→大) と微回転をつけて動きを出し、各辺を
         二次ベジェで僅かに凹面 (内側へ反らせ先端を尖らせる) にしてきらめきを与える。 */
     }
     <svg
-      class="inline-block h-[1.25em] w-auto shrink-0"
+      class="w-auto shrink-0 self-stretch"
       viewBox="3 2.5 18 17"
       aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
@@ -72,14 +77,23 @@ const barWidth = level === 'sub' ? 'w-10' : 'w-16'
         d="M18 3.2Q19.12 5.06 20.8 6.3Q19.12 7.54 18 9.4Q16.88 7.54 15.2 6.3Q16.88 5.06 18 3.2Z"
       ></path>
     </svg>
-    <slot />
-  </Tag>
-  {
-    bar && (
-      <span
-        class:list={['block h-1 rounded-full bg-sunlight', barWidth]}
-        aria-hidden="true"
-      />
-    )
-  }
+    <div class:list={['flex flex-col gap-2', textAlign]}>
+      <Tag
+        class:list={['font-serif font-medium text-primary', textSize]}
+      >
+        <slot />
+      </Tag>
+      {
+        bar && (
+          <span
+            class:list={[
+              'block h-1 self-start rounded-full bg-sunlight',
+              barWidth,
+            ]}
+            aria-hidden="true"
+          />
+        )
+      }
+    </div>
+  </div>
 </div>
