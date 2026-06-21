@@ -39,7 +39,7 @@ const justify = align === 'center' ? 'justify-center' : 'justify-start'
 // 文字列のテキスト配置。装飾線 (bar) は文字列の左端に固定したいので、
 // 縦並びコンテナの cross 軸配置とは独立に bar 側へ self-start を付ける。
 const textAlign =
-  align === 'center' ? 'items-center text-center' : 'items-start'
+  align === 'center' ? 'items-center text-center' : 'items-start text-left'
 const barWidth = level === 'sub' ? 'w-10' : 'w-16'
 ---
 
