@@ -38,25 +38,29 @@ const textSize = {
 const justify = align === 'center' ? 'justify-center' : 'justify-start'
 // 文字列のテキスト配置。装飾線 (bar) は文字列の左端に固定したいので、
 // 縦並びコンテナの cross 軸配置とは独立に bar 側へ self-start を付ける。
-const textAlign = align === 'center' ? 'items-center text-center' : 'items-start'
+const textAlign =
+  align === 'center' ? 'items-center text-center' : 'items-start'
 const barWidth = level === 'sub' ? 'w-10' : 'w-16'
 ---
 
 <div class:list={['flex', justify, className]}>
   {
     /* リーディングアイコン (三つの実) を左に置き、文字列＋装飾線の縦並びを右に置く横並び。
-      アイコンはこの行に対して self-stretch で伸び、「文字列＋装飾線を合わせた高さ」に揃う。
+      アイコンの高さは「文字列＋装飾線」とおおよそ揃うよう em 基準で固定する
+      (見出しの font-size を行コンテナへ載せて em の基準にする)。
+      self-stretch で行高に追従させる方式は、幅がアスペクト比から文字列の
+      折返し → 行高 → 幅… と循環して暴走するため採らない。
       装飾線はアイコンの下へは伸ばさず、文字列の左端 (self-start) に固定するため、
       タイトルが中央揃えでも装飾線だけは左寄せになる。 */
   }
-  <div class="flex items-stretch gap-3">
+  <div class:list={['flex items-center gap-3', textSize]}>
     {
       /* 三つの実: 深緑 → 陽光 → コーラルの上昇するひし形 (実り・広がり)。
         サイズに強弱 (中→小→大) と微回転をつけて動きを出し、各辺を
         二次ベジェで僅かに凹面 (内側へ反らせ先端を尖らせる) にしてきらめきを与える。 */
     }
     <svg
-      class="w-auto shrink-0 self-stretch"
+      class="aspect-[18/17] h-[1.8em] w-auto shrink-0"
       viewBox="3 2.5 18 17"
       aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
@@ -78,9 +82,7 @@ const barWidth = level === 'sub' ? 'w-10' : 'w-16'
       ></path>
     </svg>
     <div class:list={['flex flex-col gap-2', textAlign]}>
-      <Tag
-        class:list={['font-serif font-medium text-primary', textSize]}
-      >
+      <Tag class:list={['font-serif font-medium text-primary', textSize]}>
         <slot />
       </Tag>
       {
