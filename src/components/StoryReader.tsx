@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import StoryArt, { type StoryScene } from './StoryArt'
 
 /**
  * StoryReader — 「活動の始まり物語」をライトノベル風に読ませるリーダー島。
@@ -18,6 +19,8 @@ export interface StoryPage {
   title: string
   /** 本文段落。「」で始まる行はセリフとして字下げしない。 */
   paragraphs: string[]
+  /** 章の情景に合わせたベクター挿絵 (StoryArt のシーン)。ページ送りで切り替わる。 */
+  art?: StoryScene
 }
 
 /** 各ページ末尾に添える注記 (実話ベース + AI 編集の明示)。 */
@@ -112,53 +115,63 @@ export default function StoryReader({ pages }: { pages: StoryPage[] }) {
       {/* 本文カード */}
       <article
         aria-live="polite"
-        className="overflow-hidden rounded-3xl border border-primary/10 border-t-4 border-t-sunlight bg-surface px-6 py-10 shadow-sm md:px-12 md:py-14"
+        className="overflow-hidden rounded-3xl border border-primary/10 border-t-4 border-t-sunlight bg-surface shadow-sm"
       >
-        <h2 className="mb-8 font-serif text-2xl font-medium leading-snug text-primary md:text-3xl">
-          {page.title}
-        </h2>
-        <div className="space-y-5 font-serif text-[1.05rem] leading-loose text-body md:text-lg">
-          {page.paragraphs.map((text, i) => {
-            const isDialogue = text.startsWith('「')
-            // 空文字は行間 (情景の「間」) として小さなスペーサーにする。
-            if (text === '') {
-              return <div key={i} className="h-3" aria-hidden="true" />
-            }
-            return (
-              <p key={i} className={isDialogue ? '' : 'indent-4'}>
-                {text}
-              </p>
-            )
-          })}
-        </div>
-
-        {/* 最終ページの CTA: 「知る → 参加する」へ送り出す */}
-        {isLast && (
-          <div className="mt-10 rounded-2xl bg-sunlight-soft/60 px-6 py-7 text-center">
-            <p className="font-serif text-lg text-primary-deep">
-              物語の続きは、ここにあります。
-            </p>
-            <div className="mt-5 flex flex-wrap justify-center gap-3">
-              <a
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-accent-strong px-8 py-3 font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
-                href={JOIN_URL}
-              >
-                あなたも耕してみる
-              </a>
-              <a
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-accent-strong bg-surface px-8 py-3 font-medium text-accent-strong transition-all hover:-translate-y-0.5 hover:bg-accent-strong hover:text-white hover:shadow-lg"
-                href="/news"
-              >
-                その後の近況を見る
-              </a>
-            </div>
-          </div>
+        {/* 章の情景挿絵: ページを送るたびに「同じ谷の違う表情」が現れる */}
+        {page.art && (
+          <StoryArt
+            scene={page.art}
+            title={`${page.kicker}「${page.title}」の情景`}
+            className="aspect-[16/7] w-full"
+          />
         )}
+        <div className="px-6 py-10 md:px-12 md:py-14">
+          <h2 className="mb-8 font-serif text-2xl font-medium leading-snug text-primary md:text-3xl">
+            {page.title}
+          </h2>
+          <div className="space-y-5 font-serif text-[1.05rem] leading-loose text-body md:text-lg">
+            {page.paragraphs.map((text, i) => {
+              const isDialogue = text.startsWith('「')
+              // 空文字は行間 (情景の「間」) として小さなスペーサーにする。
+              if (text === '') {
+                return <div key={i} className="h-3" aria-hidden="true" />
+              }
+              return (
+                <p key={i} className={isDialogue ? '' : 'indent-4'}>
+                  {text}
+                </p>
+              )
+            })}
+          </div>
 
-        {/* 実話ベース + AI 編集の注記 (各ページ末尾) */}
-        <p className="mt-10 border-t border-primary/10 pt-5 text-xs leading-relaxed text-body/55">
-          {STORY_NOTE}
-        </p>
+          {/* 最終ページの CTA: 「知る → 参加する」へ送り出す */}
+          {isLast && (
+            <div className="mt-10 rounded-2xl bg-sunlight-soft/60 px-6 py-7 text-center">
+              <p className="font-serif text-lg text-primary-deep">
+                物語の続きは、ここにあります。
+              </p>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <a
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accent-strong px-8 py-3 font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
+                  href={JOIN_URL}
+                >
+                  あなたも耕してみる
+                </a>
+                <a
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-accent-strong bg-surface px-8 py-3 font-medium text-accent-strong transition-all hover:-translate-y-0.5 hover:bg-accent-strong hover:text-white hover:shadow-lg"
+                  href="/news"
+                >
+                  その後の近況を見る
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* 実話ベース + AI 編集の注記 (各ページ末尾) */}
+          <p className="mt-10 border-t border-primary/10 pt-5 text-xs leading-relaxed text-body/55">
+            {STORY_NOTE}
+          </p>
+        </div>
       </article>
 
       {/* ページ送りコントロール */}
