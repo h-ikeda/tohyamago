@@ -72,13 +72,13 @@ const tints = {
 }
 ---
 
-<ul class="grid gap-5 sm:grid-cols-3">
+<ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
   {
     journeys.map((j) => {
       const t = tints[j.tint as keyof typeof tints]
       return (
         <li
-          class:list={['sm:flex', j.featured && 'sm:col-span-3 lg:col-span-1']}
+          class:list={['sm:flex', j.featured && 'sm:col-span-2 lg:col-span-1']}
         >
           <Card
             as="div"
