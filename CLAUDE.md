@@ -66,7 +66,7 @@ tohyamago/
 │   │   ├── Button.astro        # 共通 UI プリミティブ (CTA ボタン)
 │   │   ├── Card.astro          # 共通 UI プリミティブ (カード)
 │   │   ├── Container.astro     # 共通 UI プリミティブ (コンテナ幅)
-│   │   ├── SectionHeading.astro# 共通 UI プリミティブ (▲ 見出し)
+│   │   ├── SectionHeading.astro# 共通 UI プリミティブ (「三つの実」見出し)
 │   │   ├── Posts.astro         # Content Collection からダイジェストカード一覧を描画 (PostCard のグリッド。ctaEvery で NewsCta を挿入)
 │   │   ├── PostCard.astro       # 近況一覧のダイジェストカード (新規, 抜粋＋サムネイル → /news/[slug])
 │   │   ├── postExcerpt.ts       # 記事本文から一覧用プレーンテキスト抜粋を作る純粋関数 (新規)
@@ -335,11 +335,12 @@ const events = defineCollection({
 
 ## 環境変数
 
-| 変数名                 | 用途                                    |
-| ---------------------- | --------------------------------------- |
-| `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー |
+| 変数名                 | 用途                                                                                                                                               |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー                                                                                                            |
+| `GA_MEASUREMENT_ID`    | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー） |
 
-GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。
+GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。`GA_MEASUREMENT_ID` は秘匿情報ではなく公開される ID のため、Cloudflare では「変数」、CI では GitHub Actions の Variables（`vars`）として登録する。
 
 ## 開発コマンド
 
@@ -380,8 +381,21 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
 ## デザイン規則
 
 - カラーテーマ: green / lime (山・自然を想起)
-- 三角形 (▲) の装飾モチーフをロゴ・見出し・フッターに使用
-  - Tailwind の `before:` / `after:` 疑似要素で border-trick を利用して描画
+- 装飾モチーフ（▲ に限定しない方針。2026-06 更新）
+  - **ロゴ (`SiteLogo.astro`) の「山＝▲」はブランドマークの核として維持**する。▲（山）はブランドマークの核に限定し、サイト全体を山モチーフで埋め尽くさない。
+  - **見出し (`SectionHeading.astro`) は ▲ を廃止**し、**「三つの実」マーク**（深緑→陽光→コーラルの、上昇する 3 つの凹面ひし形。サイズ強弱・微回転で動きを出す）を使う。実り・広がり・育つコミュニティを表す差し色モチーフとして、ロゴの山 (▲) と役割を分ける。色は必ずデザイントークン（`fill-primary` / `fill-sunlight` / `fill-accent`）で指定し、ハードコード hex を使わない。
+  - **バッジ（ラベルピル）の ▲ は廃止**する方針 → 下記「バッジ（ラベルピル）の方針」。
+  - ▲ を残す箇所（ロゴ等）の描画は Tailwind の `before:` / `after:` 疑似要素で border-trick / `content` を利用。
+- **バッジ（ラベルピル）の方針**（2026-06 決定。**記録のみ。置換は今後の修正時に段階的に適用**）
+  - 団体名・小ラベルのピルは、ヒーロー (`index.astro`) で作成した **三角なしの濃緑ベタピル**に寄せる。基準スタイル:
+    `rounded-full bg-primary-deep px-4 py-1 font-serif text-sm tracking-wide text-white`（＋ `▲` は付けない）。
+    - 暗い写真の上に重ねる場合は `ring-1 ring-white/25` と `[text-shadow:0_1px_3px_rgba(15,46,33,0.6)]` を足す。明るい地色の上ではベタのまま（白文字で AA を確保）。`backdrop-blur` はベタ背景には不要。
+  - 旧スタイル（`bg-sunlight-soft` 等の淡色ピル＋ `before:content-['▲']`、`text-primary-deep` 文字）は順次これへ置換する。
+  - 置換対象（アイブロウのラベルピル）: `pages/news.astro` /
+    `pages/story.astro` / `pages/products.astro` / `pages/join.astro` /
+    `pages/news/archive.astro` / `components/ComingSoon.astro`。
+  - ▲ をラベル/見出しの**前置記号**として使う箇所（`components/JourneyCards.astro` のカードラベル、`components/NewsCta.astro` の見出し、`components/SiteHeader.astro` モバイルのグループ見出し）はピルではないため本方針の主対象ではないが、▲ を外す方向で**併せて見直してよい**（要否は個別判断）。
+  - **対象外**: `SiteLogo.astro` のブランドマーク、`ProductCard.astro` の作物色スウォッチ（▲ を色見本として使用）。`SectionHeading.astro` は ▲ を廃止し「三つの実」マークへ移行済み（上記「装飾モチーフ」参照）。
 - フォントウェイト: light (`:root` に `font-weight: var(--font-weight-light)` を設定)
 - レスポンシブ: モバイルファーストで設計
 - ナビゲーション: グローバルナビ（ジャーナリー導線）は `SiteHeader.astro`、法令系文書（定款 / 公告 / 特商法表記）と法人概要は `SiteFooter.astro` に整理（旧フローティング `RouterMenu` は廃止）

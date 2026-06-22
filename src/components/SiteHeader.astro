@@ -13,6 +13,7 @@
  */
 import Container from '~/components/Container.astro'
 import SiteLogo from '~/components/SiteLogo.astro'
+import ArrowIcon from '~/components/ArrowIcon.astro'
 
 interface Props {
   currentPath?: string
@@ -29,7 +30,7 @@ const groups: NavGroup[] = [
     items: [
       { path: '/purpose', title: '活動趣旨' },
       { path: '/story', title: '遠山郷との始まり' },
-      { path: '/news', title: '近況' },
+      { path: '/news', title: '活動記録' },
     ],
   },
   {
@@ -141,12 +142,10 @@ const ctaVariants = {
                     >
                       {i.title}
                       {i.external && (
-                        <span
-                          aria-hidden="true"
-                          class="text-xs text-primary/50"
-                        >
-                          ↗
-                        </span>
+                        <ArrowIcon
+                          external
+                          class="h-3.5 w-3.5 text-primary/50"
+                        />
                       )}
                     </a>
                   </li>
@@ -241,12 +240,10 @@ const ctaVariants = {
                       >
                         {i.title}
                         {i.external && (
-                          <span
-                            aria-hidden="true"
-                            class="text-xs text-primary/50"
-                          >
-                            ↗
-                          </span>
+                          <ArrowIcon
+                            external
+                            class="h-3.5 w-3.5 text-primary/50"
+                          />
                         )}
                       </a>
                     </li>

@@ -18,8 +18,10 @@ jobs:
         task: ['format:check', 'lint', 'typecheck']
     name: quality (${{ matrix.task }})
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -32,8 +34,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -52,8 +56,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -61,6 +67,7 @@ jobs:
       - run: npm run build
         env:
           PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
 
   # 実ブラウザ E2E (jsdom では検証できない重なり順などの回帰確認)
   e2e:
@@ -68,8 +75,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
