@@ -37,9 +37,8 @@ const variants = {
     'border border-accent-strong text-accent-strong bg-surface hover:bg-accent-strong hover:text-white',
 }
 
-// 矢印アイコンの共通属性 (em 追従 / 線端を丸めて柔らかく / 線幅の見えを揃える)
-const iconBase =
-  'h-[1.05em] w-[1.05em] shrink-0 transition-transform motion-reduce:transition-none'
+// 矢印アイコンの共通属性 (線端を丸めて柔らかく / 線幅の見えを揃える)。サイズは個別指定
+const iconBase = 'shrink-0 transition-transform motion-reduce:transition-none'
 ---
 
 <a
@@ -50,7 +49,7 @@ const iconBase =
   <slot />
   {
     buttonArrow === 'internal' && (
-      // 短い右矢印 (軸を詰めた小ぶりな矢印)。ホバーで右へ前進
+      // 右矢印 (傘=矢じりを広く開き視認性を上げる)。ホバーで右へ前進
       <svg
         aria-hidden="true"
         viewBox="0 0 24 24"
@@ -59,10 +58,13 @@ const iconBase =
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class:list={[iconBase, 'group-hover:translate-x-0.5']}
+        class:list={[
+          iconBase,
+          'h-[1.2em] w-[1.2em] group-hover:translate-x-0.5',
+        ]}
       >
-        <path d="M8 12h8" />
-        <path d="M12 8l4 4-4 4" />
+        <path d="M5 12h13" />
+        <path d="M11 6l6 6-6 6" />
       </svg>
     )
   }
@@ -80,7 +82,7 @@ const iconBase =
         stroke-linejoin="round"
         class:list={[
           iconBase,
-          'group-hover:-translate-y-0.5 group-hover:translate-x-0.5',
+          'h-[1.05em] w-[1.05em] group-hover:-translate-y-0.5 group-hover:translate-x-0.5',
         ]}
       >
         <path d="M18 13v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
