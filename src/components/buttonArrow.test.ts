@@ -14,6 +14,13 @@ describe('isExternalHref', () => {
     expect(isExternalHref('http-status')).toBe(false)
     expect(isExternalHref('/httpie')).toBe(false)
   })
+
+  it('大文字スキーム・前後空白を正規化して判定する', () => {
+    expect(isExternalHref('HTTPS://example.com')).toBe(true)
+    expect(isExternalHref('Http://example.com')).toBe(true)
+    expect(isExternalHref('  https://example.com  ')).toBe(true)
+    expect(isExternalHref('  /join  ')).toBe(false)
+  })
 })
 
 describe('resolveButtonArrow', () => {

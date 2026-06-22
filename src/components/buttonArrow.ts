@@ -16,17 +16,19 @@ export type ButtonArrowKind = 'internal' | 'external'
  * 外部リンク (別タブで開く) か判定する。
  * startsWith('http') だと 'http-status' のような相対パスも拾うため、
  * プロトコル付き (http:// または https://) のみを外部とみなす。
+ * 大文字スキーム (HTTPS://) や前後空白も拾えるよう i フラグ + trim で正規化する。
  */
 export function isExternalHref(href: string): boolean {
-  return /^https?:\/\//.test(href)
+  return /^https?:\/\//i.test(href.trim())
 }
 
 export function resolveButtonArrow(
   href: string,
   override?: boolean,
 ): ButtonArrowKind | null {
-  const anchor = href.startsWith('#')
+  const normalizedHref = href.trim()
+  const anchor = normalizedHref.startsWith('#')
   const showArrow = override ?? !anchor
   if (!showArrow) return null
-  return isExternalHref(href) ? 'external' : 'internal'
+  return isExternalHref(normalizedHref) ? 'external' : 'internal'
 }
