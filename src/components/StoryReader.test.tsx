@@ -7,11 +7,13 @@ const pages: StoryPage[] = [
   {
     kicker: 'プロローグ',
     title: '冬の、秘境へ',
+    art: 'winter',
     paragraphs: ['ある年の冬。', '「二度芋を、つくってみませんか」'],
   },
   {
     kicker: '第一話',
     title: '一枚の貼り紙',
+    art: 'notice',
     paragraphs: ['伝承館の片隅に、一枚の貼り紙。'],
   },
   {
@@ -138,6 +140,34 @@ describe('StoryReader', () => {
       screen.getByRole('heading', { name: '畑は、続いていく' }),
     ).toBeInTheDocument()
     expect(window.location.hash).toBe('#p3')
+  })
+
+  it('art を持つページではページ送りで挿絵 (SVG) が切り替わる', async () => {
+    const user = userEvent.setup()
+    render(<StoryReader pages={pages} />)
+
+    // 1 ページ目はプロローグの挿絵
+    expect(
+      screen.getByRole('img', { name: 'プロローグ「冬の、秘境へ」の情景' }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: '次の話' }))
+
+    // 2 ページ目では第一話の挿絵に切り替わる
+    expect(
+      screen.getByRole('img', { name: '第一話「一枚の貼り紙」の情景' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('img', { name: 'プロローグ「冬の、秘境へ」の情景' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('art を持たないページでは挿絵を描画しない', () => {
+    const noArt: StoryPage[] = [
+      { kicker: 'テスト', title: '挿絵なし', paragraphs: ['本文'] },
+    ]
+    render(<StoryReader pages={noArt} />)
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 
   it('空文字列の段落は情景の「間」としてスペーサー描画される', () => {

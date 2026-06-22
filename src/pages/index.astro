@@ -7,11 +7,11 @@ import SectionHeading from '~/components/SectionHeading.astro'
 import Button from '~/components/Button.astro'
 import Card from '~/components/Card.astro'
 import JourneyCards from '~/components/JourneyCards.astro'
+import StoryArt from '~/components/StoryArt.tsx'
 import Posts from '~/components/Posts.astro'
 import { upcomingTasks } from '~/components/homeTasks'
 import type { Intensity } from '~/components/FarmCalendar'
-import farmImage from '~/assets/farm.jpg'
-import mountsImage from '~/assets/mounts.jpg'
+import heroImage from '~/assets/hero-photo.jpg'
 
 // 「今月の活動」: 農作業カレンダー (crops) から当月 (無ければ最も近い先の月) に
 // 参加できる作業を抽出する。ビルド時の月を起点にするため、季節に追従して自動更新される。
@@ -34,40 +34,70 @@ const intensityLabel: Record<Intensity, string> = {
 ---
 
 <BaseLayout>
-  <!-- ヒーロー: 秘境の空気感を写真で伝えつつ、最優先導線「参加する」へ送り出す -->
-  <section
-    class="relative overflow-hidden bg-gradient-to-b from-sky-soft via-base to-base px-4 pt-14 pb-12 text-center sm:pt-20"
-  >
-    <span
-      class="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full bg-sunlight-soft px-4 py-1 font-serif text-sm tracking-wide text-primary-deep
-             before:text-xs before:text-accent-strong before:content-['▲']"
+  <!-- ヒーロー: レスポンシブに切り替える。
+       - スマホ (~md): 写真を「切れない」バナー (元画像と同じ 4:3 をそのまま表示) として
+         上に置き、テキストは下のクリーム地に重ねず配置する。狭く背の低い端末でも
+         写真が中途半端に切れて見えず、文字は地色の上で確実に読める。
+       - md 以上: 写真を全面背景にし、テキストをダークグリーンのスクリム上に白文字で重ねる。 -->
+  <section class="relative isolate overflow-hidden">
+    <!-- メディア: スマホは通常フローのバナー、md 以上は絶対配置でセクション全面を覆う -->
+    <div
+      class="relative aspect-[16/9] w-full overflow-hidden md:absolute md:inset-0 md:-z-10 md:aspect-auto md:h-full"
     >
-      一般社団法人遠山郷応援会
-    </span>
-    <h1
-      class="font-serif text-3xl font-medium leading-snug text-primary md:text-5xl"
-    >
-      秘境の里を、<wbr />楽しく未来へ
-    </h1>
-    <p class="mx-auto mt-5 max-w-xl leading-loose text-body">
-      長野県の南端、南アルプスの麓に抱かれた秘境・遠山郷。谷あいの里に受け継がれてきた景観と暮らしを、地域の人とボランティアが力を合わせて、楽しみながら次の世代へつないでいきます。
-    </p>
-    <div class="mx-auto mt-8 w-full max-w-4xl">
+      <!-- responsiveStyles 有効時、Astro は <Image> 用のスタイルを「レイヤー外」で注入する
+           (data-astro-image-* セレクタや :where([data-astro-image]){height:auto} 等)。
+           Tailwind v4 のユーティリティは @layer utilities に入るため、CSS カスケードレイヤーの
+           規則により「レイヤー外の通常宣言 > レイヤー内の通常宣言」となり、specificity に関わらず
+           Astro 側が勝つ。そのため次の 2 点が通常クラスでは効かず、! (important) で勝たせる:
+             1. height: <img> の h-full が height:auto に負けると高さが制限されず、画像が原寸比で
+                描画されて object-fit のトリミングが起きない (= object-position が無効化される)。
+             2. object-position: md:object-[50%_68%] が data-astro-image-pos="center" に負ける。
+           md 以上は被写体 (空〜山並み) を上寄りに見せ、ワイド画面でも空が残り
+           バッジが空に載るよう object-position を 50% 38% にする。 -->
       <BlurImage
-        src={farmImage}
+        src={heroImage}
         alt="遠山郷の急斜面に広がる畑と山並み"
         loading="eager"
         fetchpriority="high"
         fade={false}
-        sizes="(min-width: 896px) 896px, 100vw"
-        class="aspect-video w-full overflow-hidden rounded-3xl shadow-lg ring-1 ring-primary/10"
-        imgClass="h-full w-full object-cover"
+        sizes="100vw"
+        class="absolute inset-0 h-full w-full"
+        imgClass="h-full! w-full object-cover object-center md:object-[50%_38%]!"
       />
+      <!-- スクリム: md 以上でのみ全面に重ね、下部の白文字の可読性 (WCAG AA) を確保する。
+           スマホでは写真をそのまま見せる (テキストは下のクリーム地に置くため不要)。 -->
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 md:bg-gradient-to-t md:from-primary-deep/92 md:via-primary-deep/42 md:to-transparent"
+      >
+      </div>
     </div>
-    <div class="mt-8 flex flex-wrap justify-center gap-3">
-      <Button href="/join">活動に参加する</Button>
-      <Button href="/calendar" variant="outline">秘境の一年を見る</Button>
-    </div>
+    <Container
+      size="wide"
+      class="flex flex-col items-center gap-4 border-b border-primary/10 bg-gradient-to-b from-sunlight-soft/30 to-base px-4 py-6 text-center md:min-h-[clamp(22rem,58svh,32rem)] md:justify-end md:gap-5 md:border-0 md:bg-none md:py-0 md:pb-12 md:pt-16"
+    >
+      <span
+        class="flex w-fit items-center gap-2 rounded-full bg-primary-deep px-4 py-1 font-serif text-sm tracking-wide text-white ring-1 ring-white/25 [text-shadow:0_1px_3px_rgba(15,46,33,0.6)]"
+      >
+        一般社団法人遠山郷応援会
+      </span>
+      <h1
+        class="font-serif text-3xl font-medium leading-snug text-primary md:text-5xl md:text-white md:[text-shadow:0_2px_8px_rgba(15,46,33,0.55)]"
+      >
+        <span class="inline-block">秘境の里を、</span><span class="inline-block"
+          >未来へつなぐ</span
+        >
+      </h1>
+      <p
+        class="mx-auto max-w-xl text-justify leading-relaxed text-body md:leading-loose md:text-white md:[text-shadow:0_1px_4px_rgba(15,46,33,0.75)]"
+      >
+        長野県の南端、南アルプスの麓に抱かれた秘境・遠山郷。谷あいの里に受け継がれてきた景観と暮らしを、地域の人とボランティアが力を合わせて、楽しみながら次の世代へつないでいきます。
+      </p>
+      <div class="mt-2 flex flex-wrap justify-center gap-3">
+        <Button href="/join">活動に参加する</Button>
+        <Button href="/calendar" variant="outline">秘境の一年を見る</Button>
+      </div>
+    </Container>
   </section>
 
   <Container size="wide" class="py-12 md:py-16">
@@ -146,22 +176,29 @@ const intensityLabel: Record<Intensity, string> = {
     <!-- 始まり物語 teaser -->
     <section class="mb-16">
       <Card class="overflow-hidden md:grid md:grid-cols-2">
-        <BlurImage
-          src={mountsImage}
-          alt="遠山郷の山並みと谷あいの里"
-          sizes="(min-width: 768px) 50vw, 100vw"
-          class="aspect-video h-full w-full md:aspect-auto"
-          imgClass="h-full w-full object-cover"
-        />
+        <div
+          class="relative aspect-video w-full overflow-hidden md:aspect-auto md:h-full"
+        >
+          <StoryArt
+            scene="hero"
+            title="陽光のさす谷あいの段々畑を見上げる、ひとりの人影"
+            className="h-full w-full"
+          />
+          <span
+            class="absolute left-3 top-3 flex w-fit items-center gap-2 rounded-full bg-primary-deep px-4 py-1 font-serif text-xs tracking-wide text-white ring-1 ring-white/25 [text-shadow:0_1px_3px_rgba(15,46,33,0.6)]"
+          >
+            AIライトノベル
+          </span>
+        </div>
         <div class="flex flex-col justify-center gap-3 px-6 py-8 md:px-10">
           <SectionHeading as="h2" level="sub" align="left">
             一枚の貼り紙から
           </SectionHeading>
           <p class="leading-loose text-body">
-            「二度芋を、つくってみませんか」——たった一枚の貼り紙から始まった、ある秘境通いの物語。私たちがどうやって遠山郷とつながり、活動を続けてきたのかを、読み物としてお届けします。
+            「二度芋を、つくってみませんか」——たった一枚の貼り紙から始まった、ある秘境通いの物語。ひとりの若者がその谷とどう出会い、なぜ何年もかよい続けることになったのか。活動の原点に遡る物語。
           </p>
           <div class="mt-2">
-            <Button href="/story" variant="outline">始まりの物語を読む</Button>
+            <Button href="/story" variant="outline">物語を読む</Button>
           </div>
         </div>
       </Card>
@@ -170,7 +207,7 @@ const intensityLabel: Record<Intensity, string> = {
     <!-- 近況ダイジェスト: 最新数件のみを載せ、続きは近況アーカイブ /news へ誘導する。
          id="feed" は旧 /#feed ブックマーク互換のためのアンカー。 -->
     <section id="feed" class="scroll-mt-24">
-      <SectionHeading as="h2" class="mb-2">近況</SectionHeading>
+      <SectionHeading as="h2" class="mb-2">近頃の活動状況</SectionHeading>
       <p class="mb-8 text-center text-sm leading-relaxed text-body/80">
         活動の様子を随時お届けしています。
       </p>

@@ -8,6 +8,7 @@
 import type { CollectionEntry } from 'astro:content'
 import BlurImage from '~/components/BlurImage.astro'
 import Card from '~/components/Card.astro'
+import ArrowIcon from '~/components/ArrowIcon.astro'
 import { postExcerpt } from '~/components/postExcerpt'
 import { formatPostDate } from '~/components/postDate'
 
@@ -24,7 +25,7 @@ const thumbnail = post.data.images[0]
 <Card as="article" hover class:list={['h-full', className]}>
   <a
     href={`/news/${post.id}`}
-    class="flex h-full flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:ring-offset-2"
+    class="group flex h-full flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:ring-offset-2"
   >
     {
       thumbnail && (
@@ -33,7 +34,7 @@ const thumbnail = post.data.images[0]
           alt=""
           sizes="(min-width: 640px) 360px, 100vw"
           class="aspect-video w-full border-b border-primary/10"
-          imgClass="h-full w-full object-cover saturate-[0.85]"
+          imgClass="h-full! w-full object-cover saturate-[0.85]"
         />
       )
     }
@@ -54,9 +55,12 @@ const thumbnail = post.data.images[0]
         )
       }
       <span
-        class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-strong after:content-['→']"
+        class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent-strong"
       >
         続きを読む
+        <ArrowIcon
+          class="h-[1.1em] w-[1.1em] transition-transform motion-safe:group-hover:translate-x-0.5"
+        />
       </span>
     </div>
   </a>
