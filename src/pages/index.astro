@@ -7,11 +7,11 @@ import SectionHeading from '~/components/SectionHeading.astro'
 import Button from '~/components/Button.astro'
 import Card from '~/components/Card.astro'
 import JourneyCards from '~/components/JourneyCards.astro'
+import StoryArt from '~/components/StoryArt.tsx'
 import Posts from '~/components/Posts.astro'
 import { upcomingTasks } from '~/components/homeTasks'
 import type { Intensity } from '~/components/FarmCalendar'
 import heroImage from '~/assets/hero-photo.jpg'
-import mountsImage from '~/assets/mounts.jpg'
 
 // 「今月の活動」: 農作業カレンダー (crops) から当月 (無ければ最も近い先の月) に
 // 参加できる作業を抽出する。ビルド時の月を起点にするため、季節に追従して自動更新される。
@@ -176,22 +176,24 @@ const intensityLabel: Record<Intensity, string> = {
     <!-- 始まり物語 teaser -->
     <section class="mb-16">
       <Card class="overflow-hidden md:grid md:grid-cols-2">
-        <BlurImage
-          src={mountsImage}
-          alt="遠山郷の山並みと谷あいの里"
-          sizes="(min-width: 768px) 50vw, 100vw"
-          class="aspect-video h-full w-full md:aspect-auto"
-          imgClass="h-full! w-full object-cover"
-        />
+        <div
+          class="aspect-video w-full overflow-hidden md:aspect-auto md:h-full"
+        >
+          <StoryArt
+            scene="hero"
+            title="陽光のさす谷あいの段々畑を見上げる、ひとりの人影"
+            className="h-full w-full"
+          />
+        </div>
         <div class="flex flex-col justify-center gap-3 px-6 py-8 md:px-10">
           <SectionHeading as="h2" level="sub" align="left">
             一枚の貼り紙から
           </SectionHeading>
           <p class="leading-loose text-body">
-            「二度芋を、つくってみませんか」——たった一枚の貼り紙から始まった、ある秘境通いの物語。私たちがどうやって遠山郷とつながり、活動を続けてきたのかを、読み物としてお届けします。
+            「二度芋を、つくってみませんか」——たった一枚の貼り紙から始まった、ある秘境通いの物語。ひとりの若者がその谷とどう出会い、なぜ何年もかよい続けることになったのか。活動の原点を、読み物としてお届けします。
           </p>
           <div class="mt-2">
-            <Button href="/story" variant="outline">始まりの物語を読む</Button>
+            <Button href="/story" variant="outline">物語を読む</Button>
           </div>
         </div>
       </Card>
