@@ -14,6 +14,13 @@ describe('isExternalHref', () => {
     expect(isExternalHref('http-status')).toBe(false)
     expect(isExternalHref('/httpie')).toBe(false)
   })
+
+  it('大文字スキーム・前後空白を正規化して判定する', () => {
+    expect(isExternalHref('HTTPS://example.com')).toBe(true)
+    expect(isExternalHref('Http://example.com')).toBe(true)
+    expect(isExternalHref('  https://example.com  ')).toBe(true)
+    expect(isExternalHref('  /join  ')).toBe(false)
+  })
 })
 
 describe('resolveButtonArrow', () => {
@@ -41,5 +48,12 @@ describe('resolveButtonArrow', () => {
   it('override=true でアンカーにも矢印を強制できる (種別は href から判定)', () => {
     expect(resolveButtonArrow('#p1', true)).toBe('internal')
     expect(resolveButtonArrow('https://example.com', true)).toBe('external')
+  })
+
+  it('大文字スキーム・前後空白を含む href も正規化して判定する', () => {
+    expect(resolveButtonArrow('HTTPS://example.com')).toBe('external')
+    expect(resolveButtonArrow('  https://example.com  ')).toBe('external')
+    expect(resolveButtonArrow('  /join  ')).toBe('internal')
+    expect(resolveButtonArrow('  #p1  ')).toBeNull()
   })
 })
