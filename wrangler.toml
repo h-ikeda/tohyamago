@@ -1,6 +1,11 @@
 name = "tohyamago"
 compatibility_date = "2026-01-01"
 
+# プロダクション環境はカスタムドメインでのみ公開し、workers.dev のルートは無効化する
+workers_dev = false
+# プレビューデプロイは workers.dev のサブドメインで一意な URL を発行する
+preview_urls = true
+
 [build]
 command = "npm run build"
 
