@@ -49,4 +49,11 @@ describe('resolveButtonArrow', () => {
     expect(resolveButtonArrow('#p1', true)).toBe('internal')
     expect(resolveButtonArrow('https://example.com', true)).toBe('external')
   })
+
+  it('大文字スキーム・前後空白を含む href も正規化して判定する', () => {
+    expect(resolveButtonArrow('HTTPS://example.com')).toBe('external')
+    expect(resolveButtonArrow('  https://example.com  ')).toBe('external')
+    expect(resolveButtonArrow('  /join  ')).toBe('internal')
+    expect(resolveButtonArrow('  #p1  ')).toBeNull()
+  })
 })
