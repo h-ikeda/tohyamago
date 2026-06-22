@@ -18,10 +18,10 @@ jobs:
         task: ['format:check', 'lint', 'typecheck']
     name: quality (${{ matrix.task }})
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad1989e1147ee97884f0cea29
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
-      - uses: actions/setup-node@1a4442caab129c34a94213308687b702ec3906a7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -34,10 +34,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad1989e1147ee97884f0cea29
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
-      - uses: actions/setup-node@1a4442caab129c34a94213308687b702ec3906a7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -56,10 +56,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad1989e1147ee97884f0cea29
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
-      - uses: actions/setup-node@1a4442caab129c34a94213308687b702ec3906a7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
@@ -75,10 +75,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad1989e1147ee97884f0cea29
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
-      - uses: actions/setup-node@1a4442caab129c34a94213308687b702ec3906a7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
