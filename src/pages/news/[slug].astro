@@ -99,7 +99,7 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
             class="group rounded-2xl border border-primary/10 bg-surface px-5 py-4 transition-shadow hover:shadow-md"
           >
             <span class="flex items-center gap-1 text-xs text-body/60">
-              <ArrowIcon class="h-[1.1em] w-[1.1em] -scale-x-100 transition-transform group-hover:-translate-x-0.5 motion-reduce:transition-none" />
+              <ArrowIcon class="h-[1.1em] w-[1.1em] -scale-x-100 transition-transform motion-safe:group-hover:-translate-x-0.5" />
               新しい記事
             </span>
             <span class="mt-1 block leading-relaxed text-primary">
@@ -118,7 +118,7 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
           >
             <span class="flex items-center justify-end gap-1 text-xs text-body/60">
               古い記事
-              <ArrowIcon class="h-[1.1em] w-[1.1em] transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+              <ArrowIcon class="h-[1.1em] w-[1.1em] transition-transform motion-safe:group-hover:translate-x-0.5" />
             </span>
             <span class="mt-1 block leading-relaxed text-primary">
               {postExcerpt(older.body, 36) || formatPostDate(older.data.date)}

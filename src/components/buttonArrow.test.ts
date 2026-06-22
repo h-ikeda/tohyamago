@@ -1,10 +1,27 @@
 import { describe, it, expect } from 'vitest'
-import { resolveButtonArrow } from './buttonArrow'
+import { resolveButtonArrow, isExternalHref } from './buttonArrow'
+
+describe('isExternalHref', () => {
+  it('http(s):// で始まる URL のみ外部とみなす', () => {
+    expect(isExternalHref('https://shop.tohyamago.org')).toBe(true)
+    expect(isExternalHref('http://example.com')).toBe(true)
+  })
+
+  it('プロトコルなしの相対パスは外部とみなさない', () => {
+    expect(isExternalHref('/join')).toBe(false)
+    expect(isExternalHref('#p1')).toBe(false)
+    // 'http' で始まるが URL ではない相対パス (誤検知しないこと)
+    expect(isExternalHref('http-status')).toBe(false)
+    expect(isExternalHref('/httpie')).toBe(false)
+  })
+})
 
 describe('resolveButtonArrow', () => {
   it('内部ページへのリンクは内部矢印 (前進) を出す', () => {
     expect(resolveButtonArrow('/join')).toBe('internal')
     expect(resolveButtonArrow('/news/archive')).toBe('internal')
+    // 'http' で始まる相対パスは内部扱い
+    expect(resolveButtonArrow('/http-status')).toBe('internal')
   })
 
   it('外部リンク (http/https) は外部矢印 (別タブ) を出す', () => {

@@ -11,7 +11,7 @@
  *
  * アイコンは ArrowIcon.astro (SVG) を共用し、サイト全体で矢印の形を統一する。
  */
-import { resolveButtonArrow } from '~/components/buttonArrow'
+import { resolveButtonArrow, isExternalHref } from '~/components/buttonArrow'
 import ArrowIcon from '~/components/ArrowIcon.astro'
 
 interface Props {
@@ -23,13 +23,13 @@ interface Props {
 }
 
 const { href, variant = 'accent', arrow, class: className = '' } = Astro.props
-const external = href.startsWith('http')
+const external = isExternalHref(href)
 
 // 末尾矢印の種別 (internal / external / null) を href から判定する
 const buttonArrow = resolveButtonArrow(href, arrow)
 
 const base =
-  'group inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+  'group inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium transition-all motion-safe:hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 const variants = {
   // 白文字を載せる CTA は WCAG AA を満たす accent-strong を使用
   accent: 'bg-accent-strong text-white hover:opacity-90',
@@ -46,14 +46,14 @@ const variants = {
   <slot />
   {
     buttonArrow === 'internal' && (
-      <ArrowIcon class="h-[1.2em] w-[1.2em] transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+      <ArrowIcon class="h-[1.2em] w-[1.2em] transition-transform motion-safe:group-hover:translate-x-0.5" />
     )
   }
   {
     buttonArrow === 'external' && (
       <ArrowIcon
         external
-        class="h-[1.05em] w-[1.05em] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none"
+        class="h-[1.05em] w-[1.05em] transition-transform motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:translate-x-0.5"
       />
     )
   }
