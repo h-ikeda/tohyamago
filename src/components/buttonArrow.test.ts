@@ -2,23 +2,14 @@ import { describe, it, expect } from 'vitest'
 import { resolveButtonArrow } from './buttonArrow'
 
 describe('resolveButtonArrow', () => {
-  it('内部ページへのリンクは前進を示す → を出す', () => {
-    expect(resolveButtonArrow('/join')).toEqual({ external: false, glyph: '→' })
-    expect(resolveButtonArrow('/news/archive')).toEqual({
-      external: false,
-      glyph: '→',
-    })
+  it('内部ページへのリンクは内部矢印 (前進) を出す', () => {
+    expect(resolveButtonArrow('/join')).toBe('internal')
+    expect(resolveButtonArrow('/news/archive')).toBe('internal')
   })
 
-  it('外部リンク (http/https) は別タブを示す ↗ を出す', () => {
-    expect(resolveButtonArrow('https://shop.tohyamago.org')).toEqual({
-      external: true,
-      glyph: '↗',
-    })
-    expect(resolveButtonArrow('http://example.com')).toEqual({
-      external: true,
-      glyph: '↗',
-    })
+  it('外部リンク (http/https) は外部矢印 (別タブ) を出す', () => {
+    expect(resolveButtonArrow('https://shop.tohyamago.org')).toBe('external')
+    expect(resolveButtonArrow('http://example.com')).toBe('external')
   })
 
   it('同一ページ内アンカー (#) はページ遷移ではないので矢印を出さない', () => {
@@ -30,10 +21,8 @@ describe('resolveButtonArrow', () => {
     expect(resolveButtonArrow('https://example.com', false)).toBeNull()
   })
 
-  it('override=true でアンカーにも矢印を強制できる', () => {
-    expect(resolveButtonArrow('#p1', true)).toEqual({
-      external: false,
-      glyph: '→',
-    })
+  it('override=true でアンカーにも矢印を強制できる (種別は href から判定)', () => {
+    expect(resolveButtonArrow('#p1', true)).toBe('internal')
+    expect(resolveButtonArrow('https://example.com', true)).toBe('external')
   })
 })

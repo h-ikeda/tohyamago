@@ -3,11 +3,14 @@
  * Button — CTA ボタン (README 2.4)。
  * 既定は accent(テラコッタ) 背景 + 白文字 (WCAG AA)、丸み rounded-full。
  *
- * 別ページへ遷移するボタンには「遷移する」ことが直感的に伝わるよう末尾に矢印を付ける。
- * - 内部ページ (/...): → (前進＝サイト内で次のページへ)。ホバーで右へ少し動く
- * - 外部リンク (http...): ↗ (別タブ・外部サイトへ。SiteHeader の外部リンク表記と統一)
+ * 別ページへ遷移するボタンには「遷移する」ことが直感的に伝わるよう末尾に矢印アイコンを付ける。
+ * - 内部ページ (/...): 短い右矢印 (前進＝サイト内で次のページへ)。ホバーで右へ少し動く
+ * - 外部リンク (http...): 四角から斜めに飛び出す矢印 (別タブ・外部サイトへ)
  * - 同一ページ内アンカー (#...): 矢印なし (ページ遷移ではなくスクロールのため)
- * `arrow` を明示すると自動判定を上書きできる (true=→ を強制 / false=矢印なし)。
+ * `arrow` を明示すると自動判定を上書きできる (true=矢印あり / false=矢印なし)。
+ *
+ * アイコンは SVG (currentColor で文字色に同調 / em でフォントサイズに追従)。
+ * 内部・外部とも viewBox 24・stroke-width 2 で線幅の見えを揃える。aria-hidden。
  */
 import { resolveButtonArrow } from '~/components/buttonArrow'
 
@@ -22,7 +25,7 @@ interface Props {
 const { href, variant = 'accent', arrow, class: className = '' } = Astro.props
 const external = href.startsWith('http')
 
-// 末尾矢印 (内部 → / 外部 ↗ / アンカーなし) を href から判定する
+// 末尾矢印の種別 (internal / external / null) を href から判定する
 const buttonArrow = resolveButtonArrow(href, arrow)
 
 const base =
@@ -33,6 +36,10 @@ const variants = {
   outline:
     'border border-accent-strong text-accent-strong bg-surface hover:bg-accent-strong hover:text-white',
 }
+
+// 矢印アイコンの共通属性 (em 追従 / 線端を丸めて柔らかく / 線幅の見えを揃える)
+const iconBase =
+  'h-[1.05em] w-[1.05em] shrink-0 transition-transform motion-reduce:transition-none'
 ---
 
 <a
@@ -42,18 +49,44 @@ const variants = {
 >
   <slot />
   {
-    buttonArrow && (
-      <span
+    buttonArrow === 'internal' && (
+      // 短い右矢印 (軸を詰めた小ぶりな矢印)。ホバーで右へ前進
+      <svg
         aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class:list={[iconBase, 'group-hover:translate-x-0.5']}
+      >
+        <path d="M8 12h8" />
+        <path d="M12 8l4 4-4 4" />
+      </svg>
+    )
+  }
+  {
+    buttonArrow === 'external' && (
+      // 四角の枠から斜め右上に飛び出す矢印 (標準の「別タブで開く」記号)。
+      // ホバーで枠から少し飛び出すように右上へ動く
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
         class:list={[
-          'transition-transform',
-          buttonArrow.external
-            ? 'group-hover:-translate-y-0.5 group-hover:translate-x-0.5'
-            : 'group-hover:translate-x-0.5',
+          iconBase,
+          'group-hover:-translate-y-0.5 group-hover:translate-x-0.5',
         ]}
       >
-        {buttonArrow.glyph}
-      </span>
+        <path d="M18 13v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
+        <path d="M14 5h5v5" />
+        <path d="M19 5l-8 8" />
+      </svg>
     )
   }
 </a>
