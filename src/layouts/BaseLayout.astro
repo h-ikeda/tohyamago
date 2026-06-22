@@ -13,6 +13,11 @@ const fullTitle = title
   ? `${title} | 一般社団法人遠山郷応援会`
   : '一般社団法人遠山郷応援会'
 const currentPath = Astro.url.pathname
+
+// アクセス解析 (Google Analytics / gtag.js)。測定 ID は Cloudflare の環境変数
+// GA_MEASUREMENT_ID で設定する。未設定 (ローカル開発・プレビュー) では計測タグを
+// 出力しないため、開発中のアクセスが本番の解析に混ざらない。
+const gaMeasurementId = import.meta.env.GA_MEASUREMENT_ID
 ---
 
 <!doctype html>
@@ -27,6 +32,25 @@ const currentPath = Astro.url.pathname
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{fullTitle}</title>
+    {
+      /* Google tag (gtag.js)。GA_MEASUREMENT_ID が設定されているときのみ出力する。 */
+      gaMeasurementId && (
+        <Fragment>
+          <script
+            is:inline
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+          />
+          <script
+            is:inline
+            set:html={`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${gaMeasurementId}');`}
+          />
+        </Fragment>
+      )
+    }
     <!-- タイポグラフィ: 見出し Noto Serif JP / 本文 Noto Sans JP (light 基調) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

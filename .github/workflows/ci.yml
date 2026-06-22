@@ -61,6 +61,7 @@ jobs:
       - run: npm run build
         env:
           PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
 
   # 実ブラウザ E2E (jsdom では検証できない重なり順などの回帰確認)
   e2e:
