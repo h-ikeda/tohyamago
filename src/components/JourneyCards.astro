@@ -7,6 +7,7 @@
  * カード全体をリンクにして、どこをタップしても次の一歩へ進めるようにする。
  */
 import Card from '~/components/Card.astro'
+import ArrowIcon from '~/components/ArrowIcon.astro'
 
 interface Journey {
   href: string
@@ -127,7 +128,10 @@ const tints = {
                 ]}
               >
                 {j.cta}
-                <span aria-hidden="true">→</span>
+                <ArrowIcon
+                  external={j.external}
+                  class="h-[1.15em] w-[1.15em]"
+                />
               </span>
             </a>
           </Card>
