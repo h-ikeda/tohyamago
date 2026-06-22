@@ -335,11 +335,12 @@ const events = defineCollection({
 
 ## 環境変数
 
-| 変数名                 | 用途                                    |
-| ---------------------- | --------------------------------------- |
-| `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー |
+| 変数名                 | 用途                                                                                                                                               |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー                                                                                                            |
+| `GA_MEASUREMENT_ID`    | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー） |
 
-GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。
+GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。`GA_MEASUREMENT_ID` は秘匿情報ではなく公開される ID のため、Cloudflare では「変数」、CI では GitHub Actions の Variables（`vars`）として登録する。
 
 ## 開発コマンド
 

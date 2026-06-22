@@ -339,6 +339,7 @@ npm run preview # ビルド成果物のローカル確認
 | 変数名                                             | 用途                                    | 状態               |
 | -------------------------------------------------- | --------------------------------------- | ------------------ |
 | `PDFJS_EXPRESS_VIEWER`                             | PDF.js Express ビューワーライセンスキー | 現行               |
+| `GA_MEASUREMENT_ID`                                | Google Analytics 測定 ID（gtag.js）     | 現行               |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` ほか | Stripe 決済                             | Phase 4 で追加予定 |
 | `CLERK_*`（公開鍵・シークレット鍵等）              | Clerk 認証                              | Phase 5 で追加予定 |
 
