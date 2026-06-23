@@ -55,6 +55,7 @@ jobs:
   # プレビュー/本番ビルドが検証するため、ここでは Cloudflare が自動ビルドしない
   # フォーク由来の PR のときだけ実行し、二重ビルドを避ける。
   build:
+    name: build
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     permissions:
