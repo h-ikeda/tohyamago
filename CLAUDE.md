@@ -29,7 +29,7 @@ Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudf
 
 | 用途                 | ライブラリ                                     |
 | -------------------- | ---------------------------------------------- |
-| フレームワーク       | Astro 5 (静的サイト生成)                       |
+| フレームワーク       | Astro 7 (静的サイト生成)                       |
 | インタラクティブ部品 | React 19 (Astro Islands)                       |
 | 言語                 | TypeScript                                     |
 | スタイリング         | Tailwind CSS v4 (`@tailwindcss/vite`)          |
