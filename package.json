@@ -23,13 +23,13 @@
   "dependencies": {
     "@astrojs/react": "^5.0.7",
     "@pdftron/pdfjs-express-viewer": "^8.7.5",
-    "@tailwindcss/vite": "^4.3.0",
+    "@tailwindcss/vite": "^4.3.1",
     "astro": "^6.4.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "remark-breaks": "^4.0.0",
     "sharp": "^0.34.5",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
