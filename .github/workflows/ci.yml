@@ -66,7 +66,7 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
+          PDFJS_EXPRESS_VIEWER: ${{ vars.PDFJS_EXPRESS_VIEWER }}
           GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
 
   # 実ブラウザ E2E (jsdom では検証できない重なり順などの回帰確認)
@@ -86,4 +86,4 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
         env:
-          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
+          PDFJS_EXPRESS_VIEWER: ${{ vars.PDFJS_EXPRESS_VIEWER }}

@@ -333,17 +333,18 @@ npm run preview # ビルド成果物のローカル確認
 
 - ブランチ運用・デプロイ・ディレクトリ構造・記事追加手順の詳細は [`CLAUDE.md`](./CLAUDE.md) を参照。
 - デプロイは Cloudflare ダッシュボードの GitHub 連携（Workers Builds）。`main` への push / PR 作成で自動ビルド・公開。GitHub Actions (`ci.yml`) はビルド検証のみ。
+- 本番 / プレビューは **Wrangler Environments**（本番＝既定の Worker `tohyamago`、プレビュー＝`[env.preview]` の `tohyamago-preview`）で切り分け、環境変数は各 Worker のダッシュボードで個別管理する。詳細は [`CLAUDE.md` の「環境の切り分け」](./CLAUDE.md) を参照。
 
 ### 環境変数
 
-| 変数名                                             | 用途                                    | 状態               |
-| -------------------------------------------------- | --------------------------------------- | ------------------ |
-| `PDFJS_EXPRESS_VIEWER`                             | PDF.js Express ビューワーライセンスキー | 現行               |
-| `GA_MEASUREMENT_ID`                                | Google Analytics 測定 ID（gtag.js）     | 現行               |
-| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` ほか | Stripe 決済                             | Phase 4 で追加予定 |
-| `CLERK_*`（公開鍵・シークレット鍵等）              | Clerk 認証                              | Phase 5 で追加予定 |
+| 変数名                                             | 用途                                    | 種別             | 状態               |
+| -------------------------------------------------- | --------------------------------------- | ---------------- | ------------------ |
+| `PDFJS_EXPRESS_VIEWER`                             | PDF.js Express ビューワーライセンスキー | 変数             | 現行               |
+| `GA_MEASUREMENT_ID`                                | Google Analytics 測定 ID（gtag.js）     | 変数             | 現行               |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` ほか | Stripe 決済                             | シークレット     | Phase 4 で追加予定 |
+| `CLERK_*`（公開鍵・シークレット鍵等）              | Clerk 認証                              | 一部シークレット | Phase 5 で追加予定 |
 
-> 新規シークレットは Cloudflare ダッシュボードと（CI で必要なら）GitHub Secrets の両方に登録する。
+> 環境変数は本番 / プレビューで切り分ける。デプロイ時は Wrangler Environments の各 Worker のダッシュボードで設定し（本番のみ・プレビューのみを明示）、CI で必要なものは GitHub Actions の Variables（公開可能な変数）または Secrets（秘匿情報）に登録する。`PDFJS_EXPRESS_VIEWER` / `GA_MEASUREMENT_ID` はいずれも秘匿情報ではないため変数として扱う。
 
 ### 外部リンク
 

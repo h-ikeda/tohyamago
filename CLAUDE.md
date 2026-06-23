@@ -6,13 +6,26 @@
 
 Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) は品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI として動作し、デプロイは行わない。
 
+### 環境の切り分け (Wrangler Environments)
+
+本番環境とプレビュー環境で環境変数を切り分けるため、**Wrangler Environments** を使う。Cloudflare ダッシュボードのビルド設定はトリガー単位で本番/プレビューの変数を分けにくいため、`wrangler.toml` に環境の枠 (本番＝トップレベル、プレビュー＝`[env.preview]`) を定義し、それぞれを別 Worker としてデプロイする。
+
+| 環境       | Worker 名           | wrangler.toml       | デプロイ/ビルドコマンド (ダッシュボード)  | 公開先                   |
+| ---------- | ------------------- | ------------------- | ----------------------------------------- | ------------------------ |
+| 本番       | `tohyamago`         | トップレベル (既定) | `npm run build`（`--env` なし＝既定環境） | カスタムドメイン         |
+| プレビュー | `tohyamago-preview` | `[env.preview]`     | `--env preview` を付けてビルド/デプロイ   | workers.dev サブドメイン |
+
+- `vars` は環境間で**継承されない**ため環境ごとに設定するが、`build` / `assets` は**継承される**。値は **Cloudflare ダッシュボードの各 Worker (Settings > Variables)** で管理し、`wrangler.toml` には環境の枠だけを置く。
+- これにより、**本番 Worker (`tohyamago`) にだけ `GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER` を設定**すれば、プレビューには計測タグ等が出力されない（「本番のみ設定」を実現）。
+- 今後 Stripe / Clerk のキーを追加する際も、同じく本番 Worker とプレビュー Worker のダッシュボードで別々の値を設定して切り分ける。
+
 ### Cloudflare ダッシュボード側の設定
 
-- Build command: `npm run build`
-- Build output directory: `dist` (`wrangler.toml` の `pages_build_output_dir` でも指定済み)
+- Build command: `npm run build`（プレビュー Worker は `--env preview` を付ける）
+- Build output directory: `dist`（`wrangler.toml` の `[assets]` でも指定済み）
 - Root directory: `/`
 - Node version: 22
-- 環境変数: `PDFJS_EXPRESS_VIEWER`
+- ビルド時の環境変数 (`GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER`) は各 Worker の Settings > Variables で設定（本番 Worker のみ）
 
 ## 技術スタック
 
@@ -340,7 +353,12 @@ const events = defineCollection({
 | `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー                                                                                                            |
 | `GA_MEASUREMENT_ID`    | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー） |
 
-GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。`GA_MEASUREMENT_ID` は秘匿情報ではなく公開される ID のため、Cloudflare では「変数」、CI では GitHub Actions の Variables（`vars`）として登録する。
+いずれも秘匿情報ではない（`GA_MEASUREMENT_ID` は公開される測定 ID、`PDFJS_EXPRESS_VIEWER` はドメイン固定のビューワーキー）ため、**シークレットではなく通常の「変数」として扱う**。
+
+- **デプロイ時（Cloudflare）**: Wrangler Environments の各 Worker のビルド変数として設定する（上記「環境の切り分け」参照）。本番 Worker (`tohyamago`) のみに設定し、プレビュー Worker (`tohyamago-preview`) には設定しない。
+- **CI（GitHub Actions）**: `ci.yml` のビルド検証・E2E でも参照するため、GitHub Actions の **Variables（`vars`）** に登録する（Secrets ではない）。`vars.GA_MEASUREMENT_ID` / `vars.PDFJS_EXPRESS_VIEWER` を参照する。
+
+> 今後追加する Stripe / Clerk のシークレットキーは秘匿情報のため扱いが異なる。デプロイ時は各 Worker のダッシュボードでシークレットとして本番/プレビュー別々に設定し、CI で必要なものは GitHub Secrets に登録する。
 
 ## 開発コマンド
 
