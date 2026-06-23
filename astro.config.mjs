@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config'
 import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
+import { unified } from '@astrojs/markdown-remark'
 import remarkBreaks from 'remark-breaks'
 import { resolveBuildEnv } from './src/buildEnv'
 
@@ -24,8 +25,10 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  // Astro 7 で markdown.remarkPlugins は非推奨。@astrojs/markdown-remark の
+  // unified() に渡してデフォルトプロセッサを拡張する方式へ移行した。
   markdown: {
-    remarkPlugins: [remarkBreaks],
+    processor: unified({ remarkPlugins: [remarkBreaks] }),
   },
   trailingSlash: 'never',
   build: {
