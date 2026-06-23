@@ -51,7 +51,11 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  # フルビルド検証。同一リポジトリのブランチ/PR と main への push は Cloudflare の
+  # プレビュー/本番ビルドが検証するため、ここでは Cloudflare が自動ビルドしない
+  # フォーク由来の PR のときだけ実行し、二重ビルドを避ける。
   build:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read

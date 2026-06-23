@@ -4,7 +4,7 @@
 
 ## ホスティング
 
-Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) は品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI として動作し、デプロイは行わない。
+Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) は品質チェック (Lint / Format / 型チェック / テスト) を行う CI として動作し、デプロイは行わない。フルビルド検証は通常 Cloudflare のプレビュー/本番ビルドが担うため、`ci.yml` の `build` ジョブは **Cloudflare が自動ビルドしないフォーク由来の PR のときだけ**実行する（二重ビルド回避）。
 
 ### 環境変数の本番 / プレビュー切り分け (ビルド時にブランチ判定)
 
@@ -117,7 +117,7 @@ tohyamago/
 │   └── .well-known/
 │       └── apple-developer-merchantid-domain-association
 ├── wrangler.toml               # Cloudflare Pages 設定 (出力ディレクトリ)
-└── .github/workflows/ci.yml    # 品質チェック + ビルド検証 CI (デプロイは Cloudflare 側)
+└── .github/workflows/ci.yml    # 品質チェック CI + フォーク PR のみフルビルド検証 (デプロイは Cloudflare 側)
 ```
 
 ## サイト構成（情報設計）
