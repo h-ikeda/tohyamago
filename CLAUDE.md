@@ -6,14 +6,15 @@
 
 Cloudflare Workers (静的アセット配信) にデプロイする静的サイト。デプロイは **GitHub Actions から wrangler CLI で実行する** (`.github/workflows/deploy.yml`)。将来の環境設定 (環境変数・シークレット・ビルド手順) の複雑化に対応するため、デプロイ手順を Cloudflare ダッシュボード任せにせず本リポジトリ側に集約している。
 
-- `main` への push → CI (`ci.yml`) 成功後に `deploy` ジョブ (`workflow_run` トリガー) が `npm run build` → `wrangler deploy` で本番 (カスタムドメイン) へ公開。
-- PR → CI 成功後に `preview` ジョブが `wrangler versions upload` でプレビュー版をアップロードし、一意なプレビュー URL を発行 (`wrangler.toml` の `preview_urls = true`)。シークレットを参照できない fork / Dependabot の PR ではスキップ。
+- `main` への push → CI (`ci.yml`) 成功後に `deploy` ジョブ (`workflow_run` トリガー) が **CI がビルドした `dist` アーティファクトを受け取り** `wrangler deploy` で本番 (カスタムドメイン) へ公開。
+- PR → CI 成功後に `preview` ジョブが同じく `dist` アーティファクトを `wrangler versions upload` でアップロードし、一意なプレビュー URL を発行 (`wrangler.toml` の `preview_urls = true`)。シークレットを参照できない fork / Dependabot の PR ではスキップ。
 - GitHub Actions (`ci.yml`) は従来どおり品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI で、デプロイはしない。`deploy.yml` はその CI の成功を `workflow_run` で受けて初めて動く (品質ゲート)。
+- **セキュリティ (pwn request 回避)**: `workflow_run` は Cloudflare シークレットを参照できる特権コンテキストで動くため、`deploy.yml` では PR の信頼できないコードを checkout / 実行しない。リポジトリは信頼できる **デフォルトブランチ (main) のみ checkout** し、ビルド成果物 (`dist`) は CI (非特権コンテキスト) の `build` ジョブが上げたアーティファクトを受け取って `wrangler` でアップロードするだけにする (再ビルドしない)。
 - 旧 **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds) は無効化する** (二重デプロイを避けるため、ダッシュボード側の Git 連携を切断しておく)。
 
 ### デプロイ設定
 
-- ビルド: `npm run build` (出力は `dist`。`wrangler.toml` の `[assets]` で指定)。ビルドは CI 側で明示的に実行するため、`wrangler.toml` に `[build]` は置かない (二重ビルド回避)。
+- ビルド: `npm run build` (出力は `dist`。`wrangler.toml` の `[assets]` で指定)。ビルドは CI (`ci.yml`) の `build` ジョブで実行し `dist` をアーティファクトとして渡すため、`wrangler.toml` に `[build]` は置かず `deploy.yml` でも再ビルドしない (二重ビルド回避 ＆ 特権コンテキストでの未検証コード実行回避)。
 - Node version: 22
 - 必要なシークレット / 変数 (GitHub の Settings に登録):
   - `secrets.CLOUDFLARE_API_TOKEN` … Workers のデプロイ権限を持つ API トークン
@@ -113,8 +114,8 @@ tohyamago/
 │       └── apple-developer-merchantid-domain-association
 ├── wrangler.toml               # Cloudflare Workers 設定 (静的アセット出力ディレクトリ)
 └── .github/workflows/
-    ├── ci.yml                  # 品質チェック + ビルド検証 CI (デプロイはしない)
-    └── deploy.yml              # wrangler CLI で Cloudflare Workers へデプロイ (本番 / PR プレビュー)
+    ├── ci.yml                  # 品質チェック + ビルド検証 CI (dist をアーティファクト出力。デプロイはしない)
+    └── deploy.yml              # CI 成功を workflow_run で受け、dist アーティファクトを wrangler CLI で配信 (本番 / PR プレビュー)
 ```
 
 ## サイト構成（情報設計）

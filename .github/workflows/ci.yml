@@ -68,6 +68,14 @@ jobs:
         env:
           PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
           GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+      # ビルド成果物をデプロイ workflow (deploy.yml) へ受け渡す。
+      # 特権コンテキストで再ビルドしないことで、信頼できないコードの実行を避ける。
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+          if-no-files-found: error
 
   # 実ブラウザ E2E (jsdom では検証できない重なり順などの回帰確認)
   e2e:

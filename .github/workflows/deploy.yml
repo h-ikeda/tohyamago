@@ -8,11 +8,15 @@ name: Deploy
 # CI (ci.yml) の完了を workflow_run でトリガーし、CI が成功したときのみデプロイする
 # (品質チェック・ビルド検証を通過していない変更を公開しないためのゲート)。
 #
+# セキュリティ: workflow_run は特権コンテキスト (Cloudflare シークレットを参照可能) で動く。
+# ここで PR の信頼できないコードを checkout / 実行すると "pwn request" の危険があるため、
+#   - リポジトリは信頼できるデフォルトブランチ (main) のみ checkout し、
+#   - ビルド成果物 (dist) は CI (非特権コンテキスト) がアップロードしたアーティファクトを受け取り、
+#     ここでは再ビルドせず wrangler でアップロードするだけにする。
+#
 # 必要なシークレット / 変数 (GitHub の Settings に登録):
 #   secrets.CLOUDFLARE_API_TOKEN  … Workers のデプロイ権限を持つ API トークン
 #   secrets.CLOUDFLARE_ACCOUNT_ID … Cloudflare のアカウント ID
-#   secrets.PDFJS_EXPRESS_VIEWER  … ビルドに必要 (CI と共通)
-#   vars.GA_MEASUREMENT_ID        … ビルドに必要 (CI と共通)
 
 on:
   workflow_run:
@@ -39,21 +43,24 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read # 別 run のアーティファクトを取得するため
     steps:
-      # workflow_run はデフォルトブランチ文脈で動くため、CI が検証した commit を明示的に取得する
+      # 信頼できるデフォルトブランチ (main) のみを checkout する (PR の head は使わない)
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
-        env:
-          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
-          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+      # CI がビルドした dist を受け取る (ここでは再ビルドしない)
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: dist
+          path: dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
       - run: npm run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -70,20 +77,24 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read # 別 run のアーティファクトを取得するため
     steps:
+      # PR の信頼できない wrangler.toml を避けるため、設定は main のものを使う
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
-        env:
-          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
-          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+      # PR の CI がビルドした dist (静的アセット) を受け取り、アップロードのみ行う
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: dist
+          path: dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
       - run: npx wrangler versions upload
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
