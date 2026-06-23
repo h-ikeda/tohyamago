@@ -344,7 +344,7 @@ npm run preview # ビルド成果物のローカル確認
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` ほか | Stripe 決済                             | シークレット     | Phase 4 で追加予定 |
 | `CLERK_*`（公開鍵・シークレット鍵等）              | Clerk 認証                              | 一部シークレット | Phase 5 で追加予定 |
 
-> 環境変数は本番 / プレビューで切り分ける。デプロイ時は Wrangler Environments の各 Worker のダッシュボードで設定し（本番のみ・プレビューのみを明示）、CI で必要なものは GitHub Actions の Variables（公開可能な変数）または Secrets（秘匿情報）に登録する。`PDFJS_EXPRESS_VIEWER` / `GA_MEASUREMENT_ID` はいずれも秘匿情報ではないため変数として扱う。
+> 環境変数は本番 / プレビューで切り分ける。本サイトは静的生成のため `PDFJS_EXPRESS_VIEWER` / `GA_MEASUREMENT_ID` は**ビルド時**に必要で、デプロイ時は Wrangler Environments の各 Worker の **Settings > Build「Build variables and secrets」**（ランタイム用の Variables & Secrets ではない）に設定する（本番 Worker のみ）。CI で必要なものは GitHub Actions の Variables（公開可能な変数）または Secrets（秘匿情報）に登録する。両変数とも秘匿情報ではないため変数として扱う。
 
 ### 外部リンク
 

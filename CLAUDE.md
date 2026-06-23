@@ -15,9 +15,11 @@ Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudf
 | 本番       | `tohyamago`         | トップレベル (既定) | `npm run build`（`--env` なし＝既定環境） | カスタムドメイン         |
 | プレビュー | `tohyamago-preview` | `[env.preview]`     | `--env preview` を付けてビルド/デプロイ   | workers.dev サブドメイン |
 
-- `vars` は環境間で**継承されない**ため環境ごとに設定するが、`build` / `assets` は**継承される**。値は **Cloudflare ダッシュボードの各 Worker (Settings > Variables)** で管理し、`wrangler.toml` には環境の枠だけを置く。
-- これにより、**本番 Worker (`tohyamago`) にだけ `GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER` を設定**すれば、プレビューには計測タグ等が出力されない（「本番のみ設定」を実現）。
-- 今後 Stripe / Clerk のキーを追加する際も、同じく本番 Worker とプレビュー Worker のダッシュボードで別々の値を設定して切り分ける。
+- このサイトは Astro の静的生成で、`GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER` は **ビルド時**に `import.meta.env` 経由で HTML へ焼き込む。ランタイムに Worker スクリプトは無く (assets のみ) `[vars]` は読まれないため、これらは Cloudflare の **ビルド変数** として設定する。
+  - Cloudflare には 2 系統あり混同しやすい: **ビルド時変数** = ダッシュボードの **Settings > Build > 「Build variables and secrets」**（`npm run build` の実行環境にのみ注入、ランタイム不可）／**ランタイム変数** = Settings > Variables & Secrets（＝`wrangler.toml` の `[vars]`、デプロイ後の Worker が `env.X` で読む）。本サイトが使うのは前者。
+  - ビルド変数も **Worker (Git ビルド接続) ごと**に分かれるため、`wrangler.toml` には環境の枠だけを置き、値は各 Worker のダッシュボードで管理する。
+- これにより、**本番 Worker (`tohyamago`) のビルド変数にだけ `GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER` を設定**すれば、プレビューには計測タグ等が出力されない（「本番のみ設定」を実現）。
+- 今後 Stripe / Clerk のキーを追加する際も、同じく本番 Worker とプレビュー Worker のダッシュボードで別々の値を設定して切り分ける（サーバー側で実行する秘匿キーはランタイムのシークレットとして、ビルド時に必要な公開キー等はビルド変数として、用途に応じて使い分ける）。
 
 ### Cloudflare ダッシュボード側の設定
 
@@ -25,7 +27,7 @@ Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudf
 - Build output directory: `dist`（`wrangler.toml` の `[assets]` でも指定済み）
 - Root directory: `/`
 - Node version: 22
-- ビルド時の環境変数 (`GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER`) は各 Worker の Settings > Variables で設定（本番 Worker のみ）
+- ビルド時の環境変数 (`GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER`) は各 Worker の **Settings > Build > 「Build variables and secrets」** で設定（本番 Worker のみ。ランタイム用の Variables & Secrets ではない）
 
 ## 技術スタック
 
@@ -355,7 +357,7 @@ const events = defineCollection({
 
 いずれも秘匿情報ではない（`GA_MEASUREMENT_ID` は公開される測定 ID、`PDFJS_EXPRESS_VIEWER` はドメイン固定のビューワーキー）ため、**シークレットではなく通常の「変数」として扱う**。
 
-- **デプロイ時（Cloudflare）**: Wrangler Environments の各 Worker のビルド変数として設定する（上記「環境の切り分け」参照）。本番 Worker (`tohyamago`) のみに設定し、プレビュー Worker (`tohyamago-preview`) には設定しない。
+- **デプロイ時（Cloudflare）**: 静的生成でビルド時に HTML へ焼き込むため、各 Worker の **Settings > Build > 「Build variables and secrets」**（＝ビルド変数。ランタイム用の Variables & Secrets ではない）に設定する（上記「環境の切り分け」参照）。本番 Worker (`tohyamago`) のみに設定し、プレビュー Worker (`tohyamago-preview`) には設定しない。
 - **CI（GitHub Actions）**: `ci.yml` のビルド検証・E2E でも参照するため、GitHub Actions の **Variables（`vars`）** に登録する（Secrets ではない）。`vars.GA_MEASUREMENT_ID` / `vars.PDFJS_EXPRESS_VIEWER` を参照する。
 
 > 今後追加する Stripe / Clerk のシークレットキーは秘匿情報のため扱いが異なる。デプロイ時は各 Worker のダッシュボードでシークレットとして本番/プレビュー別々に設定し、CI で必要なものは GitHub Secrets に登録する。
