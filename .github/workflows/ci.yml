@@ -51,7 +51,12 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  # フルビルド検証。同一リポジトリのブランチ/PR と main への push は Cloudflare の
+  # プレビュー/本番ビルドが検証するため、ここでは Cloudflare が自動ビルドしない
+  # フォーク由来の PR のときだけ実行し、二重ビルドを避ける。
   build:
+    name: build
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -65,9 +70,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-        env:
-          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
-          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
 
   # 実ブラウザ E2E (jsdom では検証できない重なり順などの回帰確認)
   e2e:
@@ -85,5 +87,3 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-        env:
-          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}

@@ -4,15 +4,26 @@
 
 ## ホスティング
 
-Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) は品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI として動作し、デプロイは行わない。
+Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) は品質チェック (Lint / Format / 型チェック / テスト) を行う CI として動作し、デプロイは行わない。フルビルド検証は通常 Cloudflare のプレビュー/本番ビルドが担うため、`ci.yml` の `build` ジョブは **Cloudflare が自動ビルドしないフォーク由来の PR のときだけ**実行する（二重ビルド回避）。
+
+### 環境変数の本番 / プレビュー切り分け (ビルド時にブランチ判定)
+
+単一 Worker (`tohyamago`) のまま、本番ブランチ (`main`) のビルドとプレビュー (PR / 非本番ブランチ) のビルドで **ビルド時変数を出し分ける**。Cloudflare ダッシュボードのビルド設定はトリガー単位で本番/プレビューの値を分けにくいため、**両方の値をビルド変数に登録しておき、ビルド時にブランチを見て選ぶ**方式を採る。
+
+- このサイトは Astro の静的生成で、`GA_MEASUREMENT_ID` / `PDFJS_EXPRESS_VIEWER` は **ビルド時**に `import.meta.env` 経由で HTML へ焼き込む。ランタイムに Worker スクリプトは無く (assets のみ) `[vars]` は読まれないため、これらは Cloudflare の **ビルド変数** として設定する。
+  - Cloudflare には 2 系統あり混同しやすい: **ビルド時変数** = ダッシュボードの **Settings > Build > 「Build variables and secrets」**（`npm run build` の実行環境にのみ注入、ランタイム不可）／**ランタイム変数** = Settings > Variables & Secrets（＝`wrangler.toml` の `[vars]`、デプロイ後の Worker が `env.X` で読む）。本サイトが使うのは前者。
+- **設定方法**: ビルド変数に `GA_MEASUREMENT_ID_PRODUCTION` / `GA_MEASUREMENT_ID_PREVIEW`（および `PDFJS_EXPRESS_VIEWER_PRODUCTION` / `..._PREVIEW`）を登録する。Cloudflare がビルド時に注入する `WORKERS_CI_BRANCH` を見て、`main` なら `_PRODUCTION`、それ以外なら `_PREVIEW` を採用し、素の名前 (`GA_MEASUREMENT_ID` 等) に解決する。**プレビューに値を出したくない変数は `_PREVIEW` を未設定にすれば、その変数は注入されない**（例: プレビューには計測タグが出ない）。
+- 解決ロジックは純粋関数 `src/buildEnv.ts`（`resolveBuildEnv`）に分離し Vitest でテストする。`astro.config.mjs` が読み込み時に `process.env` へ反映するため、`BaseLayout.astro` / `articles.astro` 側は従来どおり `import.meta.env.<NAME>` を読むだけでよい。
+- 素の名前 (`GA_MEASUREMENT_ID`) が直接設定されていればそれを最優先する（CI のビルド検証や手動上書き・ローカル開発の `.env` 用）。
+- 今後 Stripe / Clerk を追加する際の住み分け: **ビルド時に埋め込む公開キー**（publishable key 等）は同じく `_PRODUCTION` / `_PREVIEW` のビルド変数で出し分ける。**サーバー側で使う秘密鍵**はビルド変数に置かず（公開リポジトリの PR ビルドにも値が見えてしまうため）、ランタイムのシークレットとして扱う。
 
 ### Cloudflare ダッシュボード側の設定
 
 - Build command: `npm run build`
-- Build output directory: `dist` (`wrangler.toml` の `pages_build_output_dir` でも指定済み)
+- Build output directory: `dist`（`wrangler.toml` の `[assets]` でも指定済み）
 - Root directory: `/`
 - Node version: 22
-- 環境変数: `PDFJS_EXPRESS_VIEWER`
+- ビルド時の環境変数は **Settings > Build > 「Build variables and secrets」** に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` の形で登録（ランタイム用の Variables & Secrets ではない）。PR / 非本番ブランチも自動ビルドするため、非本番ブランチビルドを有効化しておく。
 
 ## 技術スタック
 
@@ -89,6 +100,8 @@ tohyamago/
 │   │   ├── image-fade-in.test.ts # image-fade-in のテスト (Vitest, jsdom)
 │   │   └── PdfViewer.tsx       # PDF.js Express ラッパー (React, client:only)
 │   ├── content.config.ts       # Content Collection スキーマ (posts / crops / events)
+│   ├── buildEnv.ts             # ビルド時変数を本番/プレビューで出し分ける純粋関数 (astro.config.mjs が利用)
+│   ├── buildEnv.test.ts        # buildEnv のテスト (Vitest)
 │   ├── content/
 │   │   ├── posts/              # 記事 (Markdown) と添付画像
 │   │   ├── crops/              # 農作業カレンダーの作物・作業データ (新規, YAML)
@@ -104,7 +117,7 @@ tohyamago/
 │   └── .well-known/
 │       └── apple-developer-merchantid-domain-association
 ├── wrangler.toml               # Cloudflare Pages 設定 (出力ディレクトリ)
-└── .github/workflows/ci.yml    # 品質チェック + ビルド検証 CI (デプロイは Cloudflare 側)
+└── .github/workflows/ci.yml    # 品質チェック CI + フォーク PR のみフルビルド検証 (デプロイは Cloudflare 側)
 ```
 
 ## サイト構成（情報設計）
@@ -340,7 +353,12 @@ const events = defineCollection({
 | `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー                                                                                                            |
 | `GA_MEASUREMENT_ID`    | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー） |
 
-GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。`GA_MEASUREMENT_ID` は秘匿情報ではなく公開される ID のため、Cloudflare では「変数」、CI では GitHub Actions の Variables（`vars`）として登録する。
+いずれも秘匿情報ではない（`GA_MEASUREMENT_ID` は公開される測定 ID、`PDFJS_EXPRESS_VIEWER` はドメイン固定のビューワーキー）ため、**シークレットではなく通常の「変数」として扱う**。
+
+- **デプロイ時（Cloudflare）**: 静的生成でビルド時に HTML へ焼き込むため、**Settings > Build > 「Build variables and secrets」**（＝ビルド変数。ランタイム用の Variables & Secrets ではない）に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` の形で登録し、ビルド時にブランチで出し分ける（上記「環境変数の本番 / プレビュー切り分け」参照）。プレビューに出したくない変数は `_PREVIEW` を未設定にする。
+- **CI（GitHub Actions）**: `ci.yml` のビルド検証・E2E は値を必要としない（テストが GA/PDF ビューワーの値に依存しないため）。素の名前が未設定なら `import.meta.env.*` は undefined になるだけでビルドは成功する。必要になった場合のみ GitHub Actions の **Variables（`vars`）** に素の名前で登録する（`resolveBuildEnv` は素の名前を最優先する）。
+
+> 今後追加する Stripe / Clerk のシークレットキーは秘匿情報のため扱いが異なる。ビルド変数には置かず（公開リポジトリの PR ビルドにも見えてしまう）、ランタイムのシークレットとして本番/プレビュー別々に設定し、CI で必要なものは GitHub Secrets に登録する。
 
 ## 開発コマンド
 

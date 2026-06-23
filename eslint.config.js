@@ -49,6 +49,14 @@ export default tseslint.config(
     },
   },
 
+  {
+    // ルート直下の設定ファイル (astro/eslint/vitest 等) は Node 環境で実行される
+    files: ['*.{js,mjs,ts}'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
+
   // Prettier と競合する整形系ルールを無効化 (必ず最後)
   prettier,
 )
