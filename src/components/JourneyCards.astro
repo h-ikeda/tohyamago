@@ -90,7 +90,12 @@ const tints = {
                 : {})}
               class="flex h-full flex-col gap-3 p-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              <div class="flex items-center gap-3">
+              {j.featured && (
+                <span class="inline-flex w-fit rounded-full bg-accent-strong px-2.5 py-0.5 text-[0.65rem] font-medium tracking-wide text-white">
+                  なかま募集中
+                </span>
+              )}
+              <h3 class="flex items-center gap-3 font-serif text-xl font-medium text-primary">
                 <span
                   aria-hidden="true"
                   class:list={[
@@ -100,13 +105,6 @@ const tints = {
                 >
                   <JourneyIcon name={j.icon} class="h-6 w-6" />
                 </span>
-                {j.featured && (
-                  <span class="rounded-full bg-accent-strong px-2.5 py-0.5 text-[0.65rem] font-medium tracking-wide text-white">
-                    なかま募集中
-                  </span>
-                )}
-              </div>
-              <h3 class="font-serif text-xl font-medium text-primary">
                 {j.title}
               </h3>
               <p class="grow text-sm leading-relaxed text-body">{j.desc}</p>
