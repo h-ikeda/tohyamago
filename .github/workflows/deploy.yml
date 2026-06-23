@@ -5,6 +5,9 @@ name: Deploy
 # 将来の環境設定 (環境変数・シークレット・ビルド手順) の複雑化に対応するため、
 # デプロイ手順を本リポジトリ側 (GitHub Actions + wrangler) に集約する。
 #
+# CI (ci.yml) の完了を workflow_run でトリガーし、CI が成功したときのみデプロイする
+# (品質チェック・ビルド検証を通過していない変更を公開しないためのゲート)。
+#
 # 必要なシークレット / 変数 (GitHub の Settings に登録):
 #   secrets.CLOUDFLARE_API_TOKEN  … Workers のデプロイ権限を持つ API トークン
 #   secrets.CLOUDFLARE_ACCOUNT_ID … Cloudflare のアカウント ID
@@ -12,26 +15,35 @@ name: Deploy
 #   vars.GA_MEASUREMENT_ID        … ビルドに必要 (CI と共通)
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_run:
+    workflows: ['CI']
+    types:
+      - completed
 
-# 同一参照への並行デプロイをまとめ、古い実行はキャンセルする
+# 既定は読み取りのみ。各ジョブで必要な権限だけを明示的に付与する
+permissions:
+  contents: read
+
+# 同一ブランチへの並行デプロイをまとめ、古い実行はキャンセルする
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: deploy-${{ github.event.workflow_run.head_branch }}
   cancel-in-progress: true
 
 jobs:
-  # main への push をカスタムドメインの本番環境へ公開する
+  # main の CI が成功したら、カスタムドメインの本番環境へ公開する
   deploy:
-    if: github.event_name == 'push'
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
+      # workflow_run はデフォルトブランチ文脈で動くため、CI が検証した commit を明示的に取得する
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
@@ -47,19 +59,21 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-  # PR ではプレビュー版をアップロードし、一意なプレビュー URL を発行する。
+  # PR の CI が成功したら、プレビュー版をアップロードし一意なプレビュー URL を発行する。
   # シークレットを参照できない fork / Dependabot の PR ではスキップする。
   preview:
     if: >-
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]'
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.triggering_actor.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           persist-credentials: false
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:

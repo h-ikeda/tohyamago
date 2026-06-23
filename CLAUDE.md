@@ -6,9 +6,9 @@
 
 Cloudflare Workers (静的アセット配信) にデプロイする静的サイト。デプロイは **GitHub Actions から wrangler CLI で実行する** (`.github/workflows/deploy.yml`)。将来の環境設定 (環境変数・シークレット・ビルド手順) の複雑化に対応するため、デプロイ手順を Cloudflare ダッシュボード任せにせず本リポジトリ側に集約している。
 
-- `main` への push → `deploy` ジョブが `npm run build` → `wrangler deploy` で本番 (カスタムドメイン) へ公開。
-- PR → `preview` ジョブが `wrangler versions upload` でプレビュー版をアップロードし、一意なプレビュー URL を発行 (`wrangler.toml` の `preview_urls = true`)。シークレットを参照できない fork / Dependabot の PR ではスキップ。
-- GitHub Actions (`ci.yml`) は従来どおり品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI で、デプロイはしない。
+- `main` への push → CI (`ci.yml`) 成功後に `deploy` ジョブ (`workflow_run` トリガー) が `npm run build` → `wrangler deploy` で本番 (カスタムドメイン) へ公開。
+- PR → CI 成功後に `preview` ジョブが `wrangler versions upload` でプレビュー版をアップロードし、一意なプレビュー URL を発行 (`wrangler.toml` の `preview_urls = true`)。シークレットを参照できない fork / Dependabot の PR ではスキップ。
+- GitHub Actions (`ci.yml`) は従来どおり品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI で、デプロイはしない。`deploy.yml` はその CI の成功を `workflow_run` で受けて初めて動く (品質ゲート)。
 - 旧 **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds) は無効化する** (二重デプロイを避けるため、ダッシュボード側の Git 連携を切断しておく)。
 
 ### デプロイ設定
