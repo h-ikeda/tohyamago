@@ -21,13 +21,24 @@ export const BUILD_ENV_KEYS = [
   'PDFJS_EXPRESS_VIEWER',
 ] as const
 
+/**
+ * ブランチ名が本番ブランチ (PRODUCTION_BRANCH) かどうかを判定する。
+ * 未設定 (ローカル開発など) やそれ以外のブランチはプレビュー扱い (false)。
+ */
 export function isProductionBranch(branch: string | undefined): boolean {
   return branch === PRODUCTION_BRANCH
 }
 
-// env (通常は process.env) から、ブランチに応じた最終的な値を解決して返す。
-// 戻り値は「素の名前 → 確定値」のマップ。値が無いキーは含めない
-// (undefined を process.env に代入すると "undefined" 文字列になる事故を防ぐ)。
+/**
+ * env (通常は process.env) から、ブランチに応じた最終的な値を解決して返す。
+ * 本番ブランチなら各キーの `_PRODUCTION`、それ以外は `_PREVIEW` を採用し、素の名前が
+ * あればそれを最優先する。戻り値は「素の名前 → 確定値」のマップで、値が無いキーは
+ * 含めない (undefined を process.env に代入すると "undefined" 文字列になる事故を防ぐ)。
+ *
+ * @param env 参照する環境変数 (WORKERS_CI_BRANCH と各キーの値を含む)
+ * @param keys 出し分け対象の変数名。既定は BUILD_ENV_KEYS
+ * @returns 解決済みの「素の名前 → 値」マップ
+ */
 export function resolveBuildEnv(
   env: Record<string, string | undefined>,
   keys: readonly string[] = BUILD_ENV_KEYS,
