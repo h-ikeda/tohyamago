@@ -4,15 +4,23 @@
 
 ## ホスティング
 
-Cloudflare Pages にデプロイする静的サイト。デプロイは **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds)** を使用し、`main` への push や PR の作成で自動的にビルド・公開される。GitHub Actions (`ci.yml`) は品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI として動作し、デプロイは行わない。
+Cloudflare Workers (静的アセット配信) にデプロイする静的サイト。デプロイは **GitHub Actions から wrangler CLI で実行する** (`.github/workflows/deploy.yml`)。将来の環境設定 (環境変数・シークレット・ビルド手順) の複雑化に対応するため、デプロイ手順を Cloudflare ダッシュボード任せにせず本リポジトリ側に集約している。
 
-### Cloudflare ダッシュボード側の設定
+- `main` への push → `deploy` ジョブが `npm run build` → `wrangler deploy` で本番 (カスタムドメイン) へ公開。
+- PR → `preview` ジョブが `wrangler versions upload` でプレビュー版をアップロードし、一意なプレビュー URL を発行 (`wrangler.toml` の `preview_urls = true`)。シークレットを参照できない fork / Dependabot の PR ではスキップ。
+- GitHub Actions (`ci.yml`) は従来どおり品質チェック (Lint / Format / 型チェック / テスト) とビルド検証を行う CI で、デプロイはしない。
+- 旧 **Cloudflare ダッシュボードの GitHub 連携 (Workers Builds) は無効化する** (二重デプロイを避けるため、ダッシュボード側の Git 連携を切断しておく)。
 
-- Build command: `npm run build`
-- Build output directory: `dist` (`wrangler.toml` の `pages_build_output_dir` でも指定済み)
-- Root directory: `/`
+### デプロイ設定
+
+- ビルド: `npm run build` (出力は `dist`。`wrangler.toml` の `[assets]` で指定)。ビルドは CI 側で明示的に実行するため、`wrangler.toml` に `[build]` は置かない (二重ビルド回避)。
 - Node version: 22
-- 環境変数: `PDFJS_EXPRESS_VIEWER`
+- 必要なシークレット / 変数 (GitHub の Settings に登録):
+  - `secrets.CLOUDFLARE_API_TOKEN` … Workers のデプロイ権限を持つ API トークン
+  - `secrets.CLOUDFLARE_ACCOUNT_ID` … Cloudflare のアカウント ID
+  - `secrets.PDFJS_EXPRESS_VIEWER` … ビルドに必要 (CI と共通)
+  - `vars.GA_MEASUREMENT_ID` … ビルドに必要 (CI と共通)
+- ローカルから手動デプロイする場合は `npx wrangler login` 済みであれば `npm run deploy`。
 
 ## 技術スタック
 
@@ -103,8 +111,10 @@ tohyamago/
 │   ├── _headers                # Cloudflare Pages のヘッダー設定
 │   └── .well-known/
 │       └── apple-developer-merchantid-domain-association
-├── wrangler.toml               # Cloudflare Pages 設定 (出力ディレクトリ)
-└── .github/workflows/ci.yml    # 品質チェック + ビルド検証 CI (デプロイは Cloudflare 側)
+├── wrangler.toml               # Cloudflare Workers 設定 (静的アセット出力ディレクトリ)
+└── .github/workflows/
+    ├── ci.yml                  # 品質チェック + ビルド検証 CI (デプロイはしない)
+    └── deploy.yml              # wrangler CLI で Cloudflare Workers へデプロイ (本番 / PR プレビュー)
 ```
 
 ## サイト構成（情報設計）
@@ -335,12 +345,14 @@ const events = defineCollection({
 
 ## 環境変数
 
-| 変数名                 | 用途                                                                                                                                               |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー                                                                                                            |
-| `GA_MEASUREMENT_ID`    | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー） |
+| 変数名                  | 用途                                                                                                                                               |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PDFJS_EXPRESS_VIEWER`  | PDF.js Express ビューワーライセンスキー（ビルド時）                                                                                                |
+| `GA_MEASUREMENT_ID`     | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー） |
+| `CLOUDFLARE_API_TOKEN`  | wrangler でのデプロイ用 API トークン（Workers デプロイ権限）。`deploy.yml` のデプロイ手順で参照                                                    |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare のアカウント ID。`deploy.yml` のデプロイ手順で参照                                                                                      |
 
-GitHub Actions の CI でも参照するため、Cloudflare ダッシュボードに加えて GitHub Secrets にも登録する。`GA_MEASUREMENT_ID` は秘匿情報ではなく公開される ID のため、Cloudflare では「変数」、CI では GitHub Actions の Variables（`vars`）として登録する。
+ビルド・デプロイともに GitHub Actions で実行するため、`PDFJS_EXPRESS_VIEWER` / `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` は **GitHub Secrets** に登録する。`GA_MEASUREMENT_ID` は秘匿情報ではなく公開される ID のため GitHub Actions の Variables（`vars`）として登録する。Cloudflare ダッシュボードの Git 連携は使わないため、ダッシュボード側への環境変数登録は不要（ダッシュボードで直接 Worker を編集・確認したい場合のみ任意で設定）。
 
 ## 開発コマンド
 

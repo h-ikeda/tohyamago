@@ -1,0 +1,76 @@
+name: Deploy
+
+# Cloudflare Workers へのデプロイを wrangler CLI で実行する。
+# 以前は Cloudflare ダッシュボードの GitHub 連携 (Workers Builds) で自動公開していたが、
+# 将来の環境設定 (環境変数・シークレット・ビルド手順) の複雑化に対応するため、
+# デプロイ手順を本リポジトリ側 (GitHub Actions + wrangler) に集約する。
+#
+# 必要なシークレット / 変数 (GitHub の Settings に登録):
+#   secrets.CLOUDFLARE_API_TOKEN  … Workers のデプロイ権限を持つ API トークン
+#   secrets.CLOUDFLARE_ACCOUNT_ID … Cloudflare のアカウント ID
+#   secrets.PDFJS_EXPRESS_VIEWER  … ビルドに必要 (CI と共通)
+#   vars.GA_MEASUREMENT_ID        … ビルドに必要 (CI と共通)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# 同一参照への並行デプロイをまとめ、古い実行はキャンセルする
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # main への push をカスタムドメインの本番環境へ公開する
+  deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+      - run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # PR ではプレビュー版をアップロードし、一意なプレビュー URL を発行する。
+  # シークレットを参照できない fork / Dependabot の PR ではスキップする。
+  preview:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          PDFJS_EXPRESS_VIEWER: ${{ secrets.PDFJS_EXPRESS_VIEWER }}
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+      - run: npx wrangler versions upload
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

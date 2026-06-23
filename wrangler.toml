@@ -6,8 +6,9 @@ workers_dev = false
 # プレビューデプロイは workers.dev のサブドメインで一意な URL を発行する
 preview_urls = true
 
-[build]
-command = "npm run build"
+# デプロイは GitHub Actions (.github/workflows/deploy.yml) で `npm run build` →
+# `wrangler deploy` の順に実行する。ビルドは CI 側で明示的に行うため、
+# wrangler 側の [build] は設定せず二重ビルドを避ける。
 
 [assets]
 directory = "./dist"
