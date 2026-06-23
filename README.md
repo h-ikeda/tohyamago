@@ -333,7 +333,7 @@ npm run preview # ビルド成果物のローカル確認
 
 - ブランチ運用・デプロイ・ディレクトリ構造・記事追加手順の詳細は [`CLAUDE.md`](./CLAUDE.md) を参照。
 - デプロイは Cloudflare ダッシュボードの GitHub 連携（Workers Builds）。`main` への push / PR 作成で自動ビルド・公開。GitHub Actions (`ci.yml`) はビルド検証のみ。
-- 本番 / プレビューは **Wrangler Environments**（本番＝既定の Worker `tohyamago`、プレビュー＝`[env.preview]` の `tohyamago-preview`）で切り分け、環境変数は各 Worker のダッシュボードで個別管理する。詳細は [`CLAUDE.md` の「環境の切り分け」](./CLAUDE.md) を参照。
+- 本番 / プレビューの環境変数は、単一 Worker のビルド変数に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` を登録し、**ビルド時にブランチ（`WORKERS_CI_BRANCH`）で出し分ける**（純粋関数 `src/buildEnv.ts`）。詳細は [`CLAUDE.md` の「環境変数の本番 / プレビュー切り分け」](./CLAUDE.md) を参照。
 
 ### 環境変数
 
@@ -344,7 +344,7 @@ npm run preview # ビルド成果物のローカル確認
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` ほか | Stripe 決済                             | シークレット     | Phase 4 で追加予定 |
 | `CLERK_*`（公開鍵・シークレット鍵等）              | Clerk 認証                              | 一部シークレット | Phase 5 で追加予定 |
 
-> 環境変数は本番 / プレビューで切り分ける。本サイトは静的生成のため `PDFJS_EXPRESS_VIEWER` / `GA_MEASUREMENT_ID` は**ビルド時**に必要で、デプロイ時は Wrangler Environments の各 Worker の **Settings > Build「Build variables and secrets」**（ランタイム用の Variables & Secrets ではない）に設定する（本番 Worker のみ）。CI で必要なものは GitHub Actions の Variables（公開可能な変数）または Secrets（秘匿情報）に登録する。両変数とも秘匿情報ではないため変数として扱う。
+> 本サイトは静的生成のため `PDFJS_EXPRESS_VIEWER` / `GA_MEASUREMENT_ID` は**ビルド時**に必要（ランタイム変数ではない）。デプロイ時は Cloudflare の **Settings > Build「Build variables and secrets」** に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` を登録し、ビルド時にブランチで出し分ける（プレビューに出したくない変数は `_PREVIEW` を未設定に）。CI では GitHub Actions の Variables（`vars`、公開可能な変数）に素の名前で登録する。両変数とも秘匿情報ではないため変数として扱い、将来の Stripe/Clerk の秘密鍵はビルド変数に置かずランタイムのシークレットとする。
 
 ### 外部リンク
 

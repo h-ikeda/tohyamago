@@ -1,18 +1,10 @@
 name = "tohyamago"
 compatibility_date = "2026-01-01"
 
-# プロダクション環境 (トップレベル = デフォルト環境。Worker 名は "tohyamago")。
-# カスタムドメインでのみ公開し、workers.dev のルートは無効化する。
+# プロダクション環境はカスタムドメインでのみ公開し、workers.dev のルートは無効化する
 workers_dev = false
-# プレビュー版デプロイは workers.dev のサブドメインで一意な URL を発行する
+# プレビューデプロイは workers.dev のサブドメインで一意な URL を発行する
 preview_urls = true
-
-# ビルド時の環境変数 (GA_MEASUREMENT_ID / PDFJS_EXPRESS_VIEWER) は
-# Cloudflare ダッシュボードの本番 Worker "tohyamago" 側 (Settings > Variables)
-# でのみ設定する。プレビュー環境 ([env.preview]) には設定しないため、
-# プレビューには計測タグ等が出力されない。値はダッシュボードで管理し、
-# wrangler.toml には環境の枠だけを定義する (vars は環境間で継承されないため
-# 環境ごとにダッシュボードで設定する)。
 
 [build]
 command = "npm run build"
@@ -20,10 +12,3 @@ command = "npm run build"
 [assets]
 directory = "./dist"
 not_found_handling = "404-page"
-
-# プレビュー環境 (PR / 非本番ブランチ)。別 Worker "tohyamago-preview" として
-# デプロイされる (デプロイ/ビルドコマンドに --env preview を付与)。
-# build / assets はトップレベルから継承される (vars は継承されないため、
-# 必要な変数はこの環境の Worker のダッシュボードで個別に設定する)。
-[env.preview]
-workers_dev = true

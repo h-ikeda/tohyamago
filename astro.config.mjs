@@ -2,6 +2,13 @@ import { defineConfig } from 'astro/config'
 import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
 import remarkBreaks from 'remark-breaks'
+import { resolveBuildEnv } from './src/buildEnv'
+
+// ビルド時変数 (GA_MEASUREMENT_ID / PDFJS_EXPRESS_VIEWER) を本番 / プレビューで
+// 出し分ける。単一 Worker のビルド変数に *_PRODUCTION / *_PREVIEW を登録しておき、
+// Cloudflare が注入する WORKERS_CI_BRANCH を見て素の名前へ解決する。設定後は
+// import.meta.env.GA_MEASUREMENT_ID 等が従来どおり読める。詳細は src/buildEnv.ts。
+Object.assign(process.env, resolveBuildEnv(process.env))
 
 export default defineConfig({
   integrations: [react()],
