@@ -308,7 +308,7 @@ const events = defineCollection({
     end: halfMonth,
     category: z.string().default('地域行事'),
     location: z.string().optional(),
-    url: z.string().url().optional(),
+    url: z.url().optional(),
     note: z.string().optional(),
   }),
 })
