@@ -356,7 +356,7 @@ const events = defineCollection({
 いずれも秘匿情報ではない（`GA_MEASUREMENT_ID` は公開される測定 ID、`PDFJS_EXPRESS_VIEWER` はドメイン固定のビューワーキー）ため、**シークレットではなく通常の「変数」として扱う**。
 
 - **デプロイ時（Cloudflare）**: 静的生成でビルド時に HTML へ焼き込むため、**Settings > Build > 「Build variables and secrets」**（＝ビルド変数。ランタイム用の Variables & Secrets ではない）に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` の形で登録し、ビルド時にブランチで出し分ける（上記「環境変数の本番 / プレビュー切り分け」参照）。プレビューに出したくない変数は `_PREVIEW` を未設定にする。
-- **CI（GitHub Actions）**: `ci.yml` のビルド検証・E2E でも参照するため、GitHub Actions の **Variables（`vars`）** に登録する（Secrets ではない）。`vars.GA_MEASUREMENT_ID` / `vars.PDFJS_EXPRESS_VIEWER` を素の名前で渡す（`resolveBuildEnv` は素の名前を最優先する）。
+- **CI（GitHub Actions）**: `ci.yml` のビルド検証・E2E は値を必要としない（テストが GA/PDF ビューワーの値に依存しないため）。素の名前が未設定なら `import.meta.env.*` は undefined になるだけでビルドは成功する。必要になった場合のみ GitHub Actions の **Variables（`vars`）** に素の名前で登録する（`resolveBuildEnv` は素の名前を最優先する）。
 
 > 今後追加する Stripe / Clerk のシークレットキーは秘匿情報のため扱いが異なる。ビルド変数には置かず（公開リポジトリの PR ビルドにも見えてしまう）、ランタイムのシークレットとして本番/プレビュー別々に設定し、CI で必要なものは GitHub Secrets に登録する。
 

@@ -344,7 +344,7 @@ npm run preview # ビルド成果物のローカル確認
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` ほか | Stripe 決済                             | シークレット     | Phase 4 で追加予定 |
 | `CLERK_*`（公開鍵・シークレット鍵等）              | Clerk 認証                              | 一部シークレット | Phase 5 で追加予定 |
 
-> 本サイトは静的生成のため `PDFJS_EXPRESS_VIEWER` / `GA_MEASUREMENT_ID` は**ビルド時**に必要（ランタイム変数ではない）。デプロイ時は Cloudflare の **Settings > Build「Build variables and secrets」** に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` を登録し、ビルド時にブランチで出し分ける（プレビューに出したくない変数は `_PREVIEW` を未設定に）。CI では GitHub Actions の Variables（`vars`、公開可能な変数）に素の名前で登録する。両変数とも秘匿情報ではないため変数として扱い、将来の Stripe/Clerk の秘密鍵はビルド変数に置かずランタイムのシークレットとする。
+> 本サイトは静的生成のため `PDFJS_EXPRESS_VIEWER` / `GA_MEASUREMENT_ID` は**ビルド時**に必要（ランタイム変数ではない）。デプロイ時は Cloudflare の **Settings > Build「Build variables and secrets」** に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` を登録し、ビルド時にブランチで出し分ける（プレビューに出したくない変数は `_PREVIEW` を未設定に）。CI（GitHub Actions）は値に依存しないため未設定でよい（必要時のみ `vars` に素の名前で登録）。両変数とも秘匿情報ではないため変数として扱い、将来の Stripe/Clerk の秘密鍵はビルド変数に置かずランタイムのシークレットとする。
 
 ### 外部リンク
 
