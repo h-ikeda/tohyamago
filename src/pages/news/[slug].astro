@@ -7,6 +7,14 @@ import Button from '~/components/Button.astro'
 import NewsCta from '~/components/NewsCta.astro'
 import ArrowIcon from '~/components/ArrowIcon.astro'
 import { formatPostDate } from '~/components/postDate'
+import { postExcerpt } from '~/components/postExcerpt'
+import {
+  SITE_NAME,
+  absoluteUrl,
+  normalizeDescription,
+  articleJsonLd,
+  breadcrumbJsonLd,
+} from '~/components/siteMeta'
 
 // 記事個別ページ (共有・SEO 用)。全記事を新しい順に並べ、
 // 前後の記事への導線 (新しい記事 / 古い記事) も静的に用意する。
@@ -26,9 +34,41 @@ export async function getStaticPaths() {
 
 const { post, newer, older } = Astro.props
 const { Content } = await render(post)
+
+// SEO/SNS 用メタ: 本文抜粋を説明文に、先頭画像を OG 画像にする。
+// 構造化データは記事 (BlogPosting) とパンくず (BreadcrumbList) を付与する。
+const excerpt = normalizeDescription(
+  postExcerpt(post.body, 120) || `${post.data.title}｜遠山郷応援会の近況`,
+)
+const pageUrl = absoluteUrl(`/news/${post.id}`)
+const ogImage = post.data.images[0]
+const structuredData = [
+  articleJsonLd({
+    title: post.data.title,
+    description: excerpt,
+    url: pageUrl,
+    image: ogImage ? absoluteUrl(ogImage.src) : undefined,
+    datePublished: post.data.date.toISOString(),
+    tags: post.data.tags,
+  }),
+  breadcrumbJsonLd([
+    { name: SITE_NAME, url: absoluteUrl('/') },
+    { name: '近況', url: absoluteUrl('/news') },
+    { name: post.data.title, url: pageUrl },
+  ]),
+]
 ---
 
-<BaseLayout title={`${post.data.title}｜近況`}>
+<BaseLayout
+  title={`${post.data.title}｜近況`}
+  description={excerpt}
+  image={ogImage}
+  imageAlt={post.data.title}
+  ogType="article"
+  publishedTime={post.data.date}
+  tags={post.data.tags}
+  jsonLd={structuredData}
+>
   <Container class="py-10 md:py-14">
     <nav class="mb-6 text-sm">
       <a

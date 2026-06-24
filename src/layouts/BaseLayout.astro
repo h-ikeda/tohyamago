@@ -1,18 +1,81 @@
 ---
+import { getImage } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
 import SiteHeader from '~/components/SiteHeader.astro'
 import SiteFooter from '~/components/SiteFooter.astro'
+import Seo from '~/components/Seo.astro'
+import {
+  SITE_NAME,
+  DEFAULT_DESCRIPTION,
+  buildTitle,
+  canonicalPath,
+  normalizeDescription,
+  organizationJsonLd,
+  websiteJsonLd,
+} from '~/components/siteMeta'
+import defaultOgImage from '~/assets/hero-photo.jpg'
 import '~/styles/global.css'
 
 interface Props {
   title?: string
+  /** 検索スニペット / OGP の説明文。未指定なら団体の既定説明を使う。 */
+  description?: string
+  /** OG / Twitter カードの画像 (imported asset)。未指定ならヒーロー画像。 */
+  image?: ImageMetadata
+  /** OG 画像の代替テキスト。 */
+  imageAlt?: string
+  /** og:type。記事ページは 'article'。 */
+  ogType?: 'website' | 'article'
+  /** 検索エンジンに索引させない (404 等)。 */
+  noindex?: boolean
+  /** 記事公開日時 (article のとき og の article:published_time に使う)。 */
+  publishedTime?: Date
+  /** 記事タグ (article:tag)。 */
+  tags?: string[]
+  /** ページ固有の JSON-LD (記事・パンくず等)。Organization/WebSite に追記する。 */
+  jsonLd?: Record<string, unknown>[]
   fullscreen?: boolean
 }
 
-const { title, fullscreen = false } = Astro.props
-const fullTitle = title
-  ? `${title} | 一般社団法人遠山郷応援会`
-  : '一般社団法人遠山郷応援会'
+const {
+  title,
+  description,
+  image,
+  imageAlt,
+  ogType = 'website',
+  noindex = false,
+  publishedTime,
+  tags = [],
+  jsonLd = [],
+  fullscreen = false,
+} = Astro.props
+
+const fullTitle = buildTitle(title)
+const metaDescription = normalizeDescription(description ?? DEFAULT_DESCRIPTION)
 const currentPath = Astro.url.pathname
+// canonical / og:url。Astro.site (astro.config の site) を基点に絶対 URL 化する。
+// build.format='file' で付く `.html` を実 URL に合わせて正規化してから絶対化する。
+const canonicalURL = new URL(canonicalPath(currentPath), Astro.site).href
+
+// OG/Twitter 画像は 1200x630 (推奨比) を JPEG で生成し絶対 URL 化する。
+// 記事など固有画像が無ければサイト共通のヒーロー画像にフォールバックする。
+const ogImage = await getImage({
+  src: image ?? defaultOgImage,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'jpeg',
+})
+const ogImageURL = new URL(ogImage.src, Astro.site).href
+const ogImageAlt = imageAlt ?? (title ? `${title}｜${SITE_NAME}` : SITE_NAME)
+
+// 構造化データ: 全ページに Organization + WebSite、加えてページ固有 (記事・パンくず)。
+const siteHref = Astro.site?.href
+const structuredData = [
+  organizationJsonLd(siteHref),
+  websiteJsonLd(siteHref),
+  ...jsonLd,
+]
 
 // アクセス解析 (Google Analytics / gtag.js)。測定 ID は Cloudflare の環境変数
 // GA_MEASUREMENT_ID で設定する。未設定 (ローカル開発・プレビュー) では計測タグを
@@ -31,7 +94,18 @@ const gaMeasurementId = import.meta.env.GA_MEASUREMENT_ID
       document.documentElement.classList.add('js')
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{fullTitle}</title>
+    <Seo
+      title={fullTitle}
+      description={metaDescription}
+      canonicalURL={canonicalURL}
+      ogType={ogType}
+      imageURL={ogImageURL}
+      imageAlt={ogImageAlt}
+      noindex={noindex}
+      publishedTime={publishedTime?.toISOString()}
+      tags={tags}
+      structuredData={structuredData}
+    />
     {
       /* Google tag (gtag.js)。GA_MEASUREMENT_ID が設定されているときのみ出力する。 */
       gaMeasurementId && (
