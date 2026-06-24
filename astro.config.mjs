@@ -15,7 +15,7 @@ Object.assign(process.env, resolveBuildEnv(process.env))
 export default defineConfig({
   // canonical / OGP / 構造化データの絶対 URL の基点。公開ドメインに合わせる
   // (src/components/siteMeta.ts の SITE_URL と一致させること)。
-  site: 'https://tohyamago.org',
+  site: 'https://www.tohyamago.org',
   // sitemap.xml を自動生成 (検索エンジン / AI クローラーの巡回を助ける)。
   // robots.txt (public/robots.txt) から参照する。
   integrations: [react(), sitemap()],

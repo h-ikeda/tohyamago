@@ -11,7 +11,7 @@
  * 本番サイトの正規オリジン (canonical / 絶対 URL の基点)。
  * astro.config.mjs の `site` と必ず一致させること (apex か www かは公開ドメインに合わせる)。
  */
-export const SITE_URL = 'https://tohyamago.org'
+export const SITE_URL = 'https://www.tohyamago.org'
 
 /** 正式名称。<title> 接尾辞・og:site_name・構造化データの組織名に使う。 */
 export const SITE_NAME = '一般社団法人遠山郷応援会'

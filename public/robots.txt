@@ -5,4 +5,4 @@ User-agent: *
 Allow: /
 
 # サイトマップの所在 (@astrojs/sitemap が build 時に生成)
-Sitemap: https://tohyamago.org/sitemap-index.xml
+Sitemap: https://www.tohyamago.org/sitemap-index.xml
