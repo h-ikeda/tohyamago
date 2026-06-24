@@ -176,9 +176,9 @@ tohyamago/
 #### 近況 / 予定の扱い
 
 - **近況一覧は `/news`（`news.astro`）に集約**し、`Posts.astro`（＝`PostCard` のグリッド）で全記事を描画する。各記事は本文を全文ではなく **ダイジェスト（抜粋＋サムネイル 1 枚）のカード**で見せ、概ね一定サイズに揃える。カードをタップすると **記事個別ページ `/news/[slug]`** で全文と全写真を読める。トップ（`index.astro`）は **最新数件のダイジェスト（`<Posts limit={3} />`）のみ**を載せ、「これまでの活動をもっと見る」CTA で `/news` へ誘導する。ヘッダーナビ「近況」も `/news` を指す。
-  - 記事スキーマはタイトルを持たないため、一覧カードや前後記事の見出しには本文から作った抜粋を流用する。抜粋（プレーンテキスト化＋字数切り詰め）は純粋関数 `postExcerpt.ts`、日付整形は `postDate.ts` が担い、いずれも個別ページ・一覧・アーカイブで共用する。
+  - 記事スキーマは `title`（必須）を持ち、一覧カード・前後記事の導線・個別ページ見出し・`<title>`／SNS 共有の見出しに使う。本文の抜粋（プレーンテキスト化＋字数切り詰め。純粋関数 `postExcerpt.ts`）はカードのリード文として `title` の下に併記する。日付整形は `postDate.ts` が担う。
 - **記事個別ページ `/news/[slug].astro`**: `getCollection('posts')` を新しい順に並べ `getStaticPaths` で全件生成。本文・全写真・`sourceUrl` を表示し、前後（新しい／古い）記事への導線と `/news`・`/news/archive` への戻り導線、末尾 `NewsCta`（full）を置く。
-- **近況アーカイブ `/news/archive.astro`**: ロードマップ Phase 2「年・季節・作物でのアーカイブ導線」「これまでの歩みを辿れる年表」に対応。記事スキーマにタグ・カテゴリが無いため、後方互換を保てる **公開年** を切り口に章立てする。年でグループ化する純粋関数 `postArchive.ts`（`groupPostsByYear`）を使い、年へのジャンプナビ＋年ごとの索引リスト（日付＋抜粋 1 行）で構成する。
+- **近況アーカイブ `/news/archive.astro`**: ロードマップ Phase 2「年・季節・作物でのアーカイブ導線」「これまでの歩みを辿れる年表」に対応。**公開年** を切り口に章立てする。年でグループ化する純粋関数 `postArchive.ts`（`groupPostsByYear`）を使い、年へのジャンプナビ＋年ごとの索引リスト（日付＋`title` 1 行）で構成する。
   - **季節フィルタ**: 季節は日付から判定できるため（スキーマ拡張不要）、年別の索引に **春夏秋冬の絞り込み**を重ねる。季節判定は純粋関数 `postSeason.ts`（`getSeason`。境界は春 3/1–6/20・夏 6/21–9/15・秋 9/16–12/5・冬 12/6–翌 2 月末で年をまたぐ）。フィルタの DOM 操作（記事の表示切替・空の年セクション/年ナビの非表示・件数更新・`aria-pressed` 同期）は `newsArchiveFilter.ts`（`applySeasonFilter`）に分離し jsdom でテストする。JS 無効時は全件表示のままのプログレッシブエンハンスメント。
 - 全記事一覧（130 件超）は縦に長く、末尾の「次は、あなたの番です」CTA に辿り着けない問題があったため、`<Posts ctaEvery={12} />` で **一定間隔（12 件ごと）に `NewsCta`（compact）を差し込み**、どこまで読んでも参加・支援への一歩に出会えるようにしている。挿入位置は純粋関数 `postCtaLayout.ts`（`ctaPositions`）が決定し、最終記事直後は末尾の本 CTA（`NewsCta` full）と重複しないよう除外する。
 - トップ末尾の近況ダイジェストには `id="feed"` を残し、旧 `/#feed` ブックマークの着地点として後方互換を保つ（新規リンクは `/news` を使う）。
@@ -188,7 +188,9 @@ tohyamago/
 
 - `src/content/posts/` に `<slug>.md` (Markdown 本文) を配置
 - 添付画像は `src/content/posts/<slug>/<filename>` に置き、frontmatter の `images` で参照
-- スキーマは `src/content.config.ts` で定義 (`date` / `images` / `sourceUrl`)
+- スキーマは `src/content.config.ts` で定義 (`title` / `date` / `tags` / `images` / `sourceUrl`)
+  - `title`（必須）: 一覧・個別ページ・SEO/SNS 共有の見出し
+  - `tags`（任意, 既定 `[]`）: 作物・作業・地名などのキーワード。SNS のハッシュタグ流用も想定し、個別ページ末尾に `#タグ` として表示する
 - Markdown は `remark-breaks` で単一改行も `<br>` 化されるため、Facebook 風の改行スタイルがそのまま再現される
 
 ### 外部リンク
@@ -207,7 +209,7 @@ tohyamago/
   2. 年代別の節（2018〜2019 / 2020〜2022 / 2023〜2024 / 2025〜）。各節に当時の記事（`src/content/posts/`）の写真・引用を 1〜2 点添える。
   3. 「法人化（2024-10-01）」の節で、サークルから一般社団法人へ形を変えた意味を説明。
   4. 末尾に CTA（「あなたも畑へ → `/join`」「物語の続きは近況で →」）。
-- **データソース**: 既存記事を活用。年表本文は `story.astro` に直接記述、または `src/content/posts/` から該当記事を slug 指定で引用するヘルパーを用意。記事 frontmatter（`date` / `images` / `sourceUrl`）の後方互換は厳守。
+- **データソース**: 既存記事を活用。年表本文は `story.astro` に直接記述、または `src/content/posts/` から該当記事を slug 指定で引用するヘルパーを用意。記事 frontmatter（`title` / `date` / `tags` / `images` / `sourceUrl`）の後方互換は厳守。
 - **README の「これまでの歩み」** と内容を重複させず、README は方針、`/story` は読み物として作り分ける。
 
 ### 農作業カレンダー (`/calendar`)
