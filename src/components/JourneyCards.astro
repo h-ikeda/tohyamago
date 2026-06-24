@@ -90,26 +90,24 @@ const tints = {
                 : {})}
               class="flex h-full flex-col gap-3 p-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-transform motion-safe:group-hover:-translate-y-0.5',
+                    t.icon,
+                  ]}
+                >
+                  <JourneyIcon name={j.icon} class="h-6 w-6" />
+                </span>
+                <h3 class="font-serif text-xl font-medium text-primary">
+                  {j.title}
+                </h3>
                 {j.featured && (
-                  <span class="inline-flex w-fit rounded-full bg-accent-strong px-2.5 py-0.5 text-[0.65rem] font-medium tracking-wide text-white ms-15">
+                  <span class="inline-flex shrink-0 rounded-full bg-accent-strong px-2.5 py-0.5 text-[0.65rem] font-medium tracking-wide text-white">
                     なかま募集中
                   </span>
                 )}
-                <div class="flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    class:list={[
-                      'flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-transform motion-safe:group-hover:-translate-y-0.5',
-                      t.icon,
-                    ]}
-                  >
-                    <JourneyIcon name={j.icon} class="h-6 w-6" />
-                  </span>
-                  <h3 class="font-serif text-xl font-medium text-primary">
-                    {j.title}
-                  </h3>
-                </div>
               </div>
               <p class="grow text-sm leading-relaxed text-body">{j.desc}</p>
               <span
