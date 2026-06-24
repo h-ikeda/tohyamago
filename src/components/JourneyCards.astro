@@ -8,12 +8,12 @@
  */
 import Card from '~/components/Card.astro'
 import ArrowIcon from '~/components/ArrowIcon.astro'
+import JourneyIcon from '~/components/JourneyIcon.astro'
 
 interface Journey {
   href: string
   external?: boolean
-  emoji: string
-  label: string
+  icon: 'sprout' | 'cup' | 'hands'
   title: string
   desc: string
   cta: string
@@ -25,8 +25,7 @@ interface Journey {
 const journeys: Journey[] = [
   {
     href: '/join',
-    emoji: '🌱',
-    label: '参加する',
+    icon: 'sprout',
     title: '活動に参加する',
     desc: '植え付け・草取り・収穫・お茶摘み。仲間同士で教え合い、地域の方々の力も借りながら進めます。初めての方も、まずは一日、活動に加わってみませんか。',
     cta: 'はじめての方へ',
@@ -35,8 +34,7 @@ const journeys: Journey[] = [
   },
   {
     href: '/products',
-    emoji: '🍵',
-    label: '成果品',
+    icon: 'cup',
     title: '遠山郷の味を買う',
     desc: '下栗芋・蕎麦・大豆・お茶。皆で活動するなかで実った収穫の一部を、この土地ならではの味としてお分けしています。',
     cta: '成果品を見る',
@@ -44,8 +42,7 @@ const journeys: Journey[] = [
   },
   {
     href: '/support',
-    emoji: '🤝',
-    label: '支える',
+    icon: 'hands',
     title: '活動を応援する',
     desc: '寄付や入会で、遠山郷の景観と暮らしを守る活動を支えられます。離れていても、谷とつながる方法があります。',
     cta: '支え方を見る',
@@ -97,29 +94,21 @@ const tints = {
                 <span
                   aria-hidden="true"
                   class:list={[
-                    'flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl',
+                    'flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-transform motion-safe:group-hover:-translate-y-0.5',
                     t.icon,
                   ]}
                 >
-                  {j.emoji}
+                  <JourneyIcon name={j.icon} class="h-6 w-6" />
                 </span>
-                <span
-                  class:list={[
-                    'flex items-center gap-1.5 font-serif text-sm font-medium tracking-wide text-primary-deep',
-                    "before:text-xs before:text-accent-strong before:content-['▲']",
-                  ]}
-                >
-                  {j.label}
-                  {j.featured && (
-                    <span class="rounded-full bg-accent-strong px-2 py-0.5 text-[0.65rem] font-medium text-white">
-                      なかま募集中
-                    </span>
-                  )}
-                </span>
+                <h3 class="font-serif text-xl font-medium text-primary">
+                  {j.title}
+                </h3>
+                {j.featured && (
+                  <span class="inline-flex shrink-0 rounded-full bg-accent-strong px-2.5 py-0.5 text-[0.65rem] font-medium tracking-wide text-white">
+                    なかま募集中
+                  </span>
+                )}
               </div>
-              <h3 class="font-serif text-xl font-medium text-primary">
-                {j.title}
-              </h3>
               <p class="grow text-sm leading-relaxed text-body">{j.desc}</p>
               <span
                 class:list={[

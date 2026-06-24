@@ -405,9 +405,10 @@ PDF.js Express ビューワーは `node_modules/@pdftron/pdfjs-express-viewer/pu
   - **バッジ（ラベルピル）の ▲ は廃止**する方針 → 下記「バッジ（ラベルピル）の方針」。
   - ▲ を残す箇所（ロゴ等）の描画は Tailwind の `before:` / `after:` 疑似要素で border-trick / `content` を利用。
 - **バッジ（ラベルピル）の方針**（2026-06 決定。**記録のみ。置換は今後の修正時に段階的に適用**）
-  - 団体名・小ラベルのピルは、ヒーロー (`index.astro`) で作成した **三角なしの濃緑ベタピル**に寄せる。基準スタイル:
+  - 団体名・小ラベルのピルは、ヒーロー (`index.astro`) で作成した **三角なしのベタピル**に寄せる。基準スタイル（標準サイズ）:
     `rounded-full bg-primary-deep px-4 py-1 font-serif text-sm tracking-wide text-white`（＋ `▲` は付けない）。
     - 暗い写真の上に重ねる場合は `ring-1 ring-white/25` と `[text-shadow:0_1px_3px_rgba(15,46,33,0.6)]` を足す。明るい地色の上ではベタのまま（白文字で AA を確保）。`backdrop-blur` はベタ背景には不要。
+    - **コンパクトサイズも許容**する。カードのタイトル行末尾など、見出しに添える小さなステータスピル（例: `JourneyCards.astro` の「なかま募集中」）では、本文・見出しを圧迫しないよう縮めてよい。基準: `rounded-full px-2.5 py-0.5 text-[0.65rem] font-medium tracking-wide text-white`（`font-serif` の代わりに `font-medium`、地色は文脈に合わせ `bg-primary-deep` か差し色の `bg-accent-strong` 等）。**三角なし・ベタ塗り・白文字・`rounded-full`** という核は標準サイズと共通で、サイズ（padding / font-size / weight）と地色だけを用途に合わせて変える。
   - 旧スタイル（`bg-sunlight-soft` 等の淡色ピル＋ `before:content-['▲']`、`text-primary-deep` 文字）は順次これへ置換する。
   - 置換対象（アイブロウのラベルピル）: `pages/news.astro` /
     `pages/story.astro` / `pages/products.astro` / `pages/join.astro` /

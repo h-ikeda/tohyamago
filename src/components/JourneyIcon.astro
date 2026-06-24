@@ -1,0 +1,69 @@
+---
+/**
+ * JourneyIcon — トップの 3 導線カード (JourneyCards) のアイコン (SVG ラインアート)。
+ *
+ * 絵文字 (🌱 / 🍵 / 🤝) は OS・フォントで見えがばらつき、サイトの線画トーン
+ * (ArrowIcon と同じ stroke ベース) から浮いていた。思わず覗きたくなる「次の一歩」を
+ * 表すため、各導線にひとつずつ手描きの線アイコンを用意して統一する。
+ *
+ * - sprout  … 参加する: 双葉の芽。これから一緒に育つ・芽吹くつながりを表す
+ * - cup     … 成果品: 湯気の立つ湯のみ。この土地の味・実りを手に取る楽しみ
+ * - hands   … 支える: 両手にすくった心。離れていても活動を応援できること
+ *
+ * currentColor で囲み円の文字色 (tint) に同調する。viewBox 24・線幅は ArrowIcon と
+ * 揃え、装飾なので aria-hidden。サイズ・配置は呼び出し側が class で渡す。
+ */
+interface Props {
+  name: 'sprout' | 'cup' | 'hands'
+  class?: string
+}
+
+const { name, class: className = '' } = Astro.props
+---
+
+<svg
+  aria-hidden="true"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.7"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class:list={['shrink-0', className]}
+>
+  {
+    name === 'sprout' && (
+      <>
+        {/* 茎 */}
+        <path d="M12 21V10" />
+        {/* 左の葉 (下生え) */}
+        <path d="M12 14C9.5 14 5 13 4.5 9.5 8 9.5 11.5 11 12 14Z" />
+        {/* 右の葉 (上に伸びる) */}
+        <path d="M12 11C12.5 8 16 6.5 19.5 6.5 19 10 15.5 11.5 12 11Z" />
+      </>
+    )
+  }
+  {
+    name === 'cup' && (
+      <>
+        {/* 湯気 */}
+        <path d="M10 3c-1 1-1 2 0 3" />
+        <path d="M14 3c-1 1-1 2 0 3" />
+        {/* 湯のみ本体 */}
+        <path d="M6 9h12v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4Z" />
+        {/* 取っ手 */}
+        <path d="M18 10.5h1.3a2.2 2.2 0 0 1 0 4.4H18" />
+      </>
+    )
+  }
+  {
+    name === 'hands' && (
+      <>
+        {/* 心 (ハート) */}
+        <path d="M12 12s-4.5-2.6-4.5-5.3C7.5 5.3 8.6 4.5 9.8 4.5c1 0 1.8.6 2.2 1.4.4-.8 1.2-1.4 2.2-1.4 1.2 0 2.3.8 2.3 2.2C16.5 9.4 12 12 12 12Z" />
+        {/* すくう両手 */}
+        <path d="M4 15c2 3.6 4.8 5.6 8 5.6s6-2 8-5.6" />
+      </>
+    )
+  }
+</svg>
