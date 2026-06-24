@@ -6,8 +6,8 @@ const posts = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
   schema: ({ image }) =>
     z.object({
-      // 一覧カード・記事ページ・SEO/SNS 共有の見出しに使うタイトル。
-      title: z.string(),
+      // 一覧カード・記事ページ・SEO/SNS 共有の見出しに使うタイトル (空文字・空白のみは不可)。
+      title: z.string().trim().min(1),
       date: z.coerce.date(),
       // SNS でのハッシュタグ流用も想定したキーワード (例: 下栗芋 / 茶摘み / 遠山郷)。
       tags: z.array(z.string()).default([]),
