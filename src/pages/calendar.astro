@@ -17,7 +17,10 @@ const events = (await getCollection('events')).map((entry) => ({
 }))
 ---
 
-<BaseLayout title="農作業カレンダー">
+<BaseLayout
+  title="農作業カレンダー"
+  description="遠山郷の活動の一年を一覧できる農作業カレンダー。下栗芋・茶・蕎麦・大豆の作業時期と地域行事から、参加したい季節が見つかります。"
+>
   <Container size="wide" class="py-12 md:py-16">
     <SectionHeading as="h1" level="page" align="left" class="mb-6"
       >農作業カレンダー</SectionHeading

@@ -6,7 +6,11 @@ import Card from '~/components/Card.astro'
 import Button from '~/components/Button.astro'
 ---
 
-<BaseLayout title="ページが見つかりません">
+<BaseLayout
+  title="ページが見つかりません"
+  description="お探しのページは見つかりませんでした。"
+  noindex
+>
   <Container class="py-12 md:py-16">
     <SectionHeading as="h1" level="page" align="left" class="mb-8"
       >ページが見つかりません</SectionHeading
