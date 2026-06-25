@@ -12,11 +12,12 @@ import { resolveBuildEnv } from './src/buildEnv'
 // import.meta.env.GA_MEASUREMENT_ID 等が従来どおり読める。詳細は src/buildEnv.ts。
 Object.assign(process.env, resolveBuildEnv(process.env))
 
-// canonical / OGP / 構造化データの絶対 URL の基点。値は環境変数 SITE_URL で上書きでき
-// (Cloudflare のビルド変数等)、未設定時は本番ドメインにフォールバックする。プレビューでも
-// 常に本番 URL を出す方針のため、ブランチによる出し分けはしない (プレビューが本番と別に
-// 索引されるのを防ぐ)。src/components/siteMeta.ts の SITE_URL と同じ既定値・同じ環境変数を使う。
-const siteUrl = process.env.SITE_URL || 'https://www.tohyamago.org'
+// canonical / OGP / 構造化データの絶対 URL の基点。値はビルド変数 PUBLIC_SITE_URL で
+// 上書きでき、未設定時は本番ドメインにフォールバックする。プレビュー・本番とも同じ
+// PUBLIC_SITE_URL を参照し、常に本番 URL を出す方針 (ブランチによる出し分けはしない。
+// プレビューが本番と別に索引されるのを防ぐ)。src/components/siteMeta.ts の SITE_URL と
+// 同じ既定値・同じ環境変数を使う。
+const siteUrl = process.env.PUBLIC_SITE_URL || 'https://www.tohyamago.org'
 
 export default defineConfig({
   site: siteUrl,

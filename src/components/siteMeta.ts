@@ -9,11 +9,13 @@
 
 /**
  * 本番サイトの正規オリジン (canonical / 絶対 URL の基点)。
- * 値は環境変数 SITE_URL で上書きでき (Cloudflare のビルド変数等)、未設定時は本番
- * ドメインにフォールバックする。プレビューでも常に本番 URL を使う方針のため、ブランチに
- * よる出し分けはしない。astro.config.mjs の `site` と同じ既定値・同じ環境変数を使うこと。
+ * 値はビルド変数 PUBLIC_SITE_URL で上書きでき、未設定時は本番ドメインにフォールバック
+ * する。プレビュー・本番とも同じ PUBLIC_SITE_URL を参照し、常に本番 URL を使う方針の
+ * ため、ブランチによる出し分けはしない。astro.config.mjs の `site` と同じ既定値・同じ
+ * 環境変数を使うこと。
  */
-export const SITE_URL = import.meta.env.SITE_URL || 'https://www.tohyamago.org'
+export const SITE_URL =
+  import.meta.env.PUBLIC_SITE_URL || 'https://www.tohyamago.org'
 
 /** 正式名称。<title> 接尾辞・og:site_name・構造化データの組織名に使う。 */
 export const SITE_NAME = '一般社団法人遠山郷応援会'
