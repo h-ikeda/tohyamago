@@ -10,6 +10,7 @@ import {
   websiteJsonLd,
   articleJsonLd,
   breadcrumbJsonLd,
+  serializeJsonLd,
 } from './siteMeta'
 
 describe('buildTitle', () => {
@@ -142,6 +143,25 @@ describe('articleJsonLd', () => {
 
   it('タグが空なら keywords を出さない', () => {
     expect(articleJsonLd({ ...base, tags: [] }).keywords).toBeUndefined()
+  })
+})
+
+describe('serializeJsonLd', () => {
+  it('< を \\u003C に置換してスクリプト早期終了を防ぐ', () => {
+    const result = serializeJsonLd({ headline: '</script><b>x' })
+    expect(result).not.toContain('</script>')
+    expect(result).not.toContain('<')
+    expect(result).toContain('\\u003C/script')
+  })
+
+  it('置換後も有効な JSON のまま (パースして元の値に戻る)', () => {
+    const data = { headline: 'a < b </script>', name: '通常' }
+    expect(JSON.parse(serializeJsonLd(data))).toEqual(data)
+  })
+
+  it('< を含まなければ JSON.stringify と等価', () => {
+    const data = { name: '遠山郷', count: 3 }
+    expect(serializeJsonLd(data)).toBe(JSON.stringify(data))
   })
 })
 

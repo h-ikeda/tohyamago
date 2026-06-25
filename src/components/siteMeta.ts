@@ -32,6 +32,14 @@ export const THEME_COLOR = '#1a7152'
 /** 既定の言語ロケール (og:locale)。 */
 export const SITE_LOCALE = 'ja_JP'
 
+/**
+ * OG / Twitter カード画像の推奨サイズ (px)。
+ * BaseLayout の og:image 生成と記事ページの JSON-LD 画像で共有し、
+ * 両者が同一の最適化画像 (同じハッシュの出力) を指すようにする。
+ */
+export const OG_IMAGE_WIDTH = 1200
+export const OG_IMAGE_HEIGHT = 630
+
 /** 同一団体を指す外部プロフィール (構造化データの sameAs)。 */
 export const SAME_AS = [
   'https://shop.tohyamago.org',
@@ -204,4 +212,14 @@ export function breadcrumbJsonLd(
       item: item.url,
     })),
   }
+}
+
+/**
+ * JSON-LD を <script type="application/ld+json"> へ安全に埋め込むための文字列化。
+ * Astro の set:html は自動エスケープしないため、`<` を `\\u003C` に置換して
+ * 本文に `</script>` 相当の文字列が含まれてもスクリプトブロックが早期終了しない
+ * ようにする (構造化データの破損・XSS 防止)。
+ */
+export function serializeJsonLd(data: Record<string, unknown>): string {
+  return JSON.stringify(data).replace(/</g, '\\u003C')
 }

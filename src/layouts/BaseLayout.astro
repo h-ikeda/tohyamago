@@ -7,6 +7,8 @@ import Seo from '~/components/Seo.astro'
 import {
   SITE_NAME,
   DEFAULT_DESCRIPTION,
+  OG_IMAGE_WIDTH,
+  OG_IMAGE_HEIGHT,
   buildTitle,
   canonicalPath,
   normalizeDescription,
@@ -61,8 +63,8 @@ const canonicalURL = new URL(canonicalPath(currentPath), Astro.site).href
 // 記事など固有画像が無ければサイト共通のヒーロー画像にフォールバックする。
 const ogImage = await getImage({
   src: image ?? defaultOgImage,
-  width: 1200,
-  height: 630,
+  width: OG_IMAGE_WIDTH,
+  height: OG_IMAGE_HEIGHT,
   fit: 'cover',
   format: 'jpeg',
 })
