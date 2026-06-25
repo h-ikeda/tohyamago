@@ -24,17 +24,38 @@ const ACTIVO_URL = 'https://activo.jp/s/a/119414'
 const mapUrl = (q: string) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
 
+// 下栗の里の埋め込み地図 (Google Maps の API キー不要の埋め込み) と、
+// 出発地からの道順を開く経路リンク。ルートの線そのものを地図上に描くには
+// Google Maps Embed API のキーが要るため、当面はエリア地図＋経路リンクで案内する。
+const DEST_QUERY = '長野県飯田市上村下栗1296'
+const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(DEST_QUERY)}&z=11&hl=ja&output=embed`
+const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(DEST_QUERY)}&travelmode=driving`
+
 // 主要ルート (4 種)。おすすめ度の高い順に並べる。
 // 公共交通は本数が限られるため、いずれも最後はレンタカー / タクシーで現地へ向かう。
 // 当会の送迎はあくまで最後の手段で、安易に頼る前提では案内しない。
 const routes = [
   {
+    id: 'car',
+    badge: '自家用車',
+    recommend: true,
+    title: '中央道・三遠南信道で下栗へ',
+    summary:
+      '乗り換えなしで現地まで行け、現地でも自由に動けるため、山あいの遠山郷にはいちばんおすすめの方法です。高速を降りてからは細い山道が続くので、時間に余裕をもってお越しください。',
+    steps: [
+      '中央自動車道「飯田IC」または「座光寺スマートIC」で高速を降ります。',
+      '三遠南信自動車道に入り、「程野IC」で降ります。',
+      '国道152号へ出て、上村小学校の手前を左折。あとは道なりに山道を登ると下栗の里です。',
+    ],
+    note: '下栗周辺は道幅が狭く、すれ違いに注意が必要です。譲り合ってゆっくり走行してください。冬季は積雪・凍結に備えてください。',
+  },
+  {
     id: 'train',
     badge: '電車 ＋ レンタカー',
-    recommend: true,
+    recommend: false,
     title: 'JR飯田線で飯田駅へ',
     summary:
-      '豊橋または豊川で JR 飯田線に乗り換え、飯田駅で降りてレンタカーで遠山郷へ。運転に不安がなければ最も分かりやすいルートです。',
+      '豊橋または豊川で JR 飯田線に乗り換え、飯田駅で降りてレンタカーで遠山郷へ。公共交通でお越しの場合に分かりやすいルートです。',
     steps: [
       '名古屋・東京方面から、まず東海道新幹線などで豊橋駅へ。',
       '豊橋駅（または豊川駅）で JR 飯田線に乗り換え、飯田駅まで。特急「伊那路」なら豊橋〜飯田はおよそ 2 時間半（1 日 2 往復）。普通列車もありますが本数・所要時間にご注意ください。',
@@ -45,7 +66,7 @@ const routes = [
   {
     id: 'bus',
     badge: '高速バス ＋ レンタカー',
-    recommend: true,
+    recommend: false,
     title: '中央道の高速バスで伊賀良へ',
     summary:
       '新宿・名古屋から高速バスで「伊賀良（いがら）」へ。バス停周辺でレンタカーを借りて遠山郷へ向かいます。座って移動でき、運賃も控えめです。',
@@ -55,20 +76,6 @@ const routes = [
       '伊賀良・飯田 IC 周辺でレンタカーを借り、遠山郷（下栗）へ。',
     ],
     note: '便によって停車するバス停が異なります。「伊賀良」に停まる便かどうか、予約時にご確認ください。',
-  },
-  {
-    id: 'car',
-    badge: '自家用車',
-    recommend: false,
-    title: '中央道・三遠南信道で下栗へ',
-    summary:
-      'お車なら乗り換えなしで現地まで。高速を降りてからは細い山道が続くため、時間に余裕をもってお越しください。',
-    steps: [
-      '中央自動車道「飯田IC」または「座光寺スマートIC」で高速を降ります。',
-      '三遠南信自動車道に入り、「程野IC」で降ります。',
-      '国道152号へ出て、上村小学校の手前を左折。あとは道なりに山道を登ると下栗の里です。',
-    ],
-    note: '下栗周辺は道幅が狭く、すれ違いに注意が必要です。譲り合ってゆっくり走行してください。冬季は積雪・凍結に備えてください。',
   },
   {
     id: 'localbus',
@@ -309,6 +316,39 @@ const stays = [
           ))
         }
       </div>
+    </section>
+
+    <!-- 地図とルート -->
+    <section class="mb-16">
+      <SectionHeading as="h2" align="left" class="mb-6"
+        >地図とルート</SectionHeading
+      >
+      <Card class="overflow-hidden border-t-4 border-t-sky">
+        <div class="aspect-video w-full bg-primary-soft/10">
+          <iframe
+            title="下栗の里と周辺の地図"
+            src={mapEmbedUrl}
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            class="h-full w-full border-0"></iframe>
+        </div>
+        <div class="px-6 py-6 md:px-8">
+          <p class="leading-loose text-body">
+            地図の中心が <span class="font-medium text-primary-deep"
+              >下栗の里</span
+            >
+            です。自家用車では、三遠南信道「程野IC」から国道152号へ出て、<span
+              class="font-medium text-primary-deep">上村小学校の手前を左折</span
+            >し、山道を登ります。下のボタンから、お使いの出発地を起点にした道順（ルート）を確認できます。
+          </p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <Button href={directionsUrl}>Googleマップでルートを調べる</Button>
+            <Button href={mapUrl(DEST_QUERY)} variant="outline"
+              >地図を大きく開く</Button
+            >
+          </div>
+        </div>
+      </Card>
     </section>
 
     <!-- 起点別の目安 -->
