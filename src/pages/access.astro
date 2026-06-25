@@ -86,28 +86,33 @@ const routes = [
   },
 ]
 
-// 起点別のおおよその目安 (例示)。正確な所要時間は時期・便により変わる。
+// 起点別のおおよその目安。時刻は代表的な便の一例で、改定で変わるため最新の時刻表で確認する。
+// - 電車: 日中に飯田へ着く特急「伊那路」は実質 1 本 (伊那路1号) のみ。これを基準に据える。
+// - 高速バス: その日いちばん早く着く便を例示する。
+// - 車: 高速 IC から下栗までの山道 (約1時間) も含めたトータルの所要時間。
 const origins = [
   {
     from: '名古屋から',
-    train: '名古屋 →〔新幹線等〕→ 豊橋 →〔飯田線〕→ 飯田駅',
-    bus: '名古屋 →〔名鉄バス・高速バス〕→ 伊賀良 / 飯田',
-    car: '中央道で約 2 時間 →（飯田IC）→ 下栗',
+    train:
+      '名古屋 →〔東海道線・新幹線で約30分〜1時間〕→ 豊橋 10:09発「特急 伊那路1号」→ 飯田 12:41着',
+    bus: '名鉄バスセンター 8:00発 → 伊賀良 約9:55／飯田駅前 10:01着（最速 約2時間）',
+    car: 'トータル約3時間（中央道〜三遠南信道〜下栗）',
   },
   {
     from: '東京から',
-    train: '東京 →〔新幹線〕→ 豊橋 →〔飯田線〕→ 飯田駅',
-    bus: '新宿（バスタ新宿）→〔中央道高速バス・約4時間〕→ 伊賀良',
-    car: '中央道で約 3.5〜4 時間 →（飯田IC）→ 下栗',
+    train:
+      '東京 →〔新幹線で約1時間20分〕→ 豊橋 10:09発「特急 伊那路1号」→ 飯田 12:41着',
+    bus: 'バスタ新宿 6:55発 → 伊賀良 10:48着（始発・最速 約3時間50分）',
+    car: 'トータル約4時間半〜5時間（中央道〜三遠南信道〜下栗）',
   },
 ]
 
 // 時刻表の参考リンク (公式・準公式)。具体的な時刻は変わるため、出発前に各社の最新情報を確認する。
 const timetables = [
   {
-    label: 'JR飯田線（特急「伊那路」・普通）時刻表',
-    href: 'https://railway.jr-central.co.jp/time-schedule/',
-    note: '豊橋・豊川〜飯田。乗り換え時刻の確認に。',
+    label: 'JR飯田線 特急「伊那路」時刻表',
+    href: 'https://ekitan.com/transit/express/train/exm-114569',
+    note: '豊橋・豊川〜飯田。日中に着くのは伊那路1号のみ。',
   },
   {
     label: '信南交通 遠山郷線（路線バス・飯田駅前〜上町ほか）',
@@ -115,9 +120,9 @@ const timetables = [
     note: '飯田駅前から上町方面の路線バス時刻表。',
   },
   {
-    label: '信南交通 高速バス 新宿線（伊賀良に停車）',
-    href: 'https://www.shinnan.co.jp/hb/hb01_time_2_1.html',
-    note: '新宿〜飯田。伊賀良で下車。',
+    label: '中央高速バス 新宿〜飯田（伊賀良に停車）',
+    href: 'https://www.highwaybus.com/gp/info/timeTbl?lineGroupNo=1&lineId=130',
+    note: 'バスタ新宿〜飯田。伊賀良で下車。',
   },
   {
     label: '名鉄バス 名古屋⇔飯田',
@@ -139,7 +144,7 @@ const restaurants = [
     area: '下栗',
     desc: '下栗の郷土料理を味わえる食事処。旬の野菜や採れたて山菜の天ぷらが付く「いっ福定食」が名物です。',
     info: 'TEL 0260-36-2613（飯田市上村下栗）',
-    detail: 'https://tohyamago.com/stay_and_eat/ippuku/',
+    detail: 'https://tohyamago.com/archives/14052',
     map: '長野県飯田市上村下栗 いっ福',
   },
   {
@@ -155,7 +160,7 @@ const restaurants = [
     area: '下栗',
     desc: '天空の里ビューポイントへの入口に建つそば処。手打ちそば定食や、荏胡麻味噌の下栗いも田楽が人気です。',
     info: 'TEL 0260-36-1005／11:00〜15:00 ごろ（水・木は休みのことが多い）',
-    detail: 'https://tohyamago.com/stay_and_eat/hanbatei/',
+    detail: 'https://tohyamago.com/archives/1152',
     map: '長野県飯田市上村下栗1296 はんば亭',
   },
 ]
@@ -173,7 +178,7 @@ const stays = [
     name: 'かぐら山荘',
     area: '遠山郷',
     desc: 'ログハウスの宿。夕食には下栗芋や豆腐田楽など、地元の味が並びます。観光協会のほど近くにあります。',
-    detail: 'https://tohyamago.com/stay_and_eat/kagura_sansou/',
+    detail: 'https://tohyamago.com/archives/512',
     map: '遠山郷 かぐら山荘',
   },
   {
@@ -344,6 +349,11 @@ const stays = [
           ))
         }
       </div>
+      <p class="mt-4 text-sm leading-relaxed text-body/80">
+        ※
+        日中に飯田へ着く特急「伊那路」は1日1本（伊那路1号）だけです。これに乗り遅れると、次は夜に着く伊那路3号（豊橋
+        18:20発）になります。高速バスはその日いちばん早く着く便、車は下栗までの山道を含めたおおよそのトータル時間です。いずれも目安のため、最新の時刻表でご確認ください。
+      </p>
     </section>
 
     <!-- 時刻表 (参考) -->
@@ -426,7 +436,7 @@ const stays = [
           ' '
         }
         <a
-          href="https://tohyamago.com/category/stay_and_eat/restaurant/"
+          href="https://tohyamago.com/archives/category/stay_and_eat/restaurant"
           target="_blank"
           rel="noopener noreferrer"
           class="font-medium text-accent-strong underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
@@ -487,7 +497,7 @@ const stays = [
           ' '
         }
         <a
-          href="https://tohyamago.com/category/stay_and_eat/stay/"
+          href="https://tohyamago.com/archives/category/stay_and_eat/stay"
           target="_blank"
           rel="noopener noreferrer"
           class="font-medium text-accent-strong underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
