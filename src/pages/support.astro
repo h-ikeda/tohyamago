@@ -23,8 +23,8 @@ const bankDetails = [
   { label: '口座番号', value: '2568712' },
   {
     label: '口座名義',
-    value: '一般社団法人遠山郷応援会',
-    code: 'カナ: シヤ）トオヤマゴウオウエンカイ',
+    value: 'シヤ）トオヤマゴウオウエンカイ',
+    code: '一般社団法人遠山郷応援会',
   },
 ]
 
@@ -77,7 +77,7 @@ const otherWays = [
     <p
       class="mx-auto mt-5 max-w-xl text-left leading-loose text-body sm:text-center"
     >
-      遠山郷の景観・暮らし・文化を守り継ぐ活動は、応援してくださる皆さまに支えられています。少額でも、一度きりでも、続けてでも。今は口座振込でご寄付を受け付けています。
+      遠山郷の景観・暮らし・文化を守り継ぐ活動は、応援してくださる皆さまに支えられています。少額でも、一度きりでも、続けてでも。現在は口座振込でご寄付を受け付けています。
     </p>
     <div class="mx-auto mt-8 w-full max-w-3xl">
       <BlurImage
@@ -138,14 +138,6 @@ const otherWays = [
             class="mt-2 h-0 w-0 shrink-0 border-x-[0.3rem] border-b-[0.5rem] border-x-transparent border-b-accent"
             aria-hidden="true"></span>
           <span
-            >お振込みの際は、振込手数料をご負担いただきますようお願いいたします。</span
-          >
-        </li>
-        <li class="flex gap-2">
-          <span
-            class="mt-2 h-0 w-0 shrink-0 border-x-[0.3rem] border-b-[0.5rem] border-x-transparent border-b-accent"
-            aria-hidden="true"></span>
-          <span
             >お振込み名義（ご依頼人名）は、領収書の発行やお問い合わせの際の確認に使わせていただきます。</span
           >
         </li>
@@ -178,7 +170,7 @@ const otherWays = [
               class="font-mono text-accent-strong underline underline-offset-2 hover:opacity-80"
               >{CONTACT_EMAIL}</a
             >
-            まで、お名前・ご住所・お振込日・金額をお知らせください。確認のうえ、領収書をお送りします。お知らせいただいた個人情報は、領収書の発行とご連絡の目的にのみ使用します。
+            まで、お名前・領収書の送付先メールアドレス・お振込日・金額をお知らせください。確認のうえ、領収書を原則としてメールでお送りします。お知らせいただいた個人情報は、領収書の発行とご連絡の目的にのみ使用します。
           </p>
         </Card>
 
@@ -188,7 +180,7 @@ const otherWays = [
           >
           <div class="space-y-3 leading-loose text-body">
             <p class="indent-4">
-              当会は認定NPO法人・公益社団法人等ではないため、<span
+              当会は認定NPO法人・公益社団法人等には該当しないため、<span
                 class="font-medium text-primary-deep">個人の方</span
               >のご寄付は、所得税の寄付金控除（寄附金控除）の対象にはなりません。
             </p>
