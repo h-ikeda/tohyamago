@@ -9,8 +9,8 @@ import mountsImage from '~/assets/mounts.jpg'
 
 const CONTACT_EMAIL = 'receive@tohyamago.org'
 
-// 口座振込でのご寄付（現在の受付方法）。オンライン決済 (Stripe) 導入までの間も、
-// 口座振込で確実にご寄付いただけるようにする。名義は振込時の一致確認があるため
+// 口座振込による寄付（現在の受付方法）。オンライン決済 (Stripe) 導入までの間も、
+// 口座振込で確実に寄付いただけるようにする。名義は振込時の一致確認があるため
 // 漢字・カナの両方を明記する。
 const bankDetails = [
   {
@@ -28,25 +28,25 @@ const bankDetails = [
   },
 ]
 
-// 今すぐ取れる、寄付以外の応援の方法（情報設計: 各ページに次の一歩を置き迷子を作らない）
+// 寄付以外の支援の方法（情報設計: 各ページに次の一歩を置き迷子を作らない）
 const otherWays = [
   {
-    title: '会員になって支える',
-    body: '会員として議論や意思決定に加わり、継続的に活動の運営を支えていただけます。年会費は 5,000 円です。',
+    title: '会員として支える',
+    body: '会員として議論や意思決定に加わり、継続的に当会の運営を支えていただけます。年会費は 5,000 円です。',
     href: '/membership',
     cta: '入会案内を見る',
     accent: 'border-l-primary-soft',
   },
   {
-    title: '成果品を買って支える',
-    body: '畑を守る活動の中で実った下栗芋・お茶・蕎麦・大豆。お求めいただくことが、活動を続ける力になります。',
+    title: '成果品の購入で支える',
+    body: '活動の中で実った下栗芋・お茶・蕎麦・大豆。お買い求めいただくことが、活動を継続する力となります。',
     href: '/products',
     cta: '成果品を見る',
     accent: 'border-l-sunlight',
   },
   {
-    title: '活動に参加して支える',
-    body: '何よりの応援は、一緒に体を動かす仲間が増えること。農作業の経験がなくても、お一人でも歓迎です。',
+    title: '活動への参加で支える',
+    body: '何よりの支援は、共に活動する仲間が増えること。農作業の経験がなくても、お一人でも歓迎いたします。',
     href: '/join',
     cta: 'はじめての方へ',
     accent: 'border-l-accent',
@@ -56,7 +56,7 @@ const otherWays = [
 
 <BaseLayout
   title="寄付・ご支援"
-  description="遠山郷応援会へのご寄付・ご支援のご案内。口座振込で単発・継続のご寄付を受け付けています。いただいた支援は遠山郷の景観・暮らし・文化を守り継ぐ活動に役立てます。"
+  description="一般社団法人遠山郷応援会への寄付・支援のご案内。口座振込により、単発・継続の寄付を受け付けております。お寄せいただいた支援は、遠山郷の景観・暮らし・文化を守り継ぐ活動に活用いたします。"
   image={mountsImage}
   imageAlt="遠山郷の山並み"
 >
@@ -67,7 +67,7 @@ const otherWays = [
     <span
       class="mx-auto mb-4 flex w-fit items-center rounded-full bg-primary-deep px-4 py-1 font-serif text-sm tracking-wide text-white"
     >
-      寄付・ご支援
+      ご寄付のお願い
     </span>
     <h1
       class="font-serif text-3xl font-medium leading-snug text-primary md:text-4xl"
@@ -77,7 +77,7 @@ const otherWays = [
     <p
       class="mx-auto mt-5 max-w-xl text-left leading-loose text-body sm:text-center"
     >
-      遠山郷の景観・暮らし・文化を守り継ぐ活動は、応援してくださる皆さまに支えられています。少額でも、一度きりでも、続けてでも。現在は口座振込でご寄付を受け付けています。
+      遠山郷の景観・暮らし・文化を守り継ぐ活動は、応援してくださる皆さまに支えられております。少額でも、一度限りでも、継続でも構いません。現在は口座振込により寄付を受け付けております。
     </p>
     <div class="mx-auto mt-8 w-full max-w-3xl">
       <BlurImage
@@ -98,16 +98,16 @@ const otherWays = [
   </section>
 
   <Container class="py-12 md:py-16">
-    <!-- 口座振込でのご寄付 (主導線) -->
+    <!-- 口座振込による寄付 (主導線) -->
     <section id="bank" class="mb-16 scroll-mt-24">
       <SectionHeading as="h2" align="left" class="mb-6"
-        >口座振込でのご寄付</SectionHeading
+        >口座振込による寄付</SectionHeading
       >
       <p class="mb-4 indent-4 leading-loose text-body">
-        現在は、以下の口座へのお振込みでご寄付を受け付けています。単発のご寄付も、継続的なご寄付も歓迎です。ご寄付の金額は自由です。お気持ちに応じてお決めください。
+        現在は、下記の口座へのお振込みにより寄付を受け付けております。単発・継続のいずれも歓迎いたします。金額の定めはございません。お気持ちに応じてお決めください。
       </p>
       <p class="mb-6 indent-4 text-sm leading-relaxed text-body/80">
-        継続的にご寄付いただける場合は、ご都合のよいときに繰り返しお振込みいただくか、お使いの金融機関の定期振込（自動振込）の設定をご利用ください。
+        継続してご支援いただける場合は、随時繰り返しお振込みいただくか、ご利用の金融機関の定期振込（自動振込）の設定をご活用ください。
       </p>
 
       <Card class="border-t-4 border-t-accent px-6 py-2 md:px-10">
@@ -138,39 +138,39 @@ const otherWays = [
             class="mt-2 h-0 w-0 shrink-0 border-x-[0.3rem] border-b-[0.5rem] border-x-transparent border-b-accent"
             aria-hidden="true"></span>
           <span
-            >お振込み名義（ご依頼人名）は、領収書の発行やお問い合わせの際の確認に使わせていただきます。</span
+            >お振込み名義（ご依頼人名）は、領収書の発行および照会の際の確認に使用いたします。</span
           >
         </li>
       </ul>
     </section>
 
-    <!-- ご寄付にあたって (領収書・使途・税制・返金。誤認を避ける) -->
+    <!-- 寄付に際して (領収書・使途・税制・返金。誤認を避ける) -->
     <section class="mb-16">
       <SectionHeading as="h2" align="left" class="mb-6"
-        >ご寄付にあたって</SectionHeading
+        >寄付に際して</SectionHeading
       >
       <div class="grid gap-6">
         <Card class="border-l-4 border-l-primary-soft px-6 py-6 md:px-8">
           <SectionHeading as="h3" level="sub" align="left" class="mb-3"
-            >ご寄付の使いみち</SectionHeading
+            >寄付の使途</SectionHeading
           >
           <p class="indent-4 leading-loose text-body">
-            いただいたご寄付は、遠山郷の景観・農地の保全、地域の暮らしや文化を守り継ぐ活動、そしてその運営に大切に活用させていただきます。
+            お寄せいただいた寄付は、遠山郷の景観・農地の保全、地域の暮らしや文化を守り継ぐ活動、ならびに当会の運営に、大切に活用いたします。
           </p>
         </Card>
 
         <Card class="border-l-4 border-l-sunlight px-6 py-6 md:px-8">
           <SectionHeading as="h3" level="sub" align="left" class="mb-3"
-            >領収書について</SectionHeading
+            >領収書の発行について</SectionHeading
           >
           <p class="indent-4 leading-loose text-body">
-            領収書が必要な方は、お振込み後に
+            領収書をご希望の方は、お振込み後に
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               class="font-mono text-accent-strong underline underline-offset-2 hover:opacity-80"
               >{CONTACT_EMAIL}</a
             >
-            まで、お名前・領収書の送付先メールアドレス・お振込日・金額をお知らせください。確認のうえ、領収書を原則としてメールでお送りします。お知らせいただいた個人情報は、領収書の発行とご連絡の目的にのみ使用します。
+            宛に、お名前・領収書の送付先メールアドレス・お振込日・金額をご連絡ください。確認のうえ、領収書は原則としてメールにて送付いたします。お知らせいただいた個人情報は、領収書の発行および連絡の目的にのみ使用いたします。
           </p>
         </Card>
 
@@ -182,14 +182,14 @@ const otherWays = [
             <p class="indent-4">
               当会は認定NPO法人・公益社団法人等には該当しないため、<span
                 class="font-medium text-primary-deep">個人の方</span
-              >のご寄付は、所得税の寄付金控除（寄附金控除）の対象にはなりません。
+              >の寄付は、所得税の寄付金控除（寄附金控除）の対象とはなりません。
             </p>
             <p class="indent-4">
               <span class="font-medium text-primary-deep">法人の方</span
-              >のご寄付は、法人税法上「一般の寄付金」として、損金算入限度額の範囲内で損金に算入できる場合があります（全額の損金算入や、特定公益増進法人に対する寄付金の特別枠の対象ではありません）。
+              >の寄付は、法人税法上「一般の寄付金」として、損金算入限度額の範囲内で損金に算入できる場合がございます（全額損金算入、および特定公益増進法人に対する寄付金の特別枠の対象ではありません）。
             </p>
             <p class="text-sm text-body/80">
-              税務上の取扱いは個別の状況により異なります。詳しくは所轄の税務署または税理士にご確認ください。
+              税務上の取扱いは個別の状況により異なります。詳細は所轄の税務署または税理士にご確認ください。
             </p>
           </div>
         </Card>
@@ -199,19 +199,19 @@ const otherWays = [
             >返金について</SectionHeading
           >
           <p class="indent-4 leading-loose text-body">
-            一度お振込みいただいたご寄付は、原則として返還いたしかねます。
+            一度お振込みいただいた寄付は、原則として返還いたしかねます。
           </p>
         </Card>
       </div>
     </section>
 
-    <!-- 寄付以外の応援の方法 (issue #207: 主要 CTA の先で必ず行動できるようにする) -->
+    <!-- 寄付以外の支援の方法 (issue #207: 主要 CTA の先で必ず行動できるようにする) -->
     <section class="mb-16">
       <SectionHeading as="h2" align="left" class="mb-6"
-        >ほかにも、応援のかたちがあります</SectionHeading
+        >その他のご支援方法</SectionHeading
       >
       <p class="mb-6 indent-4 leading-loose text-body">
-        ご寄付のほかにも、活動を支えていただける方法があります。ご自身に合うかたちで、応援していただけたら嬉しいです。
+        寄付のほかにも、活動を支えていただける方法がございます。ご自身に合った方法で、ご支援いただけますと幸いです。
       </p>
       <div class="grid gap-6 md:grid-cols-3">
         {
@@ -239,10 +239,10 @@ const otherWays = [
       class="rounded-3xl border border-primary/10 bg-gradient-to-br from-sunlight-soft/60 to-surface px-6 py-10 text-center md:px-12"
     >
       <SectionHeading as="h2" align="center" class="mb-4"
-        >ご不明な点は、お気軽に</SectionHeading
+        >お問い合わせ</SectionHeading
       >
       <p class="mx-auto max-w-xl leading-loose text-body">
-        ご寄付の方法や領収書のこと、活動の内容など、気になることがあればお気軽にお問い合わせください。皆さまの応援が、遠山郷の明日を支えています。
+        寄付の方法や領収書、活動内容などについてご不明な点がございましたら、お気軽にお問い合わせください。皆さまのご支援が、遠山郷の明日を支えております。
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-3">
         <Button href={`mailto:${CONTACT_EMAIL}`} arrow={false}
