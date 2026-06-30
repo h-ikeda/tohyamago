@@ -1,0 +1,8 @@
+# 一般社団法人遠山郷応援会 — robots.txt
+# 検索エンジン・AI 検索クローラーの巡回を歓迎する (公開サイトのため全許可)。
+
+User-agent: *
+Allow: /
+
+# サイトマップの所在 (@astrojs/sitemap が build 時に生成)
+Sitemap: https://www.tohyamago.org/sitemap-index.xml

@@ -6,7 +6,6 @@ import SectionHeading from '~/components/SectionHeading.astro'
 import Button from '~/components/Button.astro'
 import NewsCta from '~/components/NewsCta.astro'
 import { groupPostsByYear } from '~/components/postArchive'
-import { postExcerpt } from '~/components/postExcerpt'
 import { formatPostDate } from '~/components/postDate'
 import { getSeason, seasonLabel, SEASONS } from '~/components/postSeason'
 
@@ -26,7 +25,10 @@ const seasonFilters = [
 ]
 ---
 
-<BaseLayout title="近況アーカイブ">
+<BaseLayout
+  title="近況アーカイブ"
+  description="遠山郷応援会の近況アーカイブ。これまでの活動を公開年と季節からたどれる索引です。"
+>
   <section
     class="bg-gradient-to-b from-sky-soft via-base to-base px-4 pt-12 pb-8 text-center sm:pt-16"
   >
@@ -112,7 +114,6 @@ const seasonFilters = [
               </SectionHeading>
               <ul class="divide-y divide-primary/10 overflow-hidden rounded-2xl border border-primary/10 bg-surface">
                 {group.posts.map((post) => {
-                  const excerpt = postExcerpt(post.body, 60)
                   const season = getSeason(post.data.date)
                   return (
                     <li data-season={season}>
@@ -127,7 +128,7 @@ const seasonFilters = [
                           {formatPostDate(post.data.date)}
                         </time>
                         <span class="min-w-0 flex-1 truncate leading-relaxed text-body">
-                          {excerpt || '写真でつづる記録です。'}
+                          {post.data.title}
                         </span>
                         <span class="shrink-0 self-start rounded-full bg-primary/5 px-2 py-0.5 text-xs text-body/60 sm:self-auto">
                           {seasonLabel(season)}

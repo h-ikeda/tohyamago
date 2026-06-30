@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content'
+import { getImage } from 'astro:assets'
 import BlurImage from '~/components/BlurImage.astro'
 import BaseLayout from '~/layouts/BaseLayout.astro'
 import Container from '~/components/Container.astro'
@@ -8,6 +9,15 @@ import NewsCta from '~/components/NewsCta.astro'
 import ArrowIcon from '~/components/ArrowIcon.astro'
 import { formatPostDate } from '~/components/postDate'
 import { postExcerpt } from '~/components/postExcerpt'
+import {
+  SITE_NAME,
+  OG_IMAGE_WIDTH,
+  OG_IMAGE_HEIGHT,
+  absoluteUrl,
+  normalizeDescription,
+  articleJsonLd,
+  breadcrumbJsonLd,
+} from '~/components/siteMeta'
 
 // 記事個別ページ (共有・SEO 用)。全記事を新しい順に並べ、
 // 前後の記事への導線 (新しい記事 / 古い記事) も静的に用意する。
@@ -28,11 +38,51 @@ export async function getStaticPaths() {
 const { post, newer, older } = Astro.props
 const { Content } = await render(post)
 
-// タイトルを持たないスキーマのため、抜粋を見出し的に流用する (空なら日付)。
-const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
+// SEO/SNS 用メタ: 本文抜粋を説明文に、先頭画像を OG 画像にする。
+// 構造化データは記事 (BlogPosting) とパンくず (BreadcrumbList) を付与する。
+const excerpt = normalizeDescription(
+  postExcerpt(post.body, 120) || `${post.data.title}｜遠山郷応援会の近況`,
+)
+const pageUrl = absoluteUrl(`/news/${post.id}`)
+const ogImage = post.data.images[0]
+// JSON-LD の image を BaseLayout の og:image と同一の最適化画像 (1200x630 JPEG) に
+// 揃える。getImage は同一パラメータなら同じ出力 (同じハッシュ) を返すため重複コスト無し。
+const ogImageData = ogImage
+  ? await getImage({
+      src: ogImage,
+      width: OG_IMAGE_WIDTH,
+      height: OG_IMAGE_HEIGHT,
+      fit: 'cover',
+      format: 'jpeg',
+    })
+  : undefined
+const structuredData = [
+  articleJsonLd({
+    title: post.data.title,
+    description: excerpt,
+    url: pageUrl,
+    image: ogImageData ? absoluteUrl(ogImageData.src) : undefined,
+    datePublished: post.data.date.toISOString(),
+    tags: post.data.tags,
+  }),
+  breadcrumbJsonLd([
+    { name: SITE_NAME, url: absoluteUrl('/') },
+    { name: '近況', url: absoluteUrl('/news') },
+    { name: post.data.title, url: pageUrl },
+  ]),
+]
 ---
 
-<BaseLayout title={`${heading}｜近況`}>
+<BaseLayout
+  title={`${post.data.title}｜近況`}
+  description={excerpt}
+  image={ogImage}
+  imageAlt={post.data.title}
+  ogType="article"
+  publishedTime={post.data.date}
+  tags={post.data.tags}
+  jsonLd={structuredData}
+>
   <Container class="py-10 md:py-14">
     <nav class="mb-6 text-sm">
       <a
@@ -50,6 +100,12 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
       >
         {formatPostDate(post.data.date)}
       </time>
+
+      <h1
+        class="mt-2 font-serif text-2xl leading-snug font-medium text-primary md:text-3xl"
+      >
+        {post.data.title}
+      </h1>
 
       <div class="post-body mt-5 text-justify text-lg leading-loose text-body">
         <Content />
@@ -85,6 +141,18 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
           </p>
         )
       }
+
+      {
+        post.data.tags.length > 0 && (
+          <ul class="mt-8 flex flex-wrap gap-2" aria-label="タグ">
+            {post.data.tags.map((tag) => (
+              <li class="rounded-full bg-primary/5 px-3 py-1 text-sm text-accent-strong">
+                #{tag}
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </article>
 
     <!-- 前後の記事への導線 (新しい / 古い) -->
@@ -103,7 +171,7 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
               新しい記事
             </span>
             <span class="mt-1 block leading-relaxed text-primary">
-              {postExcerpt(newer.body, 36) || formatPostDate(newer.data.date)}
+              {newer.data.title}
             </span>
           </a>
         ) : (
@@ -121,7 +189,7 @@ const heading = postExcerpt(post.body, 40) || formatPostDate(post.data.date)
               <ArrowIcon class="h-[1.1em] w-[1.1em] transition-transform motion-safe:group-hover:translate-x-0.5" />
             </span>
             <span class="mt-1 block leading-relaxed text-primary">
-              {postExcerpt(older.body, 36) || formatPostDate(older.data.date)}
+              {older.data.title}
             </span>
           </a>
         )

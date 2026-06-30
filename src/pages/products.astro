@@ -97,7 +97,12 @@ const products = showcase
   .sort((a, b) => a.order - b.order)
 ---
 
-<BaseLayout title="成果品紹介">
+<BaseLayout
+  title="成果品紹介"
+  description="遠山郷の畑から生まれた成果品のご紹介。下栗芋・茶・蕎麦・大豆それぞれの物語と、オンラインショップでのお求め方法をご案内します。"
+  image={farmImage}
+  imageAlt="遠山郷の畑と成果品"
+>
   <!-- ヒーロー: 「畑に通った結果の実り」というこのページの主旨を簡潔に伝える -->
   <section
     class="relative overflow-hidden bg-gradient-to-b from-sunlight-soft/50 via-base to-base px-4 pt-12 pb-10 text-center sm:pt-16"

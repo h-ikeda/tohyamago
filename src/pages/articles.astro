@@ -6,7 +6,11 @@ import articlesPdfUrl from '~/assets/articles.pdf?url'
 const licenseKey = import.meta.env.PDFJS_EXPRESS_VIEWER
 ---
 
-<BaseLayout title="定款" fullscreen>
+<BaseLayout
+  title="定款"
+  description="一般社団法人遠山郷応援会の定款（PDF）を掲載します。"
+  fullscreen
+>
   <PdfViewer
     client:only="react"
     src={articlesPdfUrl}
