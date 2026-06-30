@@ -1,0 +1,117 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import AccessMap from './AccessMap'
+import { loadGoogleMaps, mapSearchUrl, type MapPlace } from './googleMaps'
+
+// 実スクリプトを読み込まずに、ローダの解決/失敗だけを差し替える。
+vi.mock('./googleMaps', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./googleMaps')>()
+  return { ...actual, loadGoogleMaps: vi.fn() }
+})
+
+const mockedLoad = vi.mocked(loadGoogleMaps)
+
+const place: MapPlace = {
+  name: '下栗の里',
+  lat: 35.3,
+  lng: 137.9,
+  address: '長野県飯田市上村下栗',
+  query: '下栗1296',
+}
+
+function makeFakeMaps() {
+  const addListener = vi.fn()
+  const setContent = vi.fn()
+  const open = vi.fn()
+  const mapCtor = vi.fn()
+  const markerCtor = vi.fn()
+
+  class FakeMap {
+    constructor(...args: unknown[]) {
+      mapCtor(...args)
+    }
+  }
+  class FakeMarker {
+    addListener = addListener
+    constructor(...args: unknown[]) {
+      markerCtor(...args)
+    }
+  }
+  class FakeInfoWindow {
+    setContent = setContent
+    open = open
+  }
+
+  const maps = {
+    Map: FakeMap,
+    Marker: FakeMarker,
+    InfoWindow: FakeInfoWindow,
+  } as unknown as typeof google.maps
+  return { maps, mapCtor, markerCtor, addListener, setContent, open }
+}
+
+beforeEach(() => {
+  mockedLoad.mockReset()
+})
+
+describe('AccessMap', () => {
+  it('読み込み中はローディング表示を出す', () => {
+    mockedLoad.mockReturnValue(new Promise(() => {}))
+    render(
+      <AccessMap
+        apiKey="K"
+        center={{ lat: 35.3, lng: 137.9 }}
+        places={[place]}
+      />,
+    )
+    expect(screen.getByText('地図を読み込んでいます…')).toBeInTheDocument()
+  })
+
+  it('読み込み成功で地図・マーカー・情報ウィンドウを生成する', async () => {
+    const f = makeFakeMaps()
+    mockedLoad.mockResolvedValue(f.maps)
+    render(
+      <AccessMap
+        apiKey="K"
+        center={{ lat: 35.3, lng: 137.9 }}
+        zoom={13}
+        places={[place]}
+        openName="下栗の里"
+      />,
+    )
+
+    await waitFor(() => expect(f.mapCtor).toHaveBeenCalledTimes(1))
+    expect(f.mapCtor.mock.calls[0][1]).toMatchObject({
+      center: { lat: 35.3, lng: 137.9 },
+      zoom: 13,
+      gestureHandling: 'cooperative',
+    })
+    expect(f.markerCtor).toHaveBeenCalledTimes(1)
+    expect(f.addListener).toHaveBeenCalledWith('click', expect.any(Function))
+    // openName のピンははじめから情報ウィンドウを開く
+    expect(f.setContent).toHaveBeenCalledTimes(1)
+    expect(f.open).toHaveBeenCalledTimes(1)
+    expect(
+      screen.queryByText('地図を読み込んでいます…'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('読み込み失敗でフォールバックのリンクを出す', async () => {
+    mockedLoad.mockRejectedValue(new Error('boom'))
+    render(
+      <AccessMap
+        apiKey="K"
+        center={{ lat: 35.3, lng: 137.9 }}
+        places={[place]}
+      />,
+    )
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('地図を表示できませんでした。'),
+      ).toBeInTheDocument(),
+    )
+    const link = screen.getByRole('link', { name: 'Googleマップで開く' })
+    expect(link).toHaveAttribute('href', mapSearchUrl('下栗1296'))
+  })
+})

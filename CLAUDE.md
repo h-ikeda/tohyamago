@@ -350,12 +350,13 @@ const events = defineCollection({
 
 ## 環境変数
 
-| 変数名                 | 用途                                                                                                                                               |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー                                                                                                            |
-| `GA_MEASUREMENT_ID`    | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー） |
+| 変数名                 | 用途                                                                                                                                                                                                           |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PDFJS_EXPRESS_VIEWER` | PDF.js Express ビューワーライセンスキー                                                                                                                                                                        |
+| `GA_MEASUREMENT_ID`    | Google Analytics 測定 ID（例: `G-XXXXXXXXXX`）。`BaseLayout.astro` が設定時のみ gtag.js を出力。未設定なら計測タグなし（ローカル開発・プレビュー）                                                             |
+| `GOOGLE_MAPS_API_KEY`  | Maps JavaScript API のブラウザキー。`/access` のインタラクティブ地図（`AccessMap.tsx`）で使う。設定時のみ JS 地図を出し、未設定なら API キー不要の埋め込み iframe にフォールバック（ローカル開発・プレビュー） |
 
-いずれも秘匿情報ではない（`GA_MEASUREMENT_ID` は公開される測定 ID、`PDFJS_EXPRESS_VIEWER` はドメイン固定のビューワーキー）ため、**シークレットではなく通常の「変数」として扱う**。
+いずれも秘匿情報ではない（`GA_MEASUREMENT_ID` は公開される測定 ID、`PDFJS_EXPRESS_VIEWER` はドメイン固定のビューワーキー、`GOOGLE_MAPS_API_KEY` は HTTP リファラ制限で保護する公開のブラウザキー）ため、**シークレットではなく通常の「変数」として扱う**。`GOOGLE_MAPS_API_KEY` は Google Cloud 側で「HTTP リファラ（本番・プレビューのドメイン）」と「Maps JavaScript API」に利用を絞っておく。
 
 - **デプロイ時（Cloudflare）**: 静的生成でビルド時に HTML へ焼き込むため、**Settings > Build > 「Build variables and secrets」**（＝ビルド変数。ランタイム用の Variables & Secrets ではない）に `<NAME>_PRODUCTION` / `<NAME>_PREVIEW` の形で登録し、ビルド時にブランチで出し分ける（上記「環境変数の本番 / プレビュー切り分け」参照）。プレビューに出したくない変数は `_PREVIEW` を未設定にする。
 - **CI（GitHub Actions）**: `ci.yml` のビルド検証・E2E は値を必要としない（テストが GA/PDF ビューワーの値に依存しないため）。素の名前が未設定なら `import.meta.env.*` は undefined になるだけでビルドは成功する。必要になった場合のみ GitHub Actions の **Variables（`vars`）** に素の名前で登録する（`resolveBuildEnv` は素の名前を最優先する）。
