@@ -28,8 +28,10 @@ jobs:
       - run: npm ci
       - run: npm run ${{ matrix.task }}
 
-  # テスト + カバレッジ計測。結果を Codecov へ送信する。
-  coverage:
+  # テスト + カバレッジ計測。結果を Codecov へ送信しつつ、後段の coverage
+  # ジョブが GitHub ネイティブのコードカバレッジ (Quality セクション) へ
+  # 反映できるよう、カバレッジレポートをアーティファクトとして公開する。
+  test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -50,6 +52,38 @@ jobs:
           fail_ci_if_error: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      # success 時のみアーティファクト化 (test が失敗すれば coverage ジョブも走らない)
+      - name: Upload coverage report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/cobertura-coverage.xml
+
+  # GitHub ネイティブのコードカバレッジ (PR の Quality セクション) へ反映する。
+  # 現状この機能は public preview のため、当面は test ジョブの Codecov 連携も併存させる。
+  # test の成功 (needs) を前提に、test が公開したアーティファクトからレポートする。
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
+      # push (main) などで PR 番号を逆引きする場合に必要
+      pull-requests: read
+    steps:
+      - name: Download coverage report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+      - name: Report coverage to GitHub
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: cobertura-coverage.xml
+          language: TypeScript
+          label: code-coverage/vitest
+          # fork PR など権限のない実行ではアクションが gracefully に抜けるが、
+          # 念のためアップロード失敗で CI 全体を落とさない
+          fail-on-error: false
 
   # フルビルド検証。同一リポジトリのブランチ/PR と main への push は Cloudflare の
   # プレビュー/本番ビルドが検証するため、ここでは Cloudflare が自動ビルドしない
