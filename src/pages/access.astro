@@ -53,6 +53,11 @@ const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(DEST_QU
 // 主要ルート (4 種)。おすすめ度の高い順に並べる。
 // 公共交通は本数が限られるため、いずれも最後はレンタカー / タクシーで現地へ向かう。
 // 当会の送迎はあくまで最後の手段で、安易に頼る前提では案内しない。
+//
+// 各ルートに「起点別の目安 (origins)」と「時刻表リンク (timetables)」を内包し、
+// 行き方カード 1 枚でその手段の所要時間と参照先まで完結させる (旧・独立セクションを統合)。
+// - origins.time は代表的な便の一例 / おおよそのトータル時間。改定で変わるため目安。
+// - 車は時刻表が無いため timetables は空。路線バスは起点別の目安を出さない (上町まで＋タクシー前提)。
 const routes = [
   {
     id: 'car',
@@ -66,6 +71,17 @@ const routes = [
       '三遠南信自動車道に入り、「程野IC」で降ります。',
       '国道152号へ出て、上村小学校の手前を左折。あとは道なりに山道を登ると下栗の里です。',
     ],
+    origins: [
+      {
+        from: '名古屋から',
+        time: 'トータル約3時間（中央道〜三遠南信道〜下栗）',
+      },
+      {
+        from: '東京から',
+        time: 'トータル約4時間半〜5時間（中央道〜三遠南信道〜下栗）',
+      },
+    ],
+    timetables: [],
     note: '下栗周辺は道幅が狭く、すれ違いに注意が必要です。譲り合ってゆっくり走行してください。冬季は積雪・凍結に備えてください。',
   },
   {
@@ -80,7 +96,24 @@ const routes = [
       '豊橋駅（または豊川駅）で JR 飯田線に乗り換え、飯田駅まで。特急「伊那路」なら豊橋〜飯田はおよそ 2 時間半（1 日 2 往復）。普通列車もありますが本数・所要時間にご注意ください。',
       '飯田駅周辺でレンタカーを借り、遠山郷（下栗）へ。飯田市街から下栗まではおよそ 1 時間の山道です。',
     ],
-    note: '飯田線は本数が少ない区間です。乗り換え時刻は事前にご確認ください。',
+    origins: [
+      {
+        from: '名古屋から',
+        time: '名古屋 →〔東海道線・新幹線で約30分〜1時間〕→ 豊橋 10:09発「特急 伊那路1号」→ 飯田 12:41着',
+      },
+      {
+        from: '東京から',
+        time: '東京 →〔新幹線で約1時間20分〕→ 豊橋 10:09発「特急 伊那路1号」→ 飯田 12:41着',
+      },
+    ],
+    timetables: [
+      {
+        label: 'JR飯田線 特急「伊那路」時刻表',
+        href: 'https://ekitan.com/transit/express/train/exm-114569',
+        note: '豊橋・豊川〜飯田。日中に着くのは伊那路1号のみ。',
+      },
+    ],
+    note: '飯田線は本数が少ない区間です。日中に飯田へ着く特急「伊那路」は1日1本（伊那路1号）だけで、乗り遅れると次は夜着の伊那路3号（豊橋 18:20発）になります。乗り換え時刻は事前にご確認ください。',
   },
   {
     id: 'bus',
@@ -93,6 +126,28 @@ const routes = [
       '新宿（バスタ新宿）または名古屋から、中央道経由の高速バスに乗車。',
       '「伊賀良」バス停で下車（新宿からおよそ 4 時間、名古屋からはより短時間）。飯田 IC のすぐ近くです。',
       '伊賀良・飯田 IC 周辺でレンタカーを借り、遠山郷（下栗）へ。',
+    ],
+    origins: [
+      {
+        from: '名古屋から',
+        time: '名鉄バスセンター 8:00発 → 伊賀良 約9:55／飯田駅前 10:01着（最速 約2時間）',
+      },
+      {
+        from: '東京から',
+        time: 'バスタ新宿 6:55発 → 伊賀良 10:48着（始発・最速 約3時間50分）',
+      },
+    ],
+    timetables: [
+      {
+        label: '中央高速バス 新宿〜飯田（伊賀良に停車）',
+        href: 'https://www.highwaybus.com/gp/info/timeTbl?lineGroupNo=1&lineId=130',
+        note: 'バスタ新宿〜飯田。伊賀良で下車。',
+      },
+      {
+        label: '名鉄バス 名古屋⇔飯田',
+        href: 'https://www.meitetsu-bus.co.jp/express/iida',
+        note: '名古屋方面からの高速バス。',
+      },
     ],
     note: '便によって停車するバス停が異なります。「伊賀良」に停まる便かどうか、予約時にご確認ください。',
   },
@@ -108,57 +163,20 @@ const routes = [
       '上町から下栗の集落までは山道を約 7〜8km・標高差およそ 500m 登る必要があり、健脚の方でも徒歩でおよそ 2 時間かかります。徒歩での登坂は現実的ではありません。',
       'そのため上町からはタクシー（約 15 分）の利用が基本です。宿泊先によっては送迎が受けられる場合もあるため、予約時にご確認ください。',
     ],
+    origins: [],
+    timetables: [
+      {
+        label: '信南交通 遠山郷線（路線バス・飯田駅前〜上町ほか）',
+        href: 'https://www.shinnan.co.jp/sb/time_E1_01.html',
+        note: '飯田駅前から上町方面の路線バス時刻表。',
+      },
+      {
+        label: '南信州公共交通（遠山郷線 E1）',
+        href: 'https://kk.minami.nagano.jp/sheet/bus/e1/',
+        note: '遠山郷エリアのバス路線まとめ。',
+      },
+    ],
     note: '路線バスは本数が限られ、現地までの移動手段を自分で確保する必要があります。どうしても手段が見つからない場合に限り、当会へご相談ください（送迎の確約はできません）。',
-  },
-]
-
-// 起点別のおおよその目安。時刻は代表的な便の一例で、改定で変わるため最新の時刻表で確認する。
-// - 電車: 日中に飯田へ着く特急「伊那路」は実質 1 本 (伊那路1号) のみ。これを基準に据える。
-// - 高速バス: その日いちばん早く着く便を例示する。
-// - 車: 高速 IC から下栗までの山道 (約1時間) も含めたトータルの所要時間。
-const origins = [
-  {
-    from: '名古屋から',
-    train:
-      '名古屋 →〔東海道線・新幹線で約30分〜1時間〕→ 豊橋 10:09発「特急 伊那路1号」→ 飯田 12:41着',
-    bus: '名鉄バスセンター 8:00発 → 伊賀良 約9:55／飯田駅前 10:01着（最速 約2時間）',
-    car: 'トータル約3時間（中央道〜三遠南信道〜下栗）',
-  },
-  {
-    from: '東京から',
-    train:
-      '東京 →〔新幹線で約1時間20分〕→ 豊橋 10:09発「特急 伊那路1号」→ 飯田 12:41着',
-    bus: 'バスタ新宿 6:55発 → 伊賀良 10:48着（始発・最速 約3時間50分）',
-    car: 'トータル約4時間半〜5時間（中央道〜三遠南信道〜下栗）',
-  },
-]
-
-// 時刻表の参考リンク (公式・準公式)。具体的な時刻は変わるため、出発前に各社の最新情報を確認する。
-const timetables = [
-  {
-    label: 'JR飯田線 特急「伊那路」時刻表',
-    href: 'https://ekitan.com/transit/express/train/exm-114569',
-    note: '豊橋・豊川〜飯田。日中に着くのは伊那路1号のみ。',
-  },
-  {
-    label: '信南交通 遠山郷線（路線バス・飯田駅前〜上町ほか）',
-    href: 'https://www.shinnan.co.jp/sb/time_E1_01.html',
-    note: '飯田駅前から上町方面の路線バス時刻表。',
-  },
-  {
-    label: '中央高速バス 新宿〜飯田（伊賀良に停車）',
-    href: 'https://www.highwaybus.com/gp/info/timeTbl?lineGroupNo=1&lineId=130',
-    note: 'バスタ新宿〜飯田。伊賀良で下車。',
-  },
-  {
-    label: '名鉄バス 名古屋⇔飯田',
-    href: 'https://www.meitetsu-bus.co.jp/express/iida',
-    note: '名古屋方面からの高速バス。',
-  },
-  {
-    label: '南信州公共交通（遠山郷線 E1）',
-    href: 'https://kk.minami.nagano.jp/sheet/bus/e1/',
-    note: '遠山郷エリアのバス路線まとめ。',
   },
 ]
 
@@ -295,9 +313,12 @@ const stays = [
 
     <!-- 行き方を選ぶ -->
     <section id="routes" class="mb-16 scroll-mt-24">
-      <SectionHeading as="h2" align="left" class="mb-6"
+      <SectionHeading as="h2" align="left" class="mb-4"
         >行き方を選ぶ</SectionHeading
       >
+      <p class="mb-6 leading-loose text-body">
+        目的に合う行き方をお選びください。各カードに、主要な出発地（名古屋・東京）からの所要時間の目安と、参考になる時刻表リンクをまとめています。所要時間・時刻は時期や便で変わるため、おおよその目安としてご覧のうえ、出発前に各社の最新情報をご確認ください。
+      </p>
       <div class="grid gap-6 md:grid-cols-2">
         {
           routes.map((route) => (
@@ -329,6 +350,45 @@ const stays = [
                   </li>
                 ))}
               </ol>
+              {route.origins.length > 0 && (
+                <div class="mt-5 rounded-xl bg-primary-soft/10 px-4 py-3">
+                  <p class="text-xs font-medium tracking-wide text-primary-deep">
+                    起点別の目安
+                  </p>
+                  <dl class="mt-2 space-y-2 text-sm leading-relaxed text-body">
+                    {route.origins.map((o) => (
+                      <div class="flex gap-3">
+                        <dt class="w-16 shrink-0 font-medium text-primary-deep">
+                          {o.from}
+                        </dt>
+                        <dd>{o.time}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+              {route.timetables.length > 0 && (
+                <div class="mt-4">
+                  <p class="text-xs font-medium tracking-wide text-primary-deep">
+                    時刻表（参考）
+                  </p>
+                  <ul class="mt-2 space-y-2">
+                    {route.timetables.map((t) => (
+                      <li class="leading-relaxed">
+                        <a
+                          href={t.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-sm font-medium text-accent-strong underline decoration-accent/40 underline-offset-4 hover:decoration-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                        >
+                          {t.label}
+                        </a>
+                        <span class="block text-xs text-body/80">{t.note}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <p class="mt-4 rounded-xl bg-sunlight-soft/40 px-4 py-3 text-sm leading-relaxed text-body/90">
                 {route.note}
               </p>
@@ -399,81 +459,6 @@ const stays = [
             >
           </div>
         </div>
-      </Card>
-    </section>
-
-    <!-- 起点別の目安 -->
-    <section class="mb-16">
-      <SectionHeading as="h2" align="left" class="mb-6"
-        >起点別の目安</SectionHeading
-      >
-      <p class="mb-6 leading-loose text-body">
-        代表的な出発地からの行き方の例です。所要時間は時期や便によって変わるため、おおよその目安としてご覧ください。
-      </p>
-      <div class="grid gap-6 md:grid-cols-2">
-        {
-          origins.map((o) => (
-            <Card class="border-t-4 border-t-sunlight px-6 py-6 md:px-8">
-              <h3 class="font-serif text-lg font-medium text-primary">
-                {o.from}
-              </h3>
-              <dl class="mt-4 space-y-3 text-sm leading-relaxed text-body">
-                <div class="flex gap-3">
-                  <dt class="w-16 shrink-0 font-medium text-primary-deep">
-                    電車
-                  </dt>
-                  <dd>{o.train}</dd>
-                </div>
-                <div class="flex gap-3">
-                  <dt class="w-16 shrink-0 font-medium text-primary-deep">
-                    高速バス
-                  </dt>
-                  <dd>{o.bus}</dd>
-                </div>
-                <div class="flex gap-3">
-                  <dt class="w-16 shrink-0 font-medium text-primary-deep">
-                    車
-                  </dt>
-                  <dd>{o.car}</dd>
-                </div>
-              </dl>
-            </Card>
-          ))
-        }
-      </div>
-      <p class="mt-4 text-sm leading-relaxed text-body/80">
-        ※
-        日中に飯田へ着く特急「伊那路」は1日1本（伊那路1号）だけです。これに乗り遅れると、次は夜に着く伊那路3号（豊橋
-        18:20発）になります。高速バスはその日いちばん早く着く便、車は下栗までの山道を含めたおおよそのトータル時間です。いずれも目安のため、最新の時刻表でご確認ください。
-      </p>
-    </section>
-
-    <!-- 時刻表 (参考) -->
-    <section class="mb-16">
-      <SectionHeading as="h2" align="left" class="mb-6"
-        >時刻表（参考）</SectionHeading
-      >
-      <Card class="border-l-4 border-l-primary-soft px-6 py-6 md:px-8">
-        <p class="mb-4 leading-loose text-body">
-          電車・バスの時刻は季節や改定で変わります。お出かけ前に、各社の最新の時刻表をご確認ください。
-        </p>
-        <ul class="space-y-3">
-          {
-            timetables.map((t) => (
-              <li class="leading-relaxed">
-                <a
-                  href={t.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="font-medium text-accent-strong underline decoration-accent/40 underline-offset-4 hover:decoration-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                >
-                  {t.label}
-                </a>
-                <span class="block text-sm text-body/80">{t.note}</span>
-              </li>
-            ))
-          }
-        </ul>
       </Card>
     </section>
 
