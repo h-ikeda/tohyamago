@@ -31,22 +31,15 @@ const bankDetails = [
 // 寄付以外の支援の方法（情報設計: 各ページに次の一歩を置き迷子を作らない）
 const otherWays = [
   {
-    title: '会員として支える',
-    body: '会員として議論や意思決定に加わり、継続的に当会の運営を支えていただけます。年会費は 5,000 円です。',
-    href: '/membership',
-    cta: '入会案内を見る',
-    accent: 'border-l-primary-soft',
-  },
-  {
     title: '成果品の購入で支える',
-    body: '活動の中で実った下栗芋・お茶・蕎麦・大豆。お買い求めいただくことが、活動を継続する力となります。',
+    body: '活動の中で実った成果品。お買い求めいただくことが、活動を継続する力となります。',
     href: '/products',
     cta: '成果品を見る',
     accent: 'border-l-sunlight',
   },
   {
     title: '活動への参加で支える',
-    body: '何よりの支援は、共に活動する仲間が増えること。農作業の経験がなくても、お一人でも歓迎いたします。',
+    body: '何よりの支援は、共に活動する仲間が増えること。特別な知識や経験は必要ありません。お一人での参加も歓迎です。',
     href: '/join',
     cta: 'はじめての方へ',
     accent: 'border-l-accent',
@@ -155,7 +148,7 @@ const otherWays = [
             >寄付の使途</SectionHeading
           >
           <p class="indent-4 leading-loose text-body">
-            お寄せいただいた寄付は、遠山郷の景観・農地の保全、地域の暮らしや文化を守り継ぐ活動、ならびに当会の運営に、大切に活用いたします。
+            お寄せいただいた寄付は、当会の運営に、大切に活用いたします。
           </p>
         </Card>
 
@@ -213,7 +206,7 @@ const otherWays = [
       <p class="mb-6 indent-4 leading-loose text-body">
         寄付のほかにも、活動を支えていただける方法がございます。ご自身に合った方法で、ご支援いただけますと幸いです。
       </p>
-      <div class="grid gap-6 md:grid-cols-3">
+      <div class="grid gap-6 md:grid-cols-2">
         {
           otherWays.map((way) => (
             <Card
@@ -242,7 +235,7 @@ const otherWays = [
         >お問い合わせ</SectionHeading
       >
       <p class="mx-auto max-w-xl leading-loose text-body">
-        寄付の方法や領収書、活動内容などについてご不明な点がございましたら、お気軽にお問い合わせください。皆さまのご支援が、遠山郷の明日を支えております。
+        寄付の方法や領収書、活動内容などについてご不明な点がございましたら、お問い合わせください。皆さまのご支援が、遠山郷の明日を支えております。
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-3">
         <Button href={`mailto:${CONTACT_EMAIL}`} arrow={false}
