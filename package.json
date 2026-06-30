@@ -26,11 +26,11 @@
     "@astrojs/sitemap": "^3.7.3",
     "@pdftron/pdfjs-express-viewer": "^8.7.5",
     "@tailwindcss/vite": "^4.3.1",
-    "astro": "^7.0.2",
+    "astro": "^7.0.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "remark-breaks": "^4.0.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.2",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
@@ -52,7 +52,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "globals": "^17.6.0",
+    "globals": "^17.7.0",
     "jsdom": "^29.1.1",
     "prettier": "^3.8.4",
     "prettier-plugin-astro": "^0.14.1",
